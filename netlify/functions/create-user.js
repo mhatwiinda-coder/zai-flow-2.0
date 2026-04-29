@@ -15,13 +15,13 @@ const supabase = createClient(supabaseUrl, supabaseAdminKey, {
  * Netlify Function: Create User in Both Auth and Database
  * Handles user creation with automatic Supabase Auth + Database sync
  */
-export default async (req, event) => {
+export default async (req, context) => {
   // Only allow POST requests
   if (req.method !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method not allowed" }),
-    };
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   try {
@@ -29,12 +29,15 @@ export default async (req, event) => {
 
     // Validate required fields
     if (!email || !password || !name || !role || !business_id) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
+      return new Response(
+        JSON.stringify({
           error: "Missing required fields: email, password, name, role, business_id",
         }),
-      };
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     console.log(`🔄 Creating user: ${email}`);
@@ -49,12 +52,15 @@ export default async (req, event) => {
 
     if (authError) {
       console.error("❌ Auth creation failed:", authError);
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
+      return new Response(
+        JSON.stringify({
           error: `Failed to create auth user: ${authError.message}`,
         }),
-      };
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     console.log(`✅ Auth user created: ${authUser.user.id}`);
@@ -77,12 +83,15 @@ export default async (req, event) => {
       console.error("❌ Database creation failed:", dbError);
       // Rollback: delete the auth user since database insert failed
       await supabase.auth.admin.deleteUser(authUser.user.id);
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
+      return new Response(
+        JSON.stringify({
           error: `Failed to create database user: ${dbError.message}. Auth user rolled back.`,
         }),
-      };
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     console.log(`✅ Database user created: ${dbUser.id}`);
@@ -113,9 +122,8 @@ export default async (req, event) => {
 
     console.log(`✅ User ${email} created successfully`);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
+    return new Response(
+      JSON.stringify({
         success: true,
         user: {
           id: dbUser.id,
@@ -126,14 +134,21 @@ export default async (req, event) => {
         },
         message: `User ${email} created successfully with ${role} role`,
       }),
-    };
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("❌ Error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
+    return new Response(
+      JSON.stringify({
         error: `Server error: ${error.message}`,
       }),
-    };
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 };

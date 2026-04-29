@@ -15,22 +15,22 @@ const supabase = createClient(supabaseUrl, supabaseAdminKey, {
  * Netlify Function: Sync Existing Database Users to Supabase Auth
  * One-time migration to bring all database users into Supabase Auth
  */
-export default async (req, event) => {
+export default async (req, context) => {
   // Require POST request with auth header
   if (req.method !== "POST") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method not allowed" }),
-    };
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
-  // Simple auth check (you should update this with proper security)
-  const authHeader = req.headers.authorization;
+  // Simple auth check
+  const authHeader = req.headers.get("authorization");
   if (!authHeader || authHeader !== `Bearer ${process.env.SYNC_AUTH_TOKEN}`) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: "Unauthorized" }),
-    };
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   try {
@@ -118,21 +118,27 @@ export default async (req, event) => {
     console.log(`   Skipped: ${results.skipped}`);
     console.log(`   Errors: ${results.errors.length}`);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
+    return new Response(
+      JSON.stringify({
         success: true,
         message: "User sync completed",
         results: results,
       }),
-    };
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("❌ Sync error:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
+    return new Response(
+      JSON.stringify({
         error: `Sync failed: ${error.message}`,
       }),
-    };
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 };
