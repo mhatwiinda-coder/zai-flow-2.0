@@ -91,8 +91,8 @@ Netlify Dashboard → **Site Settings** → **Build & Deploy** → **Environment
 
 Add:
 ```
-SUPABASE_URL=https://your-project-id.supabase.co
-SUPABASE_ANON_KEY=your-key-here
+SUPABASE_URL=https://[your-project-id].supabase.co
+SUPABASE_ANON_KEY=[your-anon-key-here]
 ```
 
 ### 5️⃣ Test (2 min)

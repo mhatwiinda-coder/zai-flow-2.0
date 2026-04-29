@@ -23,9 +23,9 @@ Your Supabase Admin Key needs to be stored securely in Netlify as an environment
 5. Add these environment variables:
 
 ```
-SUPABASE_URL = https://your-project-id.supabase.co
-SUPABASE_ADMIN_KEY = [Your Service Role Key from Supabase Settings → API → Secret keys]
-SYNC_AUTH_TOKEN = [Create a strong random token for sync security]
+SUPABASE_URL = https://[your-project-id].supabase.co
+SUPABASE_ADMIN_KEY = [Your-Service-Role-Key-from-Supabase]
+SYNC_AUTH_TOKEN = [Your-Strong-Random-Token]
 ```
 
 **Get these values:**

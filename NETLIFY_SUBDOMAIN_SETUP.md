@@ -181,8 +181,8 @@ If you're using your own Supabase project:
 2. Click **"Edit variables"**
 3. Add:
    ```
-   SUPABASE_URL = https://your-project-id.supabase.co
-   SUPABASE_ANON_KEY = your-anon-key-here
+   SUPABASE_URL = https://[your-project-id].supabase.co
+   SUPABASE_ANON_KEY = [your-anon-key-here]
    ```
 4. Save and redeploy
 

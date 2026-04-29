@@ -173,8 +173,8 @@ git push origin main
 Edit `frontend/js/supabase-init.js`:
 
 ```javascript
-const SUPABASE_URL = 'https://your-project-id.supabase.co';
-const SUPABASE_ANON_KEY = 'your-key-here';
+const SUPABASE_URL = 'https://[your-project-id].supabase.co';
+const SUPABASE_ANON_KEY = '[your-anon-key-here]';
 ```
 
 Then push to Git (Netlify auto-deploys).

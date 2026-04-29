@@ -34,15 +34,15 @@ You have a fully functional ERP system ready for Netlify:
 
 **File:** `frontend/js/supabase-init.js`
 
-Currently using demo Supabase project:
+Currently configured to use environment variables:
 ```javascript
-const SUPABASE_URL = 'https://jzhwlablyxaeupvtpdce.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_obO2dwFXoF6nOKZ9nCG0Hg_V-cenHsB';
+const SUPABASE_URL = 'https://[your-project-id].supabase.co';
+const SUPABASE_ANON_KEY = '[your-anon-key-here]';
 ```
 
-**For your demo, you can either:**
-1. ✅ Use the existing demo Supabase (quickest)
-2. 🔄 Replace with your own Supabase project
+**For your demo, you must:**
+1. ✅ Use your own Supabase project (configured via environment variables)
+2. Never commit actual credentials to Git
 
 ---
 

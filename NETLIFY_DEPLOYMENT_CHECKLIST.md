@@ -7,7 +7,7 @@
 - [ ] Test app locally by opening `login.html` in browser
 - [ ] Test at least one complete user flow (login → module access)
 - [ ] Gather Supabase credentials:
-  - [ ] Project URL: `https://your-project-id.supabase.co`
+  - [ ] Project URL: `https://[your-project-id].supabase.co`
   - [ ] Anon Key: `eyJ...`
   - [ ] Backend API URL (if applicable): `https://api.example.com`
 
@@ -38,7 +38,7 @@
 
 ### Netlify Environment Variables
 - [ ] Go to **Site Settings** → **Build & Deploy** → **Environment**
-- [ ] Add variable: `SUPABASE_URL = https://your-project-id.supabase.co`
+- [ ] Add variable: `SUPABASE_URL = https://[your-project-id].supabase.co`
 - [ ] Add variable: `SUPABASE_ANON_KEY = your-key-here`
 - [ ] Add variable: `API_BASE_URL = https://your-api.com` (if applicable)
 - [ ] Save and redeploy site
@@ -54,10 +54,11 @@
 
 ### Update App Configuration (if needed)
 - [ ] Edit `frontend/js/supabase-init.js`
-- [ ] Update `SUPABASE_URL` with your project URL
-- [ ] Update `SUPABASE_ANON_KEY` with your anon key
+- [ ] Update `SUPABASE_URL` with your actual project URL from Supabase dashboard
+- [ ] Update `SUPABASE_ANON_KEY` with your anon key from Supabase dashboard
 - [ ] Commit and push changes
 - [ ] Netlify will auto-redeploy
+- [ ] ⚠️ Never commit actual API keys to Git - use environment variables
 
 ---
 
