@@ -51,7 +51,7 @@ git push -u origin main
 1. **In Netlify Dashboard**, go to **Site Settings** → **Build & Deploy** → **Environment**
 2. **Click "Edit variables"** and add:
    ```
-   SUPABASE_URL=https://your-project-id.supabase.co
+   SUPABASE_URL=https://[your-project-id].supabase.co
    SUPABASE_ANON_KEY=your-anon-key-here
    API_BASE_URL=https://your-api.example.com (if you have a backend)
    ```
@@ -88,7 +88,7 @@ netlify deploy --prod
 
 ### Step 4: Set Environment Variables
 ```bash
-netlify env:set SUPABASE_URL "https://your-project-id.supabase.co"
+netlify env:set SUPABASE_URL "https://[your-project-id].supabase.co"
 netlify env:set SUPABASE_ANON_KEY "your-anon-key-here"
 netlify env:set API_BASE_URL "https://your-api.example.com"
 ```
@@ -121,7 +121,7 @@ Supabase blocks requests from unknown origins. Update your CORS settings:
 The frontend loads Supabase configuration from `js/supabase-init.js`:
 
 ```javascript
-const SUPABASE_URL = 'https://your-project-id.supabase.co';
+const SUPABASE_URL = 'https://[your-project-id].supabase.co';
 const SUPABASE_ANON_KEY = 'your-anon-key-here';
 ```
 
@@ -133,7 +133,7 @@ Edit `frontend/js/supabase-init.js` and replace with your actual values.
 ### Option B: Use environment variables (Recommended)
 Update the file to read from environment:
 ```javascript
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://your-project-id.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://[your-project-id].supabase.co';
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'your-anon-key-here';
 ```
 
