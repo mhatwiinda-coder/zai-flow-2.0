@@ -1,4 +1,4 @@
-// Supabase login via RPC function
+// Supabase authentication - Direct client-side auth
 async function login() {
   const errorDiv = document.getElementById("error");
   errorDiv.textContent = "";
@@ -12,57 +12,76 @@ async function login() {
   }
 
   try {
-    // Call local login endpoint (uses Supabase SDK on server side)
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password
-      })
+    // Sign in with Supabase Auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
     });
 
-    if (!response.ok) {
-      throw new Error("Login request failed");
+    if (error) {
+      throw new Error(error.message || "Invalid email or password");
     }
 
-    const result = await response.json();
-    console.log("RPC response:", result);
-
-    // Result is now a single JSON object, not an array
-    if (!result || typeof result !== 'object') {
-      throw new Error("Invalid response from server");
+    if (!data.user) {
+      throw new Error("Login failed - no user returned");
     }
 
-    const user = result;
-    console.log("User data:", user);
+    console.log("✅ Supabase Auth successful:", data.user.email);
 
-    // Check if login was successful
-    if (!user.success) {
-      throw new Error(user.message || "Invalid email or password");
+    // Get user profile from database
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('id, name, email, role, business_id, branch_id')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profileError) {
+      console.warn("Profile fetch error:", profileError);
     }
 
-    // Store user info (including branches for multi-tenant)
+    // Store user info in localStorage
     const userInfo = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      branches: user.branches || [],
-      current_branch_id: user.current_branch_id,
-      current_business_id: user.current_business_id
+      id: data.user.id,
+      email: data.user.email,
+      name: profile?.name || data.user.user_metadata?.name || email.split('@')[0],
+      role: profile?.role || 'user',
+      business_id: profile?.business_id,
+      branch_id: profile?.branch_id,
+      auth_session: data.session
     };
-    localStorage.setItem("user", JSON.stringify(userInfo));
-    localStorage.setItem("token", user.id.toString());
 
-    // Redirect ALL users to employee landing page based on their role
-    // The employee landing page will load accessible modules based on user's role
-    // and display role-specific dashboard with clock in/out, tasks, notifications
+    localStorage.setItem("user", JSON.stringify(userInfo));
+    localStorage.setItem("token", data.session.access_token);
+
+    console.log("✅ User logged in:", userInfo.email);
+
+    // Redirect to employee landing page
     window.location.href = "employee-landing.html";
   } catch (err) {
     errorDiv.textContent = err.message || "Login failed. Please try again.";
-    console.error("Login error:", err);
+    console.error("❌ Login error:", err);
   }
+}
+
+// Logout function
+async function logout() {
+  try {
+    await supabase.auth.signOut();
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
+}
+
+// Check if user is logged in
+function isLoggedIn() {
+  return localStorage.getItem("user") !== null;
+}
+
+// Get current user
+function getCurrentUser() {
+  const userJson = localStorage.getItem("user");
+  return userJson ? JSON.parse(userJson) : null;
 }
