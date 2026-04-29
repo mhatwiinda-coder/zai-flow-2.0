@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZAI Flow | HR & Payroll</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <style>
+    .tabs-container {
+      display: flex;
+      gap: 2px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .tab-button {
+      padding: 12px 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 2px solid rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px 8px 0 0;
+      transition: all 0.3s ease;
+    }
+    .tab-button:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+    .tab-button.active {
+      background: linear-gradient(135deg, rgba(247, 201, 72, 0.2), rgba(255, 207, 64, 0.2));
+      border-bottom-color: #f7c948;
+      color: #f7c948;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .form-grid.full {
+      grid-template-columns: 1fr;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px 12px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: white;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .form-group textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.7);
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    tr:hover {
+      background: rgba(255,255,255,0.03);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-active { background: rgba(40,199,111,0.2); color: #28c76f; }
+    .status-inactive { background: rgba(255,159,67,0.2); color: #ff9f43; }
+    .status-terminated { background: rgba(234,84,85,0.2); color: #ea5455; }
+    .status-pending { background: rgba(100,164,255,0.2); color: #64a4ff; }
+    .status-approved { background: rgba(40,199,111,0.2); color: #28c76f; }
+    .status-rejected { background: rgba(234,84,85,0.2); color: #ea5455; }
+    .action-buttons {
+      display: flex;
+      gap: 6px;
+    }
+    .action-buttons button {
+      padding: 4px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .btn-edit {
+      background: rgba(100,164,255,0.2);
+      color: #64a4ff;
+    }
+    .btn-view {
+      background: rgba(100,164,255,0.2);
+      color: #64a4ff;
+    }
+    .btn-approve {
+      background: rgba(40,199,111,0.2);
+      color: #28c76f;
+    }
+    .btn-reject {
+      background: rgba(234,84,85,0.2);
+      color: #ea5455;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .metric-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #f7c948;
+      margin-bottom: 8px;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .chart-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .chart-card h3 {
+      margin: 0 0 16px;
+      font-size: 14px;
+      color: white;
+    }
+    .no-data {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255,255,255,0.5);
+    }
+    @media (max-width: 1200px) {
+      .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <img src="assets/logo.png" class="logo" />
+    <a href="dashboard.html">Dashboard</a>
+    <a href="inventory.html">Inventory</a>
+    <a href="accounting.html">Accounting</a>
+    <a href="sales.html">Sales / POS</a>
+    <a href="purchasing.html">Purchasing</a>
+    <a href="hr.html" class="active">HR & Payroll</a>
+    <a href="bi.html">BI Dashboard</a>
+    <a href="zra.html">ZRA Smart Invoice</a>
+  <a href="#" onclick="logout()">Logout</a>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <div class="topbar">
+      <h2>👥 HR & Payroll Management</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
+        <div>
+          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
+          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+        </div>
+        <div id="userInfo"></div>
+        <button onclick="refreshHR()" class="refresh-btn" title="Refresh HR Module">🔄</button>
+      </div>
+    </div>
+
+    <!-- TABS NAVIGATION -->
+    <div class="tabs-container">
+      <button class="tab-button active" onclick="switchTab('employee-dir')">📋 Employees</button>
+      <button class="tab-button" onclick="switchTab('payroll')">💰 Payroll</button>
+      <button class="tab-button" onclick="switchTab('attendance')">📅 Attendance</button>
+      <button class="tab-button" onclick="switchTab('leave')">🏖️ Leave Requests</button>
+      <button class="tab-button" onclick="switchTab('analytics')">📊 Analytics</button>
+    </div>
+
+    <!-- ========== TAB 1: EMPLOYEE DIRECTORY ========== -->
+    <div id="employee-dir" class="tab-content active">
+      <div class="dashboard-section">
+        <h3>Employee Directory</h3>
+
+        <!-- Add Employee Button -->
+        <div style="margin-bottom: 20px;">
+          <button class="btn-primary" onclick="openEmployeeModal()" style="width: auto;">➕ Add Employee</button>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="form-grid">
+          <input type="text" id="employeeSearch" placeholder="Search by name or employee code..."
+                 oninput="filterEmployeeTable()">
+          <select id="employeeStatusFilter" onchange="filterEmployeeTable()">
+            <option value="">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+            <option value="TERMINATED">Terminated</option>
+          </select>
+        </div>
+
+        <!-- Employee Table -->
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Code</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Position</th>
+                <th>Status</th>
+                <th>Hire Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="employeeTable"></tbody>
+          </table>
+          <p id="noEmployees" class="no-data">No employees found</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TAB 2: PAYROLL ========== -->
+    <div id="payroll" class="tab-content">
+      <div class="dashboard-section">
+        <h3>Payroll Processing</h3>
+
+        <!-- Payroll Run Controls -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Month</label>
+            <select id="payrollMonth">
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4" selected>April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <select id="payrollYear">
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
+              <option value="2026" selected>2026</option>
+              <option value="2027">2027</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <button class="btn-primary" onclick="runPayroll()">🚀 Run Payroll</button>
+          <button class="btn-secondary" onclick="loadPayrollSummary()" style="margin-left: 10px;">↻ Load Current</button>
+        </div>
+
+        <!-- Payroll Summary -->
+        <div id="payrollSummaryCard" style="display: none; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <h4>Payroll Summary</h4>
+          <div class="form-grid">
+            <div>
+              <strong>Total Gross:</strong> <span id="totalGross" class="metric-value">K 0.00</span>
+            </div>
+            <div>
+              <strong>Total Deductions:</strong> <span id="totalDeductions" class="metric-value">K 0.00</span>
+            </div>
+            <div>
+              <strong>Total Net:</strong> <span id="totalNet" class="metric-value">K 0.00</span>
+            </div>
+            <div>
+              <strong>Employees:</strong> <span id="employeeCount" class="metric-value">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payroll Details Table -->
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Code</th>
+                <th>Name</th>
+                <th>Gross Salary</th>
+                <th>PAYE Tax</th>
+                <th>Pension</th>
+                <th>Other Deductions</th>
+                <th>Net Salary</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="payrollTable"></tbody>
+          </table>
+          <p id="noPayrollData" class="no-data">No payroll data loaded</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TAB 3: ATTENDANCE ========== -->
+    <div id="attendance" class="tab-content">
+      <div class="dashboard-section">
+        <h3>Attendance Tracking</h3>
+
+        <!-- Date Range Selector -->
+        <div class="form-grid">
+          <div class="form-group">
+            <label>From Date</label>
+            <input type="date" id="attendanceFromDate">
+          </div>
+          <div class="form-group">
+            <label>To Date</label>
+            <input type="date" id="attendanceToDate">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <button class="btn-primary" onclick="loadAttendanceData()">📋 Load Attendance</button>
+          <button class="btn-secondary" onclick="markAllPresent()" style="margin-left: 10px;">✅ Mark All Present</button>
+          <button class="btn-secondary" onclick="markAllAbsent()" style="margin-left: 10px;">❌ Mark All Absent</button>
+        </div>
+
+        <!-- Attendance Table -->
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee Code</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Hours Worked</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTable"></tbody>
+          </table>
+          <p id="noAttendanceData" class="no-data">No attendance data loaded</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TAB 4: LEAVE REQUESTS ========== -->
+    <div id="leave" class="tab-content">
+      <div class="dashboard-section">
+        <h3>Leave Management</h3>
+
+        <!-- Filter -->
+        <div class="form-grid">
+          <select id="leaveStatusFilter" onchange="loadLeaveRequests()">
+            <option value="">All Status</option>
+            <option value="PENDING">Pending Approval</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+        </div>
+
+        <!-- Leave Requests Table -->
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Leave Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Days</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leaveTable"></tbody>
+          </table>
+          <p id="noLeaveData" class="no-data">No leave requests</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TAB 5: HR ANALYTICS ========== -->
+    <div id="analytics" class="tab-content">
+      <div class="dashboard-section">
+        <h3>HR Analytics & Metrics</h3>
+
+        <!-- KPI Cards -->
+        <div class="dashboard-grid">
+          <div class="metric-card">
+            <div class="metric-value" id="totalHeadcount">0</div>
+            <div class="metric-label">Total Headcount</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" id="activeEmployees">0</div>
+            <div class="metric-label">Active Employees</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" id="onLeaveToday">0</div>
+            <div class="metric-label">On Leave Today</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" id="absentToday">0</div>
+            <div class="metric-label">Absent Today</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Headcount by Department</h3>
+            <canvas id="departmentChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Attendance Rate This Month</h3>
+            <canvas id="attendanceChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Turnover Metrics -->
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
+          <h4>Turnover Metrics</h4>
+          <div class="form-grid">
+            <div>
+              <strong>Terminations This Year:</strong> <span id="terminationsYear">0</span>
+            </div>
+            <div>
+              <strong>Average Tenure (months):</strong> <span id="avgTenure">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- EMPLOYEE MODAL -->
+<div id="employeeModal" class="modal" style="display:none;">
+  <div class="modal-box" style="max-height: 90vh; overflow-y: auto;">
+    <h3>👤 Add/Edit Employee</h3>
+
+    <div class="form-grid full">
+      <div class="form-group">
+        <label>Employee Code *</label>
+        <input type="text" id="empCode" placeholder="e.g., EMP-001">
+      </div>
+      <div class="form-group">
+        <label>First Name *</label>
+        <input type="text" id="empFirstName" placeholder="First Name">
+      </div>
+      <div class="form-group">
+        <label>Last Name *</label>
+        <input type="text" id="empLastName" placeholder="Last Name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="empEmail" placeholder="email@example.com">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="empPhone" placeholder="+260 xxx xxx xxx">
+      </div>
+      <div class="form-group">
+        <label>Department *</label>
+        <select id="empDepartment">
+          <option value="">Select Department</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Position *</label>
+        <input type="text" id="empPosition" placeholder="Job Title">
+      </div>
+      <div class="form-group">
+        <label>Hire Date *</label>
+        <input type="date" id="empHireDate">
+      </div>
+      <div class="form-group">
+        <label>Basic Salary *</label>
+        <input type="number" id="empBasicSalary" placeholder="10000" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="empStatus">
+          <option value="ACTIVE">Active</option>
+          <option value="INACTIVE">Inactive</option>
+          <option value="TERMINATED">Terminated</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+      <button onclick="saveEmployee()" class="btn-primary" style="flex: 1;">✅ Save</button>
+      <button onclick="document.getElementById('employeeModal').style.display='none';" class="btn-danger" style="flex: 1;">❌ Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) {
+    window.location.href = "login.html";
+  }
+  document.getElementById("userInfo").innerText = user.name + " (" + user.role + ")";
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+
+  function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    // Show selected tab
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+
+    // Load data for the tab
+    if (tabName === 'analytics') loadHRAnalytics();
+    else if (tabName === 'attendance') loadAttendanceData();
+    else if (tabName === 'leave') loadLeaveRequests();
+  }
+
+  function refreshHR() {
+    initHR();
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
+<script src="js/branch-context.js"></script>
+<script src="js/hr.js"></script>
+<script src="js/payroll.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZAI Flow | Accounting</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <img src="assets/logo.png" class="logo" />
+    <a href="dashboard.html">Dashboard</a>
+    <a href="inventory.html">Inventory</a>
+    <a href="accounting.html" class="active">Accounting</a>
+    <a href="sales.html">Sales / POS</a>
+    <a href="purchasing.html">Purchasing</a>
+    <a href="hr.html">HR & Payroll</a>
+    <a href="bi.html">BI Dashboard</a>
+    <a href="zra.html">ZRA Smart Invoice</a>
+  <a href="#" onclick="logout()">Logout</a>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <div class="topbar">
+      <h2>Professional Accounting Suite</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
+        <div>
+          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
+          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+        </div>
+        <div id="userInfo"></div>
+        <button onclick="refreshAccounting()" class="refresh-btn" title="Refresh Reports">🔄</button>
+      </div>
+    </div>
+
+    <!-- FINANCIAL SUMMARY KPI CARDS -->
+    <div class="dashboard-section">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <!-- Net Income -->
+        <div class="dashboard-kpi" style="background: linear-gradient(135deg, rgba(40, 199, 111, 0.12) 0%, rgba(40, 199, 111, 0.04) 100%); border-top: 3px solid #28c76f;">
+          <div class="kpi-header">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-label">Net Income</div>
+          </div>
+          <div class="kpi-content">
+            <div class="metric-value" id="netIncomeValue" style="color: #28c76f;">0.00</div>
+            <div class="kpi-detail">Current Period</div>
+          </div>
+        </div>
+
+        <!-- Total Assets -->
+        <div class="dashboard-kpi" style="background: linear-gradient(135deg, rgba(0, 188, 212, 0.12) 0%, rgba(0, 188, 212, 0.04) 100%); border-top: 3px solid #00bcd4;">
+          <div class="kpi-header">
+            <div class="kpi-icon">📊</div>
+            <div class="kpi-label">Total Assets</div>
+          </div>
+          <div class="kpi-content">
+            <div class="metric-value" id="totalAssetsValue" style="color: #00bcd4;">0.00</div>
+            <div class="kpi-detail">Balance Sheet</div>
+          </div>
+        </div>
+
+        <!-- Revenue -->
+        <div class="dashboard-kpi" style="background: linear-gradient(135deg, rgba(255, 159, 67, 0.12) 0%, rgba(255, 159, 67, 0.04) 100%); border-top: 3px solid #ff9f43;">
+          <div class="kpi-header">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-label">Total Revenue</div>
+          </div>
+          <div class="kpi-content">
+            <div class="metric-value" id="totalRevenueValue" style="color: #ff9f43;">0.00</div>
+            <div class="kpi-detail">Period Sales</div>
+          </div>
+        </div>
+
+        <!-- Balance Status -->
+        <div class="dashboard-kpi" style="background: linear-gradient(135deg, rgba(115, 103, 240, 0.12) 0%, rgba(115, 103, 240, 0.04) 100%); border-top: 3px solid #7367f0;">
+          <div class="kpi-header">
+            <div class="kpi-icon">⚖️</div>
+            <div class="kpi-label">Balance Status</div>
+          </div>
+          <div class="kpi-content">
+            <div class="metric-value" id="balanceStatusValue" style="color: #7367f0; font-size: 20px;">✓ Balanced</div>
+            <div class="kpi-detail">Assets = Liabilities + Equity</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PERIOD SELECTION -->
+    <div class="dashboard-section">
+      <div class="period-selector">
+        <h3>📅 Reporting Period</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; align-items: end;">
+          <div>
+            <label>Period Type</label>
+            <select id="periodType" onchange="updatePeriodDates()">
+              <option value="month">Current Month</option>
+              <option value="quarter">Current Quarter</option>
+              <option value="year">Current Year</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
+          <div>
+            <label>From Date</label>
+            <input type="date" id="fromDate" onchange="loadAllReports()" />
+          </div>
+          <div>
+            <label>To Date</label>
+            <input type="date" id="toDate" onchange="loadAllReports()" />
+          </div>
+          <button class="btn-secondary" onclick="loadAllReports()">Apply Filter</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB NAVIGATION -->
+    <div class="dashboard-section">
+      <div class="accounting-tabs-container">
+        <div class="accounting-tabs">
+          <button class="tab-button active" onclick="switchTab('pl')">📊 P&L Statement</button>
+          <button class="tab-button" onclick="switchTab('balancesheet')">🏦 Balance Sheet</button>
+          <button class="tab-button" onclick="switchTab('trialbalance')">⚖️ Trial Balance</button>
+          <button class="tab-button" onclick="switchTab('ledger')">📖 General Ledger</button>
+          <button class="tab-button" onclick="switchTab('export')">📤 Export Reports</button>
+        </div>
+
+        <!-- TAB 1: P&L STATEMENT -->
+        <div id="tab-pl" class="tab-content active">
+          <div class="financial-statement">
+            <h3 style="text-align: center; margin-bottom: 24px;">📊 Profit & Loss Statement</h3>
+
+            <div class="statement-section">
+              <div class="statement-header">
+                <span>REVENUE</span>
+                <span style="font-weight: bold;">Amount</span>
+              </div>
+              <div id="plRevenues"></div>
+              <div class="statement-total" style="border-top: 2px solid rgba(255,255,255,0.2); padding-top: 12px;">
+                <span>Total Revenue</span>
+                <span id="plTotalRevenue" style="color: #28c76f; font-weight: bold;">K 0.00</span>
+              </div>
+            </div>
+
+            <div class="statement-section" style="margin-top: 24px;">
+              <div class="statement-header">
+                <span>COST OF GOODS SOLD</span>
+                <span style="font-weight: bold;">Amount</span>
+              </div>
+              <div id="plCogs"></div>
+              <div class="statement-total" style="border-top: 2px solid rgba(255,255,255,0.2); padding-top: 12px;">
+                <span>Total COGS</span>
+                <span id="plTotalCogs" style="color: #ff5b5b; font-weight: bold;">K 0.00</span>
+              </div>
+            </div>
+
+            <div class="statement-section" style="margin-top: 24px; background: rgba(40, 199, 111, 0.08); padding: 16px; border-radius: 8px; border-left: 4px solid #28c76f;">
+              <div class="statement-total">
+                <span style="font-size: 16px; font-weight: 600;">GROSS PROFIT</span>
+                <span id="plGrossProfit" style="color: #28c76f; font-weight: bold; font-size: 16px;">K 0.00</span>
+              </div>
+              <div style="text-align: right; font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 8px;">
+                Margin: <span id="plGrossMargin">0%</span>
+              </div>
+            </div>
+
+            <div class="statement-section" style="margin-top: 24px;">
+              <div class="statement-header">
+                <span>OPERATING EXPENSES</span>
+                <span style="font-weight: bold;">Amount</span>
+              </div>
+              <div id="plExpenses"></div>
+              <div class="statement-total" style="border-top: 2px solid rgba(255,255,255,0.2); padding-top: 12px;">
+                <span>Total Expenses</span>
+                <span id="plTotalExpenses" style="color: #ff5b5b; font-weight: bold;">K 0.00</span>
+              </div>
+            </div>
+
+            <div class="statement-section" style="margin-top: 24px; background: rgba(115, 103, 240, 0.08); padding: 16px; border-radius: 8px; border-left: 4px solid #7367f0;">
+              <div class="statement-total">
+                <span style="font-size: 18px; font-weight: 700;">NET INCOME</span>
+                <span id="plNetIncome" style="color: #7367f0; font-weight: bold; font-size: 18px;">K 0.00</span>
+              </div>
+              <div style="text-align: right; font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 8px;">
+                Operating Margin: <span id="plNetMargin">0%</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.04); border-radius: 8px; border-top: 1px dashed rgba(255,255,255,0.2);">
+              <div style="font-size: 12px; color: rgba(255,255,255,0.6);">
+                <strong>Prior Period Comparison:</strong> <span id="plTrend" style="color: #28c76f;">↗ +12.5%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: BALANCE SHEET -->
+        <div id="tab-balancesheet" class="tab-content">
+          <div class="financial-statement">
+            <h3 style="text-align: center; margin-bottom: 24px;">🏦 Balance Sheet</h3>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              <!-- ASSETS -->
+              <div class="statement-section">
+                <div class="statement-header" style="margin-bottom: 16px; color: #00bcd4;">
+                  <span style="font-size: 16px; font-weight: 700;">ASSETS</span>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                  <div style="font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    Current Assets
+                  </div>
+                  <div id="bsCurrentAssets" style="margin-left: 12px;"></div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                  <div style="font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    Fixed Assets
+                  </div>
+                  <div id="bsFixedAssets" style="margin-left: 12px;"></div>
+                </div>
+
+                <div class="statement-total" style="border-top: 2px solid rgba(255,255,255,0.2); padding-top: 12px; background: rgba(0, 188, 212, 0.08);">
+                  <span style="font-weight: 700; color: #00bcd4;">TOTAL ASSETS</span>
+                  <span id="bsTotalAssets" style="color: #00bcd4; font-weight: 700;">K 0.00</span>
+                </div>
+              </div>
+
+              <!-- LIABILITIES & EQUITY -->
+              <div>
+                <div class="statement-section">
+                  <div class="statement-header" style="margin-bottom: 16px; color: #ff9f43;">
+                    <span style="font-size: 16px; font-weight: 700;">LIABILITIES</span>
+                  </div>
+
+                  <div style="margin-bottom: 20px;">
+                    <div style="font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                      Current Liabilities
+                    </div>
+                    <div id="bsCurrentLiabilities" style="margin-left: 12px;"></div>
+                  </div>
+
+                  <div style="margin-bottom: 20px;">
+                    <div style="font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                      Long-term Liabilities
+                    </div>
+                    <div id="bsLongTermLiabilities" style="margin-left: 12px;"></div>
+                  </div>
+
+                  <div class="statement-total" style="border-top: 2px solid rgba(255,255,255,0.2); padding-top: 12px; margin-bottom: 20px; background: rgba(255, 159, 67, 0.08);">
+                    <span style="font-weight: 700; color: #ff9f43;">TOTAL LIABILITIES</span>
+                    <span id="bsTotalLiabilities" style="color: #ff9f43; font-weight: 700;">K 0.00</span>
+                  </div>
+                </div>
+
+                <div class="statement-section">
+                  <div class="statement-header" style="margin-bottom: 16px; color: #28c76f;">
+                    <span style="font-size: 16px; font-weight: 700;">EQUITY</span>
+                  </div>
+                  <div id="bsEquity"></div>
+
+                  <div class="statement-total" style="border-top: 2px solid rgba(255,255,255,0.2); padding-top: 12px; background: rgba(40, 199, 111, 0.08);">
+                    <span style="font-weight: 700; color: #28c76f;">TOTAL EQUITY</span>
+                    <span id="bsTotalEquity" style="color: #28c76f; font-weight: 700;">K 0.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BALANCE VALIDATION -->
+            <div style="margin-top: 24px; padding: 16px; background: rgba(40, 199, 111, 0.08); border-radius: 8px; border-left: 4px solid #28c76f;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 600;">Balance Verification:</span>
+                <span id="balanceVerification" style="font-weight: 700; color: #28c76f;">✓ BALANCED</span>
+              </div>
+              <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 8px;">
+                Assets (K <span id="bsAssetsCheck">0.00</span>) = Liabilities + Equity (K <span id="bsLiabilitiesEquityCheck">0.00</span>)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: TRIAL BALANCE -->
+        <div id="tab-trialbalance" class="tab-content">
+          <div class="financial-statement">
+            <h3 style="text-align: center; margin-bottom: 24px;">⚖️ Trial Balance</h3>
+
+            <div style="overflow-x: auto;">
+              <table class="financial-table">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Account Name</th>
+                    <th>Type</th>
+                    <th class="debit-credit">Debit</th>
+                    <th class="debit-credit">Credit</th>
+                    <th class="debit-credit">Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="trialBalanceTable"></tbody>
+              </table>
+            </div>
+
+            <!-- TRIAL BALANCE TOTALS -->
+            <div style="margin-top: 24px; padding: 16px; background: rgba(115, 103, 240, 0.08); border-radius: 8px; border-left: 4px solid #7367f0;">
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <div>
+                  <div style="color: rgba(255,255,255,0.6); font-size: 12px;">Total Debits</div>
+                  <div id="tbTotalDebits" style="font-size: 18px; font-weight: 700; color: #7367f0;">K 0.00</div>
+                </div>
+                <div>
+                  <div style="color: rgba(255,255,255,0.6); font-size: 12px;">Total Credits</div>
+                  <div id="tbTotalCredits" style="font-size: 18px; font-weight: 700; color: #ff9f43;">K 0.00</div>
+                </div>
+                <div style="text-align: center; padding-top: 12px; border-top: 2px solid rgba(255,255,255,0.1);">
+                  <div style="color: rgba(255,255,255,0.6); font-size: 12px;">Status</div>
+                  <div id="tbBalanceStatus" style="font-size: 16px; font-weight: 700; color: #28c76f;">✓ Balanced</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: GENERAL LEDGER -->
+        <div id="tab-ledger" class="tab-content">
+          <div class="financial-statement">
+            <h3 style="margin-bottom: 24px;">📖 General Ledger</h3>
+
+            <!-- LEDGER FILTERS -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+              <div>
+                <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px;">Filter by Account</label>
+                <input type="text" id="ledgerAccountFilter" placeholder="Account name or code" onkeyup="filterGeneralLedger()" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3); color: white;" />
+              </div>
+              <div>
+                <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px;">Filter by Reference</label>
+                <input type="text" id="ledgerReferenceFilter" placeholder="SALE-123, etc" onkeyup="filterGeneralLedger()" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3); color: white;" />
+              </div>
+              <div>
+                <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 6px;">&nbsp;</label>
+                <button class="btn-secondary" onclick="clearLedgerFilters()" style="width: 100%;">Clear Filters</button>
+              </div>
+            </div>
+
+            <!-- LEDGER TABLE -->
+            <div style="overflow-x: auto;">
+              <table class="financial-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Reference</th>
+                    <th>Description</th>
+                    <th>Account</th>
+                    <th class="debit-credit">Debit</th>
+                    <th class="debit-credit">Credit</th>
+                    <th class="debit-credit">Running Balance</th>
+                  </tr>
+                </thead>
+                <tbody id="ledgerTable"></tbody>
+              </table>
+            </div>
+
+            <div style="margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.6); text-align: center;">
+              <span id="ledgerEntryCount">0</span> entries loaded
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: EXPORT REPORTS -->
+        <div id="tab-export" class="tab-content">
+          <div class="financial-statement">
+            <h3 style="text-align: center; margin-bottom: 32px;">📤 Export Reports</h3>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+              <!-- EXPORT P&L -->
+              <div style="background: linear-gradient(135deg, rgba(40, 199, 111, 0.12) 0%, rgba(40, 199, 111, 0.04) 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #28c76f;">
+                <h4 style="color: #28c76f; margin-bottom: 12px;">📊 P&L Statement</h4>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                  Export income statement for the selected period to Excel format.
+                </p>
+                <button class="btn-primary" onclick="exportPLToExcel()" style="width: 100%; background: #28c76f;">Download Excel</button>
+              </div>
+
+              <!-- EXPORT BALANCE SHEET -->
+              <div style="background: linear-gradient(135deg, rgba(0, 188, 212, 0.12) 0%, rgba(0, 188, 212, 0.04) 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #00bcd4;">
+                <h4 style="color: #00bcd4; margin-bottom: 12px;">🏦 Balance Sheet</h4>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                  Export the complete balance sheet snapshot to Excel.
+                </p>
+                <button class="btn-primary" onclick="exportBalanceSheetToExcel()" style="width: 100%; background: #00bcd4;">Download Excel</button>
+              </div>
+
+              <!-- EXPORT TRIAL BALANCE -->
+              <div style="background: linear-gradient(135deg, rgba(255, 159, 67, 0.12) 0%, rgba(255, 159, 67, 0.04) 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #ff9f43;">
+                <h4 style="color: #ff9f43; margin-bottom: 12px;">⚖️ Trial Balance</h4>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                  Export trial balance with all account balances to Excel.
+                </p>
+                <button class="btn-primary" onclick="exportTrialBalanceToExcel()" style="width: 100%; background: #ff9f43;">Download Excel</button>
+              </div>
+
+              <!-- EXPORT LEDGER -->
+              <div style="background: linear-gradient(135deg, rgba(115, 103, 240, 0.12) 0%, rgba(115, 103, 240, 0.04) 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #7367f0;">
+                <h4 style="color: #7367f0; margin-bottom: 12px;">📖 General Ledger</h4>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                  Export all journal entries in CSV format for detailed analysis.
+                </p>
+                <button class="btn-primary" onclick="exportLedgerToCSV()" style="width: 100%; background: #7367f0;">Download CSV</button>
+              </div>
+
+              <!-- EXPORT ALL -->
+              <div style="background: linear-gradient(135deg, rgba(244, 199, 72, 0.12) 0%, rgba(244, 199, 72, 0.04) 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #f4c748; grid-column: 1 / -1;">
+                <h4 style="color: #f4c748; margin-bottom: 12px;">📦 Export All Reports</h4>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                  Download all reports at once in a zipped archive for comprehensive record-keeping.
+                </p>
+                <button class="btn-primary" onclick="exportAllReports()" style="width: 100%; background: #f4c748; color: #1a1a2e;">Download All (ZIP)</button>
+              </div>
+            </div>
+
+            <!-- EXPORT HISTORY -->
+            <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+              <h4 style="margin-bottom: 16px;">📋 Recent Exports</h4>
+              <div id="exportHistory">
+                <p style="font-size: 13px; color: rgba(255,255,255,0.6); text-align: center;">No exports yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- FOOTER SCRIPTS -->
+
+<script>
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) {
+    window.location.href = "login.html";
+  }
+  document.getElementById("userInfo").innerText = user.name + " (" + user.role + ")";
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
+<script src="js/branch-context.js"></script>
+<script src="js/accounting.js"></script>
+
+</body>
+</html>

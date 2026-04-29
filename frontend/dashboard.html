@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ZAI Flow — Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-init.js"></script>
+  <script src="branch-context.js"></script>
+</head>
+<body>
+<script>
+  // Sidebar will be managed by sidebar-manager.js for dynamic role-based display
+</script>
+
+<div class="app">
+
+  <!-- SIDEBAR (dynamically populated by sidebar-manager.js) -->
+  <aside class="sidebar">
+    <img src="assets/logo.png" class="logo" />
+    <!-- Modules will be loaded here based on user role -->
+  </aside>
+
+
+
+  <!-- MAIN -->
+  <main>
+    <div class="topbar">
+      <h2>Welcome to ZAI Flow</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
+        <div>
+          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
+          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+        </div>
+        <div id="userInfo"></div>
+        <button onclick="refreshDashboard()" class="refresh-btn" title="Refresh Dashboard">🔄</button>
+      </div>
+    </div>
+
+    <!-- KPI CARDS ROW -->
+    <div class="dashboard-kpi-row">
+      <!-- SALES KPI -->
+      <div class="dashboard-kpi kpi-sales">
+        <div class="kpi-header">
+          <div class="kpi-icon">📊</div>
+          <div class="kpi-label">Today's Sales</div>
+        </div>
+        <div class="kpi-content">
+          <div class="metric-value" id="salesValue">0.00</div>
+          <div class="kpi-footer">
+            <span class="metric-unit">ZMW</span>
+            <span class="trend-badge" id="salesTrend">-</span>
+          </div>
+          <div class="kpi-detail">
+            <span id="salesCount">0</span> transactions
+          </div>
+        </div>
+      </div>
+
+      <!-- INVENTORY KPI -->
+      <div class="dashboard-kpi kpi-inventory">
+        <div class="kpi-header">
+          <div class="kpi-icon">📦</div>
+          <div class="kpi-label">Inventory Value</div>
+        </div>
+        <div class="kpi-content">
+          <div class="metric-value" id="inventoryValue">0.00</div>
+          <div class="kpi-footer">
+            <span class="metric-unit">ZMW</span>
+            <span class="alert-badge" id="inventoryAlert">!</span>
+          </div>
+          <div class="kpi-detail">
+            <span id="lowStockCount">0</span> low stock
+          </div>
+        </div>
+      </div>
+
+      <!-- FINANCIAL KPI -->
+      <div class="dashboard-kpi kpi-financial">
+        <div class="kpi-header">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-label">Net Balance</div>
+        </div>
+        <div class="kpi-content">
+          <div class="metric-value" id="financialValue">0.00</div>
+          <div class="kpi-footer">
+            <span class="metric-unit">ZMW</span>
+            <span class="trend-badge" id="financialTrend">-</span>
+          </div>
+          <div class="kpi-detail">
+            <span id="revenueRatio">0%</span> revenue ratio
+          </div>
+        </div>
+      </div>
+
+      <!-- CASH MANAGEMENT KPI -->
+      <div class="dashboard-kpi kpi-cash">
+        <div class="kpi-header">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-label">Cash Drawer</div>
+        </div>
+        <div class="kpi-content">
+          <div class="metric-value" id="drawerStatus">CLOSED</div>
+          <div class="kpi-footer">
+            <span class="metric-unit" id="drawerBalance">0.00</span>
+            <span class="variance-badge" id="drawerVariance">-</span>
+          </div>
+          <div class="kpi-detail">
+            <span id="drawerDifference">0%</span> variance
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS SECTION -->
+    <div class="dashboard-section">
+      <h3 class="section-title">Business Analytics</h3>
+      <div class="charts-row">
+        <!-- SALES TREND CHART -->
+        <div class="dashboard-chart">
+          <h4>Sales Trend (7 Days)</h4>
+          <canvas id="salesTrendChart"></canvas>
+          <div class="chart-loading" id="salesChartLoading">Loading...</div>
+        </div>
+
+        <!-- PAYMENT METHOD DISTRIBUTION -->
+        <div class="dashboard-chart">
+          <h4>Payment Methods</h4>
+          <canvas id="paymentDistributionChart"></canvas>
+          <div class="chart-loading" id="paymentChartLoading">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK ALERTS & RECENT TRANSACTIONS -->
+    <div class="dashboard-section">
+      <div class="alerts-row">
+        <!-- LOW STOCK ALERTS -->
+        <div class="alerts-card">
+          <h3>⚠️ Low Stock Items</h3>
+          <div class="alerts-list" id="lowStockList">
+            <p class="no-data">No low stock alerts</p>
+          </div>
+        </div>
+
+        <!-- RECENT TRANSACTIONS -->
+        <div class="alerts-card">
+          <h3>📝 Recent Sales</h3>
+          <div class="alerts-list" id="recentSalesList">
+            <p class="no-data">No recent sales</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYSTEM STATUS (Collapsed) -->
+    <div class="dashboard-section">
+      <details class="system-status">
+        <summary>System Status</summary>
+        <div class="glass">
+          <p>✅ Authentication: Active</p>
+          <p id="salesStatus">📊 Sales Module: Loading...</p>
+          <p id="inventoryStatus">📦 Inventory Module: Loading...</p>
+          <p id="accountingStatus">💼 Accounting Module: Loading...</p>
+        </div>
+      </details>
+    </div>
+  </main>
+
+</div>
+
+<script>
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) {
+    window.location.href = "login.html";
+  }
+
+  document.getElementById("userInfo").innerText =
+    user.name + " (" + user.role + ")";
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
+<script src="branch-context.js"></script>
+<script src="js/sidebar-manager.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

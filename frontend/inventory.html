@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZAI Flow | Inventory</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/@ericblade/quagga2/dist/quagga.js"></script>
+  
+  </head>
+<body>
+
+<div class="app">
+
+<aside class="sidebar">
+  <img src="assets/logo.png" class="logo" />
+ <a href="dashboard.html">Dashboard</a>
+  <a href="inventory.html">Inventory</a>
+  <a href="accounting.html">Accounting</a>
+  <a href="sales.html">Sales / POS</a>
+  <a href="purchasing.html">Purchasing</a>
+  <a href="hr.html">HR & Payroll</a>
+  <a href="bi.html">BI Dashboard</a>
+  <a href="zra.html">ZRA Smart Invoice</a>
+  <a href="#" onclick="logout()">Logout</a>
+</aside>
+
+<main>
+  <div class="topbar">
+    <h2>Inventory Management</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
+      <div>
+        <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
+        <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+      </div>
+      <div id="userInfo"></div>
+    </div>
+  </div>
+
+  <!-- BARCODE SCANNER CARD -->
+  <div class="dashboard-section">
+    <div class="scanner-card">
+      <div class="scanner-header">
+        <h3>📱 Barcode Scanner</h3>
+        <button onclick="toggleCamera()" class="scanner-toggle" id="cameraBtn">Start Camera</button>
+        <button onclick="toggleManualEntry()" class="manual-toggle">Manual Entry</button>
+      </div>
+
+      <!-- Camera Feed Container -->
+      <div class="scanner-container">
+        <div id="scanner" style="display: none; height: 300px; border-radius: 12px; overflow: hidden; background: #000;"></div>
+
+        <!-- Manual Input (hidden by default) -->
+        <input id="barcodeInput" type="text" placeholder="Scan barcode or enter SKU/ID" class="barcode-input" style="display: none;" />
+      </div>
+
+      <!-- Product Preview -->
+      <div id="productPreview" class="product-preview" style="display: none;">
+        <h4>Product Found</h4>
+        <div class="preview-content">
+          <div><strong>📦 Product:</strong> <span id="previewName">-</span></div>
+          <div><strong>💰 Price:</strong> K <span id="previewPrice">0.00</span></div>
+          <div><strong>📊 Stock:</strong> <span id="previewStock">0</span> units</div>
+          <div><strong>SKU:</strong> <span id="previewSKU">-</span></div>
+          <button onclick="addToLookup()" class="btn-primary">Add to Lookup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="dashboard-kpi-row">
+    <div class="dashboard-kpi kpi-inventory">
+      <div class="kpi-header">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-label">Total Products</div>
+      </div>
+      <div class="kpi-content">
+        <div class="metric-value" id="totalProducts">0</div>
+        <div class="kpi-detail"><span id="lowStockAlert">0</span> items low stock</div>
+      </div>
+    </div>
+
+    <div class="dashboard-kpi kpi-financial">
+      <div class="kpi-header">
+        <div class="kpi-icon">💎</div>
+        <div class="kpi-label">Inventory Value</div>
+      </div>
+      <div class="kpi-content">
+        <div class="metric-value" id="inventoryTotalValue">0.00</div>
+        <div class="kpi-detail">K (At cost)</div>
+      </div>
+    </div>
+
+    <div class="dashboard-kpi kpi-sales">
+      <div class="kpi-header">
+        <div class="kpi-icon">📥</div>
+        <div class="kpi-label">Stock In (Today)</div>
+      </div>
+      <div class="kpi-content">
+        <div class="metric-value" id="todayInCount">0</div>
+        <div class="kpi-detail">units added</div>
+      </div>
+    </div>
+
+    <div class="dashboard-kpi kpi-cash">
+      <div class="kpi-header">
+        <div class="kpi-icon">📤</div>
+        <div class="kpi-label">Stock Out (Today)</div>
+      </div>
+      <div class="kpi-content">
+        <div class="metric-value" id="todayOutCount">0</div>
+        <div class="kpi-detail">units sold</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIDDEN PRODUCT DROPDOWN -->
+  <div class="dashboard-section">
+    <details class="collapsible-card">
+      <summary class="collapsible-header">
+        <span>📚 Product Catalog</span>
+        <span class="product-count" id="productCount">(0 products)</span>
+      </summary>
+
+      <div class="collapsible-content">
+        <div class="search-bar">
+          <input type="text" id="productSearch" placeholder="🔍 Search products by name, SKU, or barcode..." />
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+          <p class="no-data">Loading products...</p>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- ADD PRODUCT FORM (HIDDEN) -->
+  <div class="dashboard-section">
+    <details class="collapsible-card">
+      <summary class="collapsible-header">
+        <span>➕ Add New Product</span>
+      </summary>
+
+      <div class="collapsible-content">
+        <div class="form-grid">
+          <input id="productName" type="text" placeholder="Product name *" />
+          <input id="productPrice" type="number" placeholder="Price (selling) *" step="0.01" />
+          <input id="productCost" type="number" placeholder="Cost price" step="0.01" />
+          <input id="productquantity" type="number" placeholder="Initial stock" />
+        </div>
+        <div class="form-grid">
+          <input id="barcodeInputAdd" type="text" placeholder="Barcode (scan or type)" />
+        </div>
+        <button id="saveBtn" class="btn-primary" onclick="saveProduct()">Save Product</button>
+      </div>
+    </details>
+  </div>
+
+  <!-- PRODUCT LOOKUP & EDIT (HIDDEN) -->
+  <div class="dashboard-section">
+    <details class="collapsible-card">
+      <summary class="collapsible-header">
+        <span>✏️ Edit / Adjust Product</span>
+      </summary>
+
+      <div class="collapsible-content">
+        <div class="form-grid">
+          <input id="lookupKey" type="text" placeholder="Enter SKU, barcode, or ID" />
+          <button id="lookupBtn" class="btn-secondary">Lookup</button>
+        </div>
+
+        <!-- Lookup Result -->
+        <div id="editSection" style="display: none; margin-top: 20px;">
+          <div class="form-grid">
+            <input id="editName" type="text" placeholder="Product name" />
+            <input id="editBarcode" type="text" placeholder="Barcode" />
+            <input id="editPrice" type="number" placeholder="Selling Price" step="0.01" />
+            <input id="editCost" type="number" placeholder="Cost Price" step="0.01" />
+          </div>
+          <div class="form-grid">
+            <input id="editStock" type="number" placeholder="Adjust stock quantity" />
+            <input id="editReason" type="text" placeholder="Reason for adjustment" />
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button id="updateBtn" class="btn-primary" onclick="updateProduct()">Update Product</button>
+            <button id="deleteBtn" class="btn-danger" onclick="deleteProduct()">Delete Product</button>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- INVENTORY MOVEMENTS LOG -->
+  <div class="dashboard-section">
+    <details class="collapsible-card" open>
+      <summary class="collapsible-header">
+        <span>📋 Recent Stock Movements</span>
+        <span class="movement-count">(Today)</span>
+      </summary>
+
+      <div class="collapsible-content">
+        <div class="movements-log" id="movementsLog">
+          <p class="no-data">No movements today</p>
+        </div>
+      </div>
+    </details>
+  </div>
+
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
+<script src="js/branch-context.js"></script>
+
+<script src="js/inventory.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ZAI Flow — Suppliers</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script>
+  const currentPage = location.pathname.split("/").pop();
+
+  document.querySelectorAll(".sidebar a").forEach(link => {
+    if (link.getAttribute("href") === currentPage) {
+      link.classList.add("active");
+    }
+  });
+</script>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+  <img src="assets/logo.png" class="logo" />
+
+  <a href="dashboard.html">Dashboard</a>
+  <a href="inventory.html">Inventory</a>
+  <a href="purchases.html">Purchases</a>
+  <a href="sales.html">Sales / POS</a>
+  <a href="bi.html">BI Dashboard</a>
+  <a href="zra.html">ZRA Smart Invoice</a>
+  <a href="#" onclick="logout()">Logout</a>
+</aside>
+
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <div class="topbar">
+      <h2>Suppliers</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
+        <div>
+          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
+          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+        </div>
+        <div id="userInfo"></div>
+      </div>
+    </div>
+
+    <!-- ADD SUPPLIER -->
+    <div class="glass">
+      <h3>Add Supplier</h3>
+
+      <input id="name" placeholder="Supplier name *">
+      <input id="phone" placeholder="Phone number">
+      <input id="email" placeholder="Email address">
+
+      <button onclick="addSupplier()">Add Supplier</button>
+    </div>
+
+    <!-- SUPPLIER LIST -->
+    <div class="glass" style="margin-top:20px">
+      <h3>Supplier List</h3>
+      <ul id="supplierList"></ul>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
+<script src="js/branch-context.js"></script>
+
+<script>
+/* ======================
+   AUTH GUARD
+====================== */
+const user = JSON.parse(localStorage.getItem("user"));
+const token = localStorage.getItem("token");
+
+if (!user || !token) {
+  window.location.href = "login.html";
+}
+
+/* ======================
+   USER INFO
+====================== */
+document.getElementById("userInfo").innerText =
+  user.name + " (" + user.role + ")";
+
+/* ======================
+   LOGOUT
+====================== */
+function logout() {
+  localStorage.clear();
+  window.location.href = "login.html";
+}
+
+/* ======================
+   API CONFIG
+====================== */
+const API = "";
+
+/* ======================
+   LOAD SUPPLIERS
+====================== */
+function loadSuppliers() {
+  fetch(API + "/api/suppliers", {
+    headers: {
+      Authorization: "Bearer " + token
+    }
+  })
+    .then(res => res.json())
+    .then(data => {
+      supplierList.innerHTML = "";
+
+      if (!data.length) {
+        supplierList.innerHTML = "<li>No suppliers yet</li>";
+        return;
+      }
+
+      data.forEach(s => {
+        const li = document.createElement("li");
+        li.innerText =
+          s.name +
+          (s.phone ? " — " + s.phone : "") +
+          (s.email ? " — " + s.email : "");
+        supplierList.appendChild(li);
+      });
+    });
+}
+
+/* ======================
+   ADD SUPPLIER
+====================== */
+function addSupplier() {
+  if (!name.value) {
+    alert("Supplier name is required");
+    return;
+  }
+
+  fetch(API + "/api/suppliers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token
+    },
+    body: JSON.stringify({
+      name: name.value,
+      phone: phone.value,
+      email: email.value
+    })
+  })
+    .then(res => res.json())
+    .then(() => {
+      name.value = "";
+      phone.value = "";
+      email.value = "";
+      loadSuppliers();
+    });
+}
+
+/* ======================
+   INIT
+====================== */
+loadSuppliers();
+</script>
+
+</body>
+</html>

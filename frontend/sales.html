@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZAI Flow | Point of Sale</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/@ericblade/quagga2/dist/quagga.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <img src="assets/logo.png" class="logo" />
+    <a href="dashboard.html">Dashboard</a>
+    <a href="inventory.html">Inventory</a>
+    <a href="accounting.html">Accounting</a>
+    <a href="sales.html">Sales / POS</a>
+    <a href="purchasing.html">Purchasing</a>
+    <a href="hr.html">HR & Payroll</a>
+    <a href="bi.html">BI Dashboard</a>
+    <a href="zra.html">ZRA Smart Invoice</a>
+  <a href="#" onclick="logout()">Logout</a>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <div class="topbar">
+      <h2>Point of Sale</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
+        <div>
+          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
+          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+        </div>
+        <div id="userInfo"></div>
+        <button onclick="refreshPOS()" class="refresh-btn" title="Refresh POS">🔄</button>
+      </div>
+    </div>
+
+    <!-- TILL MANAGEMENT -->
+    <div class="dashboard-section">
+      <div id="openTillSection" style="display: none;">
+        <div class="till-card">
+          <h3>📝 Open Cash Drawer</h3>
+          <div class="form-grid">
+            <input type="text" id="openingBalance" placeholder="Opening balance K" inputmode="decimal" />
+            <button id="openDrawerBtn" class="btn-primary">Open Drawer</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="drawerStatus" class="till-status-card"></div>
+
+      <div style="display: flex; gap: 12px;">
+        <button id="balanceTillBtn" class="btn-secondary" style="flex: 1;">⚖️ Balance Till</button>
+        <div id="dailySummary" class="till-summary" style="flex: 1;"></div>
+      </div>
+    </div>
+
+    <!-- POS INTERFACE -->
+    <div class="dashboard-section">
+      <div class="pos-layout">
+
+        <!-- LEFT: BARCODE SCANNER -->
+        <div class="pos-scanner-card">
+          <h3>📱 Product Lookup</h3>
+
+          <div class="scanner-controls">
+            <button onclick="togglePOSManualEntry()" class="btn-primary" id="toggleInputBtn">✏️ Type SKU/Barcode</button>
+            <button onclick="togglePOSCamera()" class="btn-secondary" id="posCameraBtn">📷 Use Camera</button>
+          </div>
+
+          <input id="posBarcodeInput" type="text" placeholder="Enter SKU, Barcode, or Product ID"
+                 onkeypress="if(event.key==='Enter') handlePOSBarcodeScan()"
+                 style="width: 100%; margin-top: 12px; padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.3); color: white; font-size: 14px;" />
+
+          <div id="posScanner" style="display: none; height: 250px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); margin-top: 12px;"></div>
+
+          <div id="productPreview" class="product-preview-mini" style="display: none;"></div>
+        </div>
+
+        <!-- RIGHT: CART & CHECKOUT -->
+        <div class="pos-cart-card">
+          <h3>🛒 Cart</h3>
+
+          <!-- Cart Items Table -->
+          <div class="cart-wrapper">
+            <table id="cartTable" style="width: 100%; font-size: 13px;">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="cartItems"></tbody>
+            </table>
+            <p id="emptyCart" class="no-data">Cart is empty</p>
+          </div>
+
+          <!-- Grand Total -->
+          <div class="total-section">
+            <h2 id="grandTotal" style="margin: 0; font-size: 32px; color: #f7c948;">K 0.00</h2>
+          </div>
+
+          <!-- Payment Section -->
+          <div class="payment-section">
+            <label>Payment Method</label>
+            <select id="paymentMethod" style="width: 100%; margin-bottom: 12px;">
+              <option value="Cash">💵 Cash</option>
+              <option value="Card">💳 Card</option>
+              <option value="Mobile Money">📱 Mobile Money</option>
+            </select>
+
+            <label id="cashLabel" style="display: none;">Cash Given</label>
+            <input id="cashGiven" type="number" placeholder="Amount received"
+                   onkeypress="if(event.key==='Enter') completeSale()"
+                   oninput="calculateChange()"
+                   style="display: none; width: 100%; margin-bottom: 8px;" />
+
+            <div id="changeDisplay" class="change-box" style="display: none; padding: 12px; background: rgba(255,255,255,0.08); border-radius: 8px; text-align: center; margin-bottom: 12px;">
+              Change: K 0.00
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-primary" onclick="completeSale()" style="flex: 1;">✅ Complete Sale</button>
+            <button class="btn-danger" onclick="clearSale()" style="flex: 1;">❌ Discard</button>
+          </div>
+
+          <!-- Receipt Actions -->
+          <div id="receiptActions" style="display: none; margin-top: 12px; display: flex; gap: 10px;">
+            <button onclick="printReceiptPreview()" class="btn-secondary" style="flex: 1; font-size: 12px;">Preview</button>
+            <button onclick="confirmPrint()" class="btn-primary" style="flex: 1; font-size: 12px;">🖨️ Print</button>
+            <button onclick="reprintReceipt()" class="btn-secondary" style="flex: 1; font-size: 12px;">↩️ Reprint</button>
+          </div>
+
+          <!-- Sales History Dropdown -->
+          <details class="collapsible-card" style="margin-top: 20px;">
+            <summary class="collapsible-header">
+              <span>📋 Sales History</span>
+              <span class="sales-count" id="salesCount">(0 sales)</span>
+            </summary>
+
+            <div class="collapsible-content">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <input type="date" id="filterDate" style="padding: 8px !important; font-size: 12px;" />
+                <select id="filterPayment" style="padding: 8px !important; font-size: 12px;">
+                  <option value="">All Payment Methods</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Card">Card</option>
+                  <option value="Mobile Money">Mobile Money</option>
+                </select>
+              </div>
+
+              <div style="max-height: 300px; overflow-y: auto;">
+                <table style="width: 100%; font-size: 12px;">
+                  <thead>
+                    <tr>
+                      <th>Sale ID</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Time</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="salesTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- RECEIPT PREVIEW (Hidden Modal) -->
+<div id="receiptPreview" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; color: black; padding: 20px; width: 300px; border-radius: 8px; z-index: 1000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+  <div id="receiptContent"></div>
+  <button onclick="document.getElementById('receiptPreview').style.display='none';" style="width: 100%; margin-top: 10px; padding: 8px; background: #f7c948; border: none; border-radius: 6px; cursor: pointer;">Close</button>
+</div>
+
+<!-- BALANCE MODAL -->
+<div id="balanceModal" class="modal" style="display:none;">
+  <div class="modal-box">
+    <h3>⚖️ Balance Till</h3>
+    <div id="balanceInfo"></div>
+    <input id="declaredCash" type="number" placeholder="Enter counted cash" style="width: 100%; padding: 10px; margin: 12px 0; border-radius: 6px; border: none;" />
+    <button onclick="closeTill()" style="width: 100%; padding: 10px; background: #28c76f; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Close Till</button>
+    <div id="balanceResult" style="margin-top: 12px;"></div>
+  </div>
+</div>
+
+<script>
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user) {
+    window.location.href = "login.html";
+  }
+  document.getElementById("userInfo").innerText = user.name + " (" + user.role + ")";
+  function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
+<script src="js/branch-context.js"></script>
+
+<script src="js/sales.js"></script>
+
+</body>
+</html>

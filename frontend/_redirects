@@ -1,0 +1,5 @@
+# ZAI FLOW 2.0 - Netlify Redirects for SPA Routing
+# All requests go to login.html for proper app routing
+
+# SPA routing - redirect all non-file requests to index (login.html for us)
+/*  /login.html  200

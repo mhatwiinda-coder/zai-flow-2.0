@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZAI Flow | BI Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <img src="assets/logo.png" class="logo" />
+
+    <a href="dashboard.html">Dashboard</a>
+    <a href="inventory.html">Inventory</a>
+    <a href="accounting.html">Accounting</a>
+    <a href="sales.html">Sales / POS</a>
+    <a href="purchasing.html">Purchasing</a>
+    <a href="hr.html">HR & Payroll</a>
+    <a href="bi.html" class="active">BI Dashboard</a>
+    <a href="zra.html">ZRA Smart Invoice</a>
+  <a href="#" onclick="logout()">Logout</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h1 style="margin: 0;">Business Intelligence Dashboard</h1>
+      <div>
+        <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
+        <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+      </div>
+    </div>
+
+    <!-- FILTERS SECTION -->
+    <div class="bi-filters card">
+      <h3>📅 Period & Filters</h3>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+        <div>
+          <label>Start Date:</label>
+          <input type="date" id="biStartDate" />
+        </div>
+        <div>
+          <label>End Date:</label>
+          <input type="date" id="biEndDate" />
+        </div>
+        <button onclick="applyDateFilter()" class="btn-primary">Apply Filter</button>
+        <button onclick="setQuickFilter('today')" class="btn-secondary">Today</button>
+        <button onclick="setQuickFilter('week')" class="btn-secondary">This Week</button>
+        <button onclick="setQuickFilter('month')" class="btn-secondary">This Month</button>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-value" id="biTotalRevenue">K 0.00</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Sales</div>
+        <div class="kpi-value" id="biTotalSales">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Avg Order Value</div>
+        <div class="kpi-value" id="biAvgOrder">K 0.00</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Low Stock Items</div>
+        <div class="kpi-value" id="biLowStock" style="color: #ff9f43;">0</div>
+      </div>
+    </div>
+
+    <!-- TAB NAVIGATION -->
+    <div class="bi-tabs">
+      <button class="bi-tab active" onclick="switchBITab('sales')">📊 Sales</button>
+      <button class="bi-tab" onclick="switchBITab('inventory')">📦 Inventory</button>
+      <button class="bi-tab" onclick="switchBITab('operations')">⚙️ Operations</button>
+      <button class="bi-tab" onclick="switchBITab('analysis')">📈 Analysis</button>
+    </div>
+
+    <!-- SALES TAB -->
+    <div id="sales-tab" class="bi-tab-content active card">
+      <h2>Sales Analytics</h2>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div>
+          <h3>Sales Trend (Last 7 Days)</h3>
+          <canvas id="salesTrendChart"></canvas>
+          <div class="chart-loading" id="salesChartLoading">Loading...</div>
+        </div>
+        <div>
+          <h3>Payment Method Breakdown</h3>
+          <canvas id="paymentChart"></canvas>
+          <div class="chart-loading" id="paymentChartLoading">Loading...</div>
+        </div>
+      </div>
+
+      <div>
+        <h3>Top Products</h3>
+        <canvas id="topProductsChart"></canvas>
+        <div class="chart-loading" id="topProductsLoading">Loading...</div>
+      </div>
+    </div>
+
+    <!-- INVENTORY TAB -->
+    <div id="inventory-tab" class="bi-tab-content card">
+      <h2>Inventory Analytics</h2>
+
+      <div style="margin-bottom: 20px;">
+        <h3 id="inventoryTitle">Inventory Summary</h3>
+        <p id="inventorySummary" style="font-size: 14px; line-height: 1.6;"></p>
+      </div>
+
+      <div>
+        <h3>Low Stock Alerts ⚠️</h3>
+        <div id="lowStockWidget" style="max-height: 400px; overflow-y: auto;"></div>
+      </div>
+    </div>
+
+    <!-- OPERATIONS TAB -->
+    <div id="operations-tab" class="bi-tab-content card">
+      <h2>Operations Summary</h2>
+
+      <div style="margin-bottom: 20px;">
+        <h3>Sales Summary</h3>
+        <p id="salesSummary" style="font-size: 14px; line-height: 1.6;"></p>
+      </div>
+
+      <div>
+        <h3>Sales Trend</h3>
+        <ul id="salesTrend" style="list-style: none; padding: 0;"></ul>
+      </div>
+    </div>
+
+    <!-- ANALYSIS TAB -->
+    <div id="analysis-tab" class="bi-tab-content card">
+      <h2>Data Analysis & Export</h2>
+
+      <div style="margin-bottom: 20px;">
+        <h3>Export Reports</h3>
+        <p>Download your business data in various formats:</p>
+        <button onclick="exportExcel()" class="btn-primary" style="padding: 12px 24px; font-size: 14px;">
+          📥 Export to Excel
+        </button>
+      </div>
+
+      <div>
+        <h3>Data Insights</h3>
+        <div id="dataInsights" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.6;">
+          <p>Data insights will appear here based on your selected period.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
+<script src="js/branch-context.js"></script>
+
+<script src="js/auth-ui.js" defer></script>
+<script src="js/bi.js" defer></script></body>
+</html>

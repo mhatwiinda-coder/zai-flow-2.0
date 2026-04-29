@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZAI FLOW 2.0 - Role Management</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .admin-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .admin-header p {
+      margin: 5px 0 0 0;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0;
+      border-bottom: 2px solid #e9ecef;
+      background: white;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .tab-button {
+      background: none;
+      border: none;
+      padding: 15px 25px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab-button.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-button:hover:not(.active) {
+      color: #333;
+    }
+
+    .tab-content {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .card h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .role-list {
+      display: grid;
+      gap: 15px;
+    }
+
+    .role-card {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .role-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    }
+
+    .role-card.selected {
+      border-color: #667eea;
+      background: #f0f3ff;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .role-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+
+    .role-card-name {
+      font-weight: bold;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .role-card-level {
+      background: #667eea;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .role-card-desc {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .role-card-stats {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    .user-table th {
+      background: #f8f9fa;
+      padding: 12px;
+      text-align: left;
+      font-weight: bold;
+      border-bottom: 2px solid #e9ecef;
+      font-size: 13px;
+      color: #333;
+    }
+
+    .user-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e9ecef;
+      font-size: 13px;
+    }
+
+    .user-table tr:hover {
+      background: #f8f9fa;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .status-badge.active {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-badge.inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-secondary {
+      background: #e9ecef;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #dee2e6;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .permission-matrix {
+      display: grid;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .permission-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .permission-section h4 {
+      margin: 0 0 12px 0;
+      color: #333;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .permission-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+    }
+
+    .permission-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .permission-item input[type="checkbox"] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+
+    .permission-item label {
+      cursor: pointer;
+      font-size: 12px;
+      color: #333;
+      margin: 0;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .search-box button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .search-box button:hover {
+      background: #5568d3;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #333;
+      font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #999;
+      padding: 40px 20px;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-right: 5px;
+    }
+
+    .badge.primary {
+      background: #e7f3ff;
+      color: #004085;
+    }
+
+    .badge.success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge.warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <h2>ZAI FLOW 2.0</h2>
+      </div>
+      <div class="nav-menu">
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="admin-roles.html" class="nav-link active">Role Management</a>
+        <a href="#" id="logout-link" class="nav-link">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="admin-container">
+    <!-- Admin Header -->
+    <div class="admin-header">
+      <div>
+        <h1>🔐 Role Management</h1>
+        <p>Manage user roles and permissions across all modules</p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
+      <div class="tabs">
+        <button class="tab-button active" onclick="switchAdminTab('users')">👥 Users & Roles</button>
+        <button class="tab-button" onclick="switchAdminTab('roles')">🎯 Role Definitions</button>
+        <button class="tab-button" onclick="switchAdminTab('permissions')">🔑 Permissions Matrix</button>
+      </div>
+
+      <!-- Tab 1: Users & Roles -->
+      <div id="tab-users" class="tab-content active">
+        <div style="padding: 20px;">
+          <div class="search-box">
+            <input type="text" id="search-users" placeholder="Search users by name or email...">
+            <button onclick="searchUsers()">🔍 Search</button>
+          </div>
+
+          <div class="card">
+            <h2>User Role Assignments</h2>
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>Current Roles</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody">
+                <tr>
+                  <td colspan="5" class="empty-state">Loading users...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <h2>Quick Role Assignment</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div class="form-group">
+                <label>Select User</label>
+                <select id="user-select">
+                  <option value="">Choose a user...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Select Role</label>
+                <select id="role-select">
+                  <option value="">Choose a role...</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="assignRoleToUser()" style="width: 100%; margin-top: 10px;">
+              ✓ Assign Role
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Role Definitions -->
+      <div id="tab-roles" class="tab-content">
+        <div style="padding: 20px;">
+          <div class="card">
+            <h2>Available Roles</h2>
+            <div class="role-list" id="roles-list">
+              <div class="empty-state">Loading roles...</div>
+            </div>
+          </div>
+
+          <div id="role-details" class="card" style="display: none;">
+            <h2 id="role-details-name">Role Details</h2>
+            <div id="role-details-content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Permissions Matrix -->
+      <div id="tab-permissions" class="tab-content">
+        <div style="padding: 20px;">
+          <div class="card">
+            <h2>Role Permissions Matrix</h2>
+            <div class="search-box">
+              <select id="matrix-role-select" onchange="loadPermissionsMatrix()">
+                <option value="">Select a role to view permissions...</option>
+              </select>
+            </div>
+            <div id="permissions-matrix-content" class="permission-matrix">
+              <div class="empty-state">Select a role to view permissions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assign Role Modal -->
+  <div id="assign-role-modal" class="modal">
+    <div class="modal-content">
+      <h3>👥 Assign Role to User</h3>
+      <div class="form-group">
+        <label>User *</label>
+        <select id="modal-user-select">
+          <option value="">Choose a user...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Role *</label>
+        <select id="modal-role-select">
+          <option value="">Choose a role...</option>
+        </select>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeAssignRoleModal()">Cancel</button>
+        <button class="btn btn-success" onclick="confirmAssignRole()">Assign Role</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remove Role Modal -->
+  <div id="remove-role-modal" class="modal">
+    <div class="modal-content">
+      <h3>⚠️ Remove Role from User</h3>
+      <p id="remove-role-message"></p>
+      <p style="color: #999; font-size: 13px;">This action cannot be undone.</p>
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeRemoveRoleModal()">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmRemoveRole()">Remove Role</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-init.js"></script>
+  <script src="branch-context.js"></script>
+  <script src="js/admin-roles.js"></script>
+</body>
+</html>
