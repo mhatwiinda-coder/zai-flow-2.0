@@ -11,7 +11,9 @@
 
 // Wait for Supabase library to be loaded
 if (window.supabase && window.supabase.createClient) {
-  const SUPABASE_URL = 'https://jzhwlablyxaeupvtpdce.supabase.co';
+  // Use project-specific credentials - these are safe to expose (public anon key)
+  const projectId = 'jzhwlablyxaeupvtpdce';
+  const SUPABASE_URL = `https://${projectId}.supabase.co`;
   const SUPABASE_ANON_KEY = 'sb_publishable_obO2dwFXoF6nOKZ9nCG0Hg_V-cenHsB';
 
   // Initialize Supabase client and make it globally accessible
