@@ -11,7 +11,7 @@
 # SERVERLESS FUNCTIONS
 # ============================================================================
 [functions]
-  directory = "netlify/functions"
+  directory = "frontend/netlify/functions"
 
 # ============================================================================
 # SPA ROUTING - Handle all routes with login.html
