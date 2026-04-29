@@ -13,8 +13,8 @@
 if (window.supabase && window.supabase.createClient) {
   // Configure with your Supabase project credentials
   // Get these from: https://supabase.com → Project Settings → API
-  const SUPABASE_URL = 'https://[your-project-id].supabase.co';
-  const SUPABASE_ANON_KEY = '[your-anon-key-here]';
+  const SUPABASE_URL = 'https://jzhwlablyxaeupvtpdce.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_obO2dwFXoF6nOKZ9nCG0Hg_V-cenHsB';
 
   // Initialize Supabase client and make it globally accessible
   window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

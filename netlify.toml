@@ -7,6 +7,13 @@
   command = ""
 
 # ============================================================================
+# SECRET SCANNING CONFIGURATION
+# ============================================================================
+# Skip secret scanning for supabase-init.js - credentials are public (anon key)
+[build.environment]
+  SECRETS_SCAN_OMIT_PATHS = "frontend/js/supabase-init.js"
+
+# ============================================================================
 # SERVERLESS FUNCTIONS
 # ============================================================================
 [functions]
