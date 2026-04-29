@@ -6,15 +6,7 @@
   # No build command needed - static site
   command = ""
   publish = "."
-
-# ============================================================================
-# REDIRECTS - Handle SPA routing
-# ============================================================================
-[[redirects]]
-  from = "/*"
-  to = "/login.html"
-  status = 200
-  # This ensures all routes redirect to login.html for proper SPA routing
+  # Note: _redirects file handles SPA routing (do not duplicate redirects here)
 
 # ============================================================================
 # HEADERS - Security and Performance
