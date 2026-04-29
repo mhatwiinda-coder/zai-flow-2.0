@@ -1,0 +1,86 @@
+# ============================================================================
+# ZAI FLOW 2.0 - Root Netlify Configuration
+# Configures: Static site (frontend), Serverless Functions, and Routing
+# ============================================================================
+
+[build]
+  # Base directory is the root (where this file is)
+  base = "."
+  # Frontend files to serve
+  publish = "frontend"
+  # Build command (empty for static site)
+  command = ""
+
+# ============================================================================
+# SERVERLESS FUNCTIONS
+# ============================================================================
+[functions]
+  directory = "netlify/functions"
+
+# ============================================================================
+# REWRITE RULES (SPA Routing)
+# ============================================================================
+# All non-file requests are rewritten to /frontend/login.html for SPA routing
+# Static files (.js, .css, images, etc.) are served directly
+
+[[redirects]]
+  from = "/*"
+  to = "/frontend/login.html"
+  status = 200
+  # This rule rewrites all requests to login.html for client-side SPA routing
+
+# ============================================================================
+# HEADERS - Security and Performance
+# ============================================================================
+
+# Default headers for all routes
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Prevent caching of HTML (contains app logic)
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+
+# Cache static assets for 1 year
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/style.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ============================================================================
+# FUNCTIONS CONFIGURATION
+# ============================================================================
+# Environment variables for serverless functions
+# These are set via Netlify Dashboard, not here
+
+[context.production]
+  environment = { SUPABASE_URL = "", SUPABASE_ADMIN_KEY = "", SYNC_AUTH_TOKEN = "" }
+
+[context.preview]
+  environment = { SUPABASE_URL = "", SUPABASE_ADMIN_KEY = "", SYNC_AUTH_TOKEN = "" }
+
+# ============================================================================
+# CONTEXT: Production
+# ============================================================================
+[context.production]
+  command = "echo 'Production deployment'"
+
+# ============================================================================
+# CONTEXT: Deploy Preview (Pull Requests)
+# ============================================================================
+[context.deploy-preview]
+  command = "echo 'Preview deployment'"
