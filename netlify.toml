@@ -4,11 +4,8 @@
 # ============================================================================
 
 [build]
-  # Base directory is the root (where this file is)
-  base = "."
-  # Frontend files to serve
+  base = "frontend"
   publish = "frontend"
-  # Build command (empty for static site)
   command = ""
 
 # ============================================================================
@@ -18,22 +15,16 @@
   directory = "netlify/functions"
 
 # ============================================================================
-# REWRITE RULES (SPA Routing)
+# SPA ROUTING - Handle all routes with login.html
 # ============================================================================
-# All non-file requests are rewritten to /frontend/login.html for SPA routing
-# Static files (.js, .css, images, etc.) are served directly
-
 [[redirects]]
   from = "/*"
-  to = "/frontend/login.html"
+  to = "/login.html"
   status = 200
-  # This rule rewrites all requests to login.html for client-side SPA routing
 
 # ============================================================================
 # HEADERS - Security and Performance
 # ============================================================================
-
-# Default headers for all routes
 [[headers]]
   for = "/*"
   [headers.values]
@@ -41,11 +32,9 @@
     X-Frame-Options = "SAMEORIGIN"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    # Prevent caching of HTML (contains app logic)
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
 
-# Cache static assets for 1 year
 [[headers]]
   for = "/js/*"
   [headers.values]
@@ -60,27 +49,3 @@
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
-# ============================================================================
-# FUNCTIONS CONFIGURATION
-# ============================================================================
-# Environment variables for serverless functions
-# These are set via Netlify Dashboard, not here
-
-[context.production]
-  environment = { SUPABASE_URL = "", SUPABASE_ADMIN_KEY = "", SYNC_AUTH_TOKEN = "" }
-
-[context.preview]
-  environment = { SUPABASE_URL = "", SUPABASE_ADMIN_KEY = "", SYNC_AUTH_TOKEN = "" }
-
-# ============================================================================
-# CONTEXT: Production
-# ============================================================================
-[context.production]
-  command = "echo 'Production deployment'"
-
-# ============================================================================
-# CONTEXT: Deploy Preview (Pull Requests)
-# ============================================================================
-[context.deploy-preview]
-  command = "echo 'Preview deployment'"
