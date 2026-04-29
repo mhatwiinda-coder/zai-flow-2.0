@@ -4,8 +4,9 @@
 # ============================================================================
 
 [build]
-  publish = "frontend"
   command = ""
+  # Note: base and publish directories are set in Netlify UI settings
+  # Do not duplicate them here to avoid path conflicts
 
 # ============================================================================
 # SERVERLESS FUNCTIONS
