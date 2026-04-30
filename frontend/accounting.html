@@ -447,9 +447,9 @@
     window.location.href = "login.html";
   }
   // Initialize branch context display BEFORE module loads
-  setTimeout(() => {
-    initializeBranchDisplay();
-    updatePageTitle('Accounting');
+  setTimeout(async () => {
+    await initializeBranchDisplay();
+    await updatePageTitle('Accounting');
   }, 500);
 
   function logout() {

@@ -178,10 +178,10 @@
   }
 
   // Initialize branch context display
-  setTimeout(() => {
-    initializeBranchDisplay();
-    updatePageTitle('Dashboard');
-  , 500);
+  setTimeout(async () => {
+    await initializeBranchDisplay();
+    await updatePageTitle('Dashboard');
+  }, 500);
 
   function logout() {
     localStorage.clear();

@@ -562,10 +562,10 @@
     window.location.href = "login.html";
   }
   // Initialize branch context display
-  setTimeout(() => {
-    initializeBranchDisplay();
-    updatePageTitle('HR & Payroll');
-  , 500);
+  setTimeout(async () => {
+    await initializeBranchDisplay();
+    await updatePageTitle('HR & Payroll');
+  }, 500);
 
   function logout() {
     localStorage.clear();

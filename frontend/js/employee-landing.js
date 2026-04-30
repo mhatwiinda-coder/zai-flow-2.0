@@ -460,7 +460,7 @@ async function loadNotifications() {
 }
 
 async function loadUserAccessibleModules() {
-  const currentContext = getBranchContext();
+  const currentContext = await getBranchContext();
   if (!supabase || !currentContext) return;
 
   try {
@@ -577,8 +577,8 @@ function escapeHtml(text) {
 // INITIALIZATION - Runs once on page load
 // ============================================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-  context = getBranchContext();
+document.addEventListener('DOMContentLoaded', async () => {
+  context = await getBranchContext();
 
   if (!context || !context.user_id) {
     console.error('❌ No user context found - redirecting to login');

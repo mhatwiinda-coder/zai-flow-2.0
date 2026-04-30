@@ -4,35 +4,50 @@
 // ============================================================================
 
 /**
- * Get current branch context from localStorage + Supabase session
- * @returns {Object|null} {branch_id, business_id, business_name, branch_name, user_id}
+ * Get current branch context from Supabase (source of truth)
+ * Fetches fresh data directly from database using Supabase Auth session
+ * @returns {Promise<Object|null>} {branch_id, business_id, business_name, branch_name, user_id}
  */
-function getBranchContext() {
+async function getBranchContext() {
   try {
-    const user = JSON.parse(localStorage.getItem('user'));
+    // Get current Supabase auth session (UUID - always current, not stale)
+    const { data: { session } } = await supabase.auth.getSession();
 
-    if (!user) {
-      console.error('❌ No user in localStorage');
+    if (!session?.user?.id) {
+      console.error('❌ No authenticated session found');
       return null;
     }
 
-    // Try auth_id first (UUID from Supabase Auth), fallback to id
-    const userId = user.auth_id || user.id;
+    const authId = session.user.id; // UUID from Supabase Auth
 
-    if (!user.current_branch_id) {
-      console.error('❌ No branch context found - user not logged in or branch not set');
+    // Fetch user's primary branch from database
+    const { data: branches, error: branchError } = await supabase
+      .from('user_branch_access')
+      .select(`
+        branch_id,
+        is_primary_branch,
+        role,
+        branches(name, business_id, business_entities(name))
+      `)
+      .eq('user_id', authId)
+      .eq('status', 'ACTIVE')
+      .order('is_primary_branch', { ascending: false })
+      .limit(1);
+
+    if (branchError || !branches || branches.length === 0) {
+      console.error('❌ No branches found for user:', branchError?.message);
       return null;
     }
 
-    const branch = user.branches?.find(b => b.branch_id === user.current_branch_id);
+    const primary = branches[0];
 
     return {
-      branch_id: user.current_branch_id,
-      business_id: user.current_business_id,
-      business_name: branch?.business_name || 'Unknown',
-      branch_name: branch?.branch_name || 'Unknown',
-      user_id: userId,
-      user_role: user.role
+      branch_id: primary.branch_id,
+      business_id: primary.branches.business_id,
+      business_name: primary.branches.business_entities.name,
+      branch_name: primary.branches.name,
+      user_id: authId,
+      user_role: primary.role
     };
   } catch (err) {
     console.error('❌ Error getting branch context:', err);

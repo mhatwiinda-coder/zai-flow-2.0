@@ -160,29 +160,9 @@
   </main>
 </div>
 
-<script>
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user) {
-    window.location.href = "login.html";
-  }
-  function logout() {
-    localStorage.clear();
-    window.location.href = "login.html";
-  }
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-init.js"></script>
 <script src="js/branch-context.js"></script>
-<script src="js/display-branch-context.js"></script>
-
-<script>
-  // Initialize branch context display
-  setTimeout(async () => {
-    await initializeBranchDisplay();
-    await updatePageTitle('BI Dashboard');
-  }, 500);
-</script>
 
 <script src="js/auth-ui.js" defer></script>
 <script src="js/bi.js" defer></script></body>
