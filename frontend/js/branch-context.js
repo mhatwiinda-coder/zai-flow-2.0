@@ -4,14 +4,22 @@
 // ============================================================================
 
 /**
- * Get current branch context from localStorage
+ * Get current branch context from localStorage + Supabase session
  * @returns {Object|null} {branch_id, business_id, business_name, branch_name, user_id}
  */
 function getBranchContext() {
   try {
     const user = JSON.parse(localStorage.getItem('user'));
 
-    if (!user || !user.current_branch_id) {
+    if (!user) {
+      console.error('❌ No user in localStorage');
+      return null;
+    }
+
+    // Try auth_id first (UUID from Supabase Auth), fallback to id
+    const userId = user.auth_id || user.id;
+
+    if (!user.current_branch_id) {
       console.error('❌ No branch context found - user not logged in or branch not set');
       return null;
     }
@@ -23,7 +31,7 @@ function getBranchContext() {
       business_id: user.current_business_id,
       business_name: branch?.business_name || 'Unknown',
       branch_name: branch?.branch_name || 'Unknown',
-      user_id: user.auth_id,
+      user_id: userId,
       user_role: user.role
     };
   } catch (err) {
