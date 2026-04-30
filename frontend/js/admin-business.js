@@ -617,6 +617,7 @@ function renderUsers() {
         <td>${business?.name || 'Unknown'}</td>
         <td>
           <button onclick="editUserRole(${user.id})" style="background: #3498db; padding: 6px 12px; font-size: 12px; margin-right: 5px;">Assign</button>
+          <button onclick="deleteUserConfirm(${user.id}, '${user.name}', '${user.email}')" style="background: #e74c3c; padding: 6px 12px; font-size: 12px;">Delete</button>
         </td>
       </tr>
     `;
@@ -628,6 +629,59 @@ function editUserRole(id) {
   if (user) {
     document.getElementById('userSelect').value = id;
     showTab('users');
+  }
+}
+
+function deleteUserConfirm(userId, userName, userEmail) {
+  const confirmed = confirm(`⚠️ Are you sure you want to delete user "${userName}" (${userEmail})?\n\nThis will:\n- Delete from Supabase Auth\n- Remove all database records\n- Remove branch access\n\nThis action CANNOT be undone.`);
+
+  if (confirmed) {
+    deleteUser(userId);
+  }
+}
+
+async function deleteUser(userId) {
+  try {
+    const user = allUsers.find(u => u.id === userId);
+    if (!user) {
+      showMessage('User not found', 'error', 'userMessage');
+      return;
+    }
+
+    // Fetch user's auth_id from database
+    const { data: userData, error: fetchError } = await window.supabase
+      .from('users')
+      .select('id, auth_id, name, email')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError || !userData) {
+      showMessage('Failed to fetch user data', 'error', 'userMessage');
+      return;
+    }
+
+    // Call Netlify function to delete user
+    const response = await fetch('/.netlify/functions/delete-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        auth_id: userData.auth_id,
+        user_id: userId
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to delete user');
+    }
+
+    showMessage(`✅ User "${userData.name}" deleted successfully`, 'success', 'userMessage');
+
+    // Reload users
+    await loadUsers();
+  } catch (err) {
+    console.error('Delete user error:', err);
+    showMessage('Error deleting user: ' + err.message, 'error', 'userMessage');
   }
 }
 
