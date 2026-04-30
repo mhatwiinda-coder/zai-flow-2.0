@@ -32,8 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Verify user is admin
-  if (context.user_role !== 'Administrator' && context.user_role !== 'Admin') {
+  // Verify user is admin (case-insensitive check)
+  const userRole = (context.user_role || '').toLowerCase();
+  if (userRole !== 'admin' && userRole !== 'administrator') {
     alert('❌ You do not have permission to access this page. Only administrators can manage roles.');
     window.location.href = 'employee-landing.html';
     return;

@@ -56,8 +56,14 @@ async function performClockIn() {
   }
 
   try {
+    const authUUID = getAuthUUID();
+    if (!authUUID) {
+      alert('❌ User authentication not found. Please refresh the page.');
+      return;
+    }
+
     const { data, error } = await window.supabase.rpc('clock_in', {
-      p_user_id: context.user_id,
+      p_user_id: authUUID,
       p_business_id: context.business_id,
       p_notes: notes || null
     });
@@ -85,8 +91,14 @@ async function performClockOut() {
   }
 
   try {
-    const { data, error } = await supabase.rpc('clock_out', {
-      p_user_id: context.user_id,
+    const authUUID = getAuthUUID();
+    if (!authUUID) {
+      alert('❌ User authentication not found. Please refresh the page.');
+      return;
+    }
+
+    const { data, error } = await window.supabase.rpc('clock_out', {
+      p_user_id: authUUID,
       p_business_id: context.business_id,
       p_notes: notes || null
     });
@@ -135,14 +147,20 @@ async function performCreateTask() {
   }
 
   try {
-    const { data, error } = await supabase.rpc('create_task', {
-      p_user_id: context.user_id,
+    const authUUID = getAuthUUID();
+    if (!authUUID) {
+      alert('❌ User authentication not found. Please refresh the page.');
+      return;
+    }
+
+    const { data, error } = await window.supabase.rpc('create_task', {
+      p_user_id: authUUID,
       p_business_id: context.business_id,
       p_title: title,
       p_description: description || null,
       p_due_date: dueDate || null,
       p_priority: priority,
-      p_assigned_to: context.user_id
+      p_assigned_to: authUUID
     });
 
     if (error) throw error;
@@ -174,13 +192,13 @@ function switchTaskTab(tabName) {
 }
 
 async function updateTaskStatus(taskId, newStatus) {
-  if (!supabase) {
+  if (!window.supabase) {
     alert('❌ System not initialized. Please refresh the page.');
     return;
   }
 
   try {
-    const { data, error } = await supabase.rpc('update_task_status', {
+    const { data, error } = await window.supabase.rpc('update_task_status', {
       p_task_id: taskId,
       p_status: newStatus
     });
@@ -200,13 +218,13 @@ async function updateTaskStatus(taskId, newStatus) {
 
 async function deleteTask(taskId) {
   if (!confirm('Are you sure you want to delete this task?')) return;
-  if (!supabase) {
+  if (!window.supabase) {
     alert('❌ System not initialized. Please refresh the page.');
     return;
   }
 
   try {
-    const { data, error } = await supabase.rpc('update_task_status', {
+    const { data, error } = await window.supabase.rpc('update_task_status', {
       p_task_id: taskId,
       p_status: 'CANCELLED'
     });
@@ -220,13 +238,13 @@ async function deleteTask(taskId) {
 }
 
 async function markNotificationRead(notificationId) {
-  if (!supabase) {
+  if (!window.supabase) {
     alert('❌ System not initialized. Please refresh the page.');
     return;
   }
 
   try {
-    const { data, error } = await supabase.rpc('mark_notification_read', {
+    const { data, error } = await window.supabase.rpc('mark_notification_read', {
       p_notification_id: notificationId
     });
 
@@ -244,8 +262,14 @@ async function markAllNotificationsRead() {
   }
 
   try {
-    const { data: notifications, error: getError } = await supabase.rpc('get_unread_notifications', {
-      p_user_id: context.user_id,
+    const authUUID = getAuthUUID();
+    if (!authUUID) {
+      alert('❌ User authentication not found. Please refresh the page.');
+      return;
+    }
+
+    const { data: notifications, error: getError } = await window.supabase.rpc('get_unread_notifications', {
+      p_user_id: authUUID,
       p_business_id: context.business_id
     });
 
@@ -256,7 +280,7 @@ async function markAllNotificationsRead() {
     }
 
     for (const notif of notifications) {
-      const { error: markError } = await supabase.rpc('mark_notification_read', {
+      const { error: markError } = await window.supabase.rpc('mark_notification_read', {
         p_notification_id: notif.notification_id
       });
       if (markError) {
@@ -294,13 +318,13 @@ function updateWelcomeSection() {
 }
 
 async function loadAttendanceStatus() {
-  if (!supabase || !context) return;
+  if (!window.supabase || !context) return;
 
   const authUUID = getAuthUUID();
   if (!authUUID) return;
 
   try {
-    const { data, error } = await supabase.rpc('get_attendance_status', {
+    const { data, error } = await window.supabase.rpc('get_attendance_status', {
       p_user_id: authUUID,
       p_business_id: context.business_id
     });
@@ -342,13 +366,13 @@ async function loadAttendanceStatus() {
 }
 
 async function loadUserTasks() {
-  if (!supabase || !context) return;
+  if (!window.supabase || !context) return;
 
   const authUUID = getAuthUUID();
   if (!authUUID) return;
 
   try {
-    const { data, error } = await supabase.rpc('get_user_tasks', {
+    const { data, error } = await window.supabase.rpc('get_user_tasks', {
       p_user_id: authUUID,
       p_business_id: context.business_id,
       p_status: null
@@ -425,13 +449,13 @@ function renderTasksByStatus(tabSuffix, tasks) {
 }
 
 async function loadNotifications() {
-  if (!supabase || !context) return;
+  if (!window.supabase || !context) return;
 
   const authUUID = getAuthUUID();
   if (!authUUID) return;
 
   try {
-    const { data, error } = await supabase.rpc('get_unread_notifications', {
+    const { data, error } = await window.supabase.rpc('get_unread_notifications', {
       p_user_id: authUUID,
       p_business_id: context.business_id
     });
@@ -470,13 +494,13 @@ async function loadNotifications() {
 
 async function loadUserAccessibleModules() {
   const currentContext = getBranchContext();
-  if (!supabase || !currentContext) return;
+  if (!window.supabase || !currentContext) return;
 
   const authUUID = getAuthUUID();
   if (!authUUID) return;
 
   try {
-    const { data, error } = await supabase.rpc('get_user_accessible_modules', {
+    const { data, error } = await window.supabase.rpc('get_user_accessible_modules', {
       p_user_id: authUUID,
       p_business_id: currentContext.business_id
     });

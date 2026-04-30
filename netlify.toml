@@ -7,11 +7,14 @@
   command = ""
 
 # ============================================================================
-# SECRET SCANNING CONFIGURATION
+# ENVIRONMENT VARIABLES
 # ============================================================================
-# Skip secret scanning for supabase-init.js - credentials are public (anon key)
+# Set these in Netlify UI under Settings > Build & deploy > Environment
+# - SUPABASE_URL: https://jzhwlablyxaeupvtpdce.supabase.co
+# - SUPABASE_ANON_KEY: your_public_key_here
 [build.environment]
   SECRETS_SCAN_OMIT_PATHS = "frontend/js/supabase-init.js"
+  PUBLISH_DIR = "frontend"
 
 # ============================================================================
 # SERVERLESS FUNCTIONS
@@ -20,8 +23,29 @@
   directory = "netlify/functions"
 
 # ============================================================================
-# SPA ROUTING - Handle all routes with login.html
+# SPA ROUTING - Serve HTML files directly, fallback to login for API-like routes
 # ============================================================================
+# HTML files should be served directly
+[[redirects]]
+  from = "/:page.html"
+  to = "/:page.html"
+  status = 200
+  force = true
+
+# Assets and static files
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/js/*"
+  to = "/js/:splat"
+  status = 200
+  force = true
+
+# For non-HTML routes, redirect to login (SPA entry point)
 [[redirects]]
   from = "/*"
   to = "/login.html"

@@ -17,12 +17,18 @@ async function initializeDynamicSidebar() {
 
   try {
     // Get user's accessible modules
-    console.log(`📡 Calling RPC: get_user_accessible_modules for user ${context.user_id} in business ${context.business_id}`);
+    const authUUID = getAuthUUID();
+    if (!authUUID) {
+      console.error('❌ User auth UUID not found');
+      return;
+    }
+
+    console.log(`📡 Calling RPC: get_user_accessible_modules for business ${context.business_id}`);
 
     const { data: modules, error } = await window.supabase.rpc(
       'get_user_accessible_modules',
       {
-        p_user_id: context.user_id,
+        p_user_id: authUUID,
         p_business_id: context.business_id
       }
     );

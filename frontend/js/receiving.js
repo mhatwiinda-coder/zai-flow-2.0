@@ -53,10 +53,12 @@ function openGoodsReceiptModal(poId) {
   (async () => {
     try {
       currentGRPoId = poId;
+      const context = getBranchContext();
 
-      const { data, error } = await supabase
-        .from('purchase_orders')
-        .select('*, purchase_order_items(id, product_id, quantity_ordered, quantity_received, products(name, sku))')
+      // Verify PO belongs to current branch
+      const { data, error } = await withBranchFilter(
+        window.supabase.from('purchase_orders').select('*, purchase_order_items(id, product_id, quantity_ordered, quantity_received, products(name, sku))')
+      )
         .eq('id', poId)
         .limit(1);
 

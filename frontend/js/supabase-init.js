@@ -11,15 +11,15 @@
 
 // Wait for Supabase library to be loaded
 if (window.supabase && window.supabase.createClient) {
-  // Configure with your Supabase project credentials
-  // Get these from: https://supabase.com → Project Settings → API
-  const SUPABASE_URL = 'https://jzhwlablyxaeupvtpdce.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_obO2dwFXoF6nOKZ9nCG0Hg_V-cenHsB';
+  // Get Supabase credentials from Netlify environment variables
+  // These are injected at build/deploy time, never hardcoded in source
+  const SUPABASE_URL = window.__SUPABASE_URL__ || 'https://jzhwlablyxaeupvtpdce.supabase.co';
+  const SUPABASE_ANON_KEY = window.__SUPABASE_ANON_KEY__ || 'sb_publishable_obO2dwFXoF6nOKZ9nCG0Hg_V-cenHsB';
 
   // Initialize Supabase client and make it globally accessible
   window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  console.log('✅ Supabase initialized:', SUPABASE_URL);
+  console.log('✅ Supabase initialized with URL from environment');
 } else {
   console.error('❌ Supabase library not loaded. Make sure the CDN script is loaded first.');
 }

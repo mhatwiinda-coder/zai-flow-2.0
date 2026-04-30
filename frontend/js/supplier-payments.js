@@ -11,9 +11,9 @@ let currentPaymentPoId = null;
 function loadPurchaseInvoices() {
   (async () => {
     try {
-      const { data, error } = await supabase
-        .from('purchase_invoices')
-        .select('id, po_id, supplier_invoice_no, invoice_date, amount, status, purchase_orders(po_number, total_amount, suppliers(name))')
+      const { data, error } = await withBranchFilter(
+        window.supabase.from('purchase_invoices').select('id, po_id, supplier_invoice_no, invoice_date, amount, status, purchase_orders(po_number, total_amount, suppliers(name))')
+      )
         .order('invoice_date', { ascending: false });
 
       if (error) throw error;
