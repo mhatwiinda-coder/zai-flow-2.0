@@ -25,6 +25,10 @@ export default async (req, context) => {
   }
 
   try {
+    console.log(`📥 Request body:`, req.body);
+    console.log(`📥 SUPABASE_URL:`, supabaseUrl ? "SET" : "MISSING");
+    console.log(`📥 SUPABASE_ADMIN_KEY:`, supabaseAdminKey ? "SET" : "MISSING");
+
     const { email, password, name, role, business_id } = JSON.parse(req.body);
 
     // Validate required fields
@@ -32,6 +36,18 @@ export default async (req, context) => {
       return new Response(
         JSON.stringify({
           error: "Missing required fields: email, password, name, role, business_id",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    if (password.length < 8) {
+      return new Response(
+        JSON.stringify({
+          error: "Password must be at least 8 characters",
         }),
         {
           status: 400,
