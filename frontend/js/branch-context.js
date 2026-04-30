@@ -34,14 +34,14 @@ function getBranchContext() {
 }
 
 /**
- * Get the current user's UUID from Supabase Auth
+ * Get the current user's UUID from localStorage
  * Used for RPC function calls (RPC functions expect UUID)
  * @returns {String|null} UUID from Supabase Auth
  */
 function getAuthUUID() {
   try {
-    const { data: { session } } = supabase.auth.getSession();
-    return session?.user?.id || null;
+    const user = JSON.parse(localStorage.getItem('user'));
+    return user?.auth_id || null;
   } catch (err) {
     console.error('❌ Error getting auth UUID:', err);
     return null;
