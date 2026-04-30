@@ -49,32 +49,43 @@ export default async (req, context) => {
       console.log(`✅ Auth user deleted: ${auth_id}`);
     }
 
-    // Step 2: Delete user_branch_access records
-    const { error: branchError } = await supabase
-      .from("user_branch_access")
-      .delete()
-      .eq("user_id", user_id);
+    // Step 2: Call RPC function to delete all related records (employees, branch access, etc)
+    const { data: rpcResult, error: rpcError } = await supabase.rpc(
+      "delete_user_complete",
+      { p_user_id: user_id }
+    );
 
-    if (branchError) {
-      console.warn("⚠️ Branch access deletion warning:", branchError.message);
-    }
+    if (rpcError) {
+      console.warn("⚠️ RPC deletion warning:", rpcError.message);
 
-    // Step 3: Delete user from database
-    const { error: dbError } = await supabase
-      .from("users")
-      .delete()
-      .eq("id", user_id);
+      // Fallback: Delete manually if RPC not available
+      const { error: branchError } = await supabase
+        .from("user_branch_access")
+        .delete()
+        .eq("user_id", user_id);
 
-    if (dbError) {
-      return new Response(
-        JSON.stringify({
-          error: `Failed to delete database user: ${dbError.message}`,
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      if (branchError) {
+        console.warn("⚠️ Branch access deletion warning:", branchError.message);
+      }
+
+      const { error: dbError } = await supabase
+        .from("users")
+        .delete()
+        .eq("id", user_id);
+
+      if (dbError) {
+        return new Response(
+          JSON.stringify({
+            error: `Failed to delete database user: ${dbError.message}`,
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+    } else {
+      console.log(`✅ RPC deletion result:`, rpcResult);
     }
 
     console.log(`✅ User ${user_id} deleted successfully`);
