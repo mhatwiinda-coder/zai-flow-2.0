@@ -207,9 +207,9 @@
   const token = localStorage.getItem("token");
 
   // Initialize branch context display
-  setTimeout(async () => {
-    await initializeBranchDisplay();
-    await updatePageTitle('ZRA Smart Invoice');
+  setTimeout(() => {
+    initializeBranchDisplay();
+    updatePageTitle('ZRA Smart Invoice');
   }, 500);
 
   function authHeaders() {

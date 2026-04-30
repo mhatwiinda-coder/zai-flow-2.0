@@ -296,9 +296,12 @@ function updateWelcomeSection() {
 async function loadAttendanceStatus() {
   if (!supabase || !context) return;
 
+  const authUUID = getAuthUUID();
+  if (!authUUID) return;
+
   try {
     const { data, error } = await supabase.rpc('get_attendance_status', {
-      p_user_id: context.user_id,
+      p_user_id: authUUID,
       p_business_id: context.business_id
     });
 
@@ -341,9 +344,12 @@ async function loadAttendanceStatus() {
 async function loadUserTasks() {
   if (!supabase || !context) return;
 
+  const authUUID = getAuthUUID();
+  if (!authUUID) return;
+
   try {
     const { data, error } = await supabase.rpc('get_user_tasks', {
-      p_user_id: context.user_id,
+      p_user_id: authUUID,
       p_business_id: context.business_id,
       p_status: null
     });
@@ -421,9 +427,12 @@ function renderTasksByStatus(tabSuffix, tasks) {
 async function loadNotifications() {
   if (!supabase || !context) return;
 
+  const authUUID = getAuthUUID();
+  if (!authUUID) return;
+
   try {
     const { data, error } = await supabase.rpc('get_unread_notifications', {
-      p_user_id: context.user_id,
+      p_user_id: authUUID,
       p_business_id: context.business_id
     });
 
@@ -460,12 +469,15 @@ async function loadNotifications() {
 }
 
 async function loadUserAccessibleModules() {
-  const currentContext = await getBranchContext();
+  const currentContext = getBranchContext();
   if (!supabase || !currentContext) return;
+
+  const authUUID = getAuthUUID();
+  if (!authUUID) return;
 
   try {
     const { data, error } = await supabase.rpc('get_user_accessible_modules', {
-      p_user_id: currentContext.user_id,
+      p_user_id: authUUID,
       p_business_id: currentContext.business_id
     });
 
@@ -577,8 +589,8 @@ function escapeHtml(text) {
 // INITIALIZATION - Runs once on page load
 // ============================================================================
 
-document.addEventListener('DOMContentLoaded', async () => {
-  context = await getBranchContext();
+document.addEventListener('DOMContentLoaded', () => {
+  context = getBranchContext();
 
   if (!context || !context.user_id) {
     console.error('❌ No user context found - redirecting to login');

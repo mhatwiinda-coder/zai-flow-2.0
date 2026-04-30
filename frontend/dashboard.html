@@ -178,9 +178,9 @@
   }
 
   // Initialize branch context display
-  setTimeout(async () => {
-    await initializeBranchDisplay();
-    await updatePageTitle('Dashboard');
+  setTimeout(() => {
+    initializeBranchDisplay();
+    updatePageTitle('Dashboard');
   }, 500);
 
   function logout() {

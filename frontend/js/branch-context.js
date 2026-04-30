@@ -4,67 +4,46 @@
 // ============================================================================
 
 /**
- * Get current branch context from Supabase (source of truth)
- * Fetches fresh data directly from database using Supabase Auth session
- * @returns {Promise<Object|null>} {branch_id, business_id, business_name, branch_name, user_id}
+ * Get current branch context from localStorage
+ * Fast, synchronous, no async/cache issues
+ * @returns {Object|null} {branch_id, business_id, business_name, branch_name, user_id}
  */
-async function getBranchContext() {
+function getBranchContext() {
   try {
-    // Get current Supabase auth session (UUID - always current, not stale)
-    const { data: { session } } = await supabase.auth.getSession();
+    const user = JSON.parse(localStorage.getItem('user'));
 
-    if (!session?.user?.id) {
-      console.error('❌ No authenticated session found');
+    if (!user || !user.current_branch_id) {
+      console.error('❌ No branch context found - user not logged in or branch not set');
       return null;
     }
 
-    const authId = session.user.id; // UUID from Supabase Auth
-
-    // Step 1: Get the INTEGER user_id from the users table using auth_id
-    const { data: userProfile, error: userError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('auth_id', authId)
-      .single();
-
-    if (userError || !userProfile?.id) {
-      console.error('❌ User profile not found:', userError?.message);
-      return null;
-    }
-
-    const userId = userProfile.id; // INTEGER user ID
-
-    // Step 2: Fetch user's primary branch from database using the INTEGER user_id
-    const { data: branches, error: branchError } = await supabase
-      .from('user_branch_access')
-      .select(`
-        branch_id,
-        is_primary_branch,
-        role,
-        branches(name, business_id, business_entities(name))
-      `)
-      .eq('user_id', userId)
-      .eq('status', 'ACTIVE')
-      .order('is_primary_branch', { ascending: false })
-      .limit(1);
-
-    if (branchError || !branches || branches.length === 0) {
-      console.error('❌ No branches found for user:', branchError?.message);
-      return null;
-    }
-
-    const primary = branches[0];
+    const branch = user.branches?.find(b => b.branch_id === user.current_branch_id);
 
     return {
-      branch_id: primary.branch_id,
-      business_id: primary.branches.business_id,
-      business_name: primary.branches.business_entities.name,
-      branch_name: primary.branches.name,
-      user_id: authId,
-      user_role: primary.role
+      branch_id: user.current_branch_id,
+      business_id: user.current_business_id,
+      business_name: branch?.business_name || 'Unknown',
+      branch_name: branch?.branch_name || 'Unknown',
+      user_id: user.id,
+      user_role: user.role
     };
   } catch (err) {
     console.error('❌ Error getting branch context:', err);
+    return null;
+  }
+}
+
+/**
+ * Get the current user's UUID from Supabase Auth
+ * Used for RPC function calls (RPC functions expect UUID)
+ * @returns {String|null} UUID from Supabase Auth
+ */
+function getAuthUUID() {
+  try {
+    const { data: { session } } = supabase.auth.getSession();
+    return session?.user?.id || null;
+  } catch (err) {
+    console.error('❌ Error getting auth UUID:', err);
     return null;
   }
 }
