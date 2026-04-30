@@ -10,7 +10,7 @@ function loadGoodsReceiptList() {
   (async () => {
     try {
       const { data, error } = await withBranchFilter(
-        supabase.from('purchase_orders').select('id, po_number, status, total_amount, suppliers(name), purchase_order_items(quantity_ordered, quantity_received)')
+        window.supabase.from('purchase_orders').select('id, po_number, status, total_amount, suppliers(name), purchase_order_items(quantity_ordered, quantity_received)')
       )
         .eq('status', 'CONFIRMED')
         .order('created_at', { ascending: false });
@@ -131,7 +131,7 @@ function submitGoodsReceipt() {
       }
 
       // Call RPC function to receive goods
-      const { data, error } = await supabase.rpc('receive_purchase_order', {
+      const { data, error } = await window.supabase.rpc('receive_purchase_order', {
         p_po_id: currentGRPoId,
         p_received_items: receivedItems
       });

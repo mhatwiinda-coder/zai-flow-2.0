@@ -142,7 +142,7 @@ function loadProfitAndLoss() {
       const context = getBranchContext();
       if (!context) return;
 
-      const { data, error } = await supabase.rpc('get_profit_loss', {
+      const { data, error } = await window.supabase.rpc('get_profit_loss', {
         p_business_id: context.business_id
       });
 
@@ -213,7 +213,7 @@ function loadBalanceSheet() {
       const context = getBranchContext();
       if (!context) return;
 
-      const { data: accounts, error } = await supabase.rpc('get_trial_balance', {
+      const { data: accounts, error } = await window.supabase.rpc('get_trial_balance', {
         p_business_id: context.business_id
       });
 
@@ -320,7 +320,7 @@ function loadTrialBalance() {
       const context = getBranchContext();
       if (!context) return;
 
-      const { data: accounts, error } = await supabase.rpc('get_trial_balance', {
+      const { data: accounts, error } = await window.supabase.rpc('get_trial_balance', {
         p_business_id: context.business_id
       });
 
@@ -379,7 +379,7 @@ function loadGeneralLedger() {
       const context = getBranchContext();
       if (!context) return;
 
-      const { data: ledgerData, error } = await supabase.rpc('get_general_ledger', {
+      const { data: ledgerData, error } = await window.supabase.rpc('get_general_ledger', {
         p_business_id: context.business_id
       });
 

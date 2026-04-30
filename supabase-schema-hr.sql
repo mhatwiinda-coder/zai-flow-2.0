@@ -126,12 +126,12 @@ CREATE TABLE public.payroll_runs (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT unique_payroll_per_branch UNIQUE(branch_id, month, year)
-    WHERE status != 'REVERSED'
 );
 
 CREATE INDEX idx_payroll_runs_branch_id ON public.payroll_runs(branch_id);
 CREATE INDEX idx_payroll_runs_month_year ON public.payroll_runs(month, year);
 CREATE INDEX idx_payroll_runs_status ON public.payroll_runs(status);
+CREATE UNIQUE INDEX idx_payroll_runs_unique_active ON public.payroll_runs(branch_id, month, year) WHERE status != 'REVERSED';
 
 -- ============================================================================
 -- 7. PAYROLL DEDUCTIONS TABLE - Multi-Tenant

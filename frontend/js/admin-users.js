@@ -22,7 +22,7 @@ function initUserManagement() {
 ===================================================== */
 async function loadAvailableBusinesses() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await window.supabase
       .from('business_entities')
       .select('id, name, status')
       .eq('status', 'ACTIVE')
@@ -86,7 +86,7 @@ async function loadBusinessUsers() {
     }
 
     // Call RPC to get business users
-    const { data, error } = await supabase.rpc('get_business_users', {
+    const { data, error } = await window.supabase.rpc('get_business_users', {
       p_business_id: currentBusinessId
     });
 
@@ -160,7 +160,7 @@ async function createBusinessUser(event) {
     }
 
     // Call RPC to create user
-    const { data, error } = await supabase.rpc('create_business_user', {
+    const { data, error } = await window.supabase.rpc('create_business_user', {
       p_business_id: currentBusinessId,
       p_email: email,
       p_password: password,
@@ -214,7 +214,7 @@ function editUser(userId) {
 ===================================================== */
 async function updateUserRole(userId, newRole) {
   try {
-    const { data, error } = await supabase.rpc('update_user_role', {
+    const { data, error } = await window.supabase.rpc('update_user_role', {
       p_user_id: userId,
       p_new_role: newRole
     });
@@ -245,7 +245,7 @@ async function deleteUser(userId) {
   }
 
   try {
-    const { data, error } = await supabase.rpc('delete_business_user', {
+    const { data, error } = await window.supabase.rpc('delete_business_user', {
       p_user_id: userId
     });
 

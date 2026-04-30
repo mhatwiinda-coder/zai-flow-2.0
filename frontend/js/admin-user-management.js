@@ -162,7 +162,7 @@ async function assignRoleToUser(user) {
     // Use RPC function to assign role
     const { data, error } = await window.supabase.rpc('assign_user_role', {
       p_user_id: userUUID,
-      p_assigned_by: context.user_id,
+      p_assigned_by: getAuthUUID(),
       p_business_id: context.business_id,
       p_role_id: roleId
     });

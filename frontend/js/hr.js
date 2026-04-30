@@ -40,7 +40,7 @@ function loadEmployeeList() {
 
       console.log(`📡 Loading employees for business_id: ${context.business_id}`);
 
-      const { data: employees, error } = await supabase.rpc('get_business_employees', {
+      const { data: employees, error } = await window.supabase.rpc('get_business_employees', {
         p_business_id: context.business_id
       });
 
@@ -96,7 +96,7 @@ function loadDepartments() {
 
       console.log(`📡 Loading departments for business_id: ${context.business_id}`);
 
-      const { data: departments, error } = await supabase.rpc('get_business_departments', {
+      const { data: departments, error } = await window.supabase.rpc('get_business_departments', {
         p_business_id: context.business_id
       });
 
@@ -273,7 +273,7 @@ function saveEmployee() {
 
         console.log(`📝 Creating employee for business_id: ${context.business_id}, branch_id: ${context.branch_id}`);
 
-        const { data: newEmp, error: empError } = await supabase
+        const { data: newEmp, error: empError } = await window.supabase
           .from('employees')
           .insert({
             business_id: context.business_id,
@@ -296,7 +296,7 @@ function saveEmployee() {
         const empId = newEmp[0].id;
 
         // Create salary structure
-        const { error: salError } = await supabase
+        const { error: salError } = await window.supabase
           .from('salary_structures')
           .insert({
             employee_id: empId,
@@ -353,7 +353,7 @@ function loadAttendanceData() {
       }
 
       // Get attendance records for the date range
-      const { data: attendanceRecords } = await supabase
+      const { data: attendanceRecords } = await window.supabase
         .from('attendance')
         .select('employee_id, status, hours_worked')
         .gte('attendance_date', fromDate)
@@ -477,7 +477,6 @@ function loadLeaveRequests() {
       let query = supabase
         .from('leave_requests')
         .select('*, employees(first_name, last_name, business_id), leave_types(name)')
-        .eq('business_id', context.business_id)
         .order('created_at', { ascending: false });
 
       const statusFilter = document.getElementById("leaveStatusFilter")?.value;
@@ -539,7 +538,7 @@ function approveLeave(leaveRequestId) {
   (async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const { data, error } = await supabase.rpc('approve_leave', {
+      const { data, error } = await window.supabase.rpc('approve_leave', {
         p_leave_request_id: leaveRequestId,
         p_approved_by: user.id
       });
@@ -558,7 +557,7 @@ function rejectLeave(leaveRequestId) {
   (async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const { data, error } = await supabase.rpc('reject_leave', {
+      const { data, error } = await window.supabase.rpc('reject_leave', {
         p_leave_request_id: leaveRequestId,
         p_approved_by: user.id
       });
@@ -746,7 +745,7 @@ function loadAttendanceChart() {
         const dateStr = date.toISOString().split('T')[0];
         dates.push(dateStr.slice(5));
 
-        const { data: attendance } = await supabase
+        const { data: attendance } = await window.supabase
           .from('attendance')
           .select('status')
           .eq('business_id', context.business_id)

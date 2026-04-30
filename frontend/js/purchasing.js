@@ -573,7 +573,7 @@ function submitPO() {
 
       const context = getBranchContext();
 
-      const { data, error } = await supabase.rpc('create_purchase_order', {
+      const { data, error } = await window.supabase.rpc('create_purchase_order', {
         p_branch_id: context.branch_id,
         p_supplier_id: currentPOData.supplier_id,
         p_items: poItems,

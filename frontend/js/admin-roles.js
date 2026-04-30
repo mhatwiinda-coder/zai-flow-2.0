@@ -322,9 +322,9 @@ async function confirmAssignRole() {
   }
 
   try {
-    const { data, error } = await supabase.rpc('assign_user_role', {
+    const { data, error } = await window.supabase.rpc('assign_user_role', {
       p_user_id: userId,
-      p_assigned_by: context.user_id,
+      p_assigned_by: getAuthUUID(),
       p_business_id: context.business_id,
       p_role_id: parseInt(roleId)
     });
@@ -391,7 +391,7 @@ async function confirmRemoveRole() {
 
     // Remove all roles for this user
     for (const role of user.roles) {
-      const { error } = await supabase.rpc('remove_user_role', {
+      const { error } = await window.supabase.rpc('remove_user_role', {
         p_user_id: selectedUserForRemoval,
         p_business_id: context.business_id,
         p_role_id: role.id

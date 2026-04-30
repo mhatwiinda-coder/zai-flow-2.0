@@ -38,7 +38,7 @@ function loadSalesMetrics() {
   (async () => {
     try {
       const { data: allSales, error } = await withBranchFilter(
-        supabase.from('sales').select('*')
+        window.supabase.from('sales').select('*')
       )
         .order('created_at', { ascending: false });
 
@@ -134,7 +134,7 @@ function loadFinancialMetrics() {
       const context = getBranchContext();
       if (!context) return;
 
-      const { data: profitLoss, error } = await supabase.rpc('get_profit_loss', {
+      const { data: profitLoss, error } = await window.supabase.rpc('get_profit_loss', {
         p_business_id: context.business_id
       });
 
@@ -465,7 +465,7 @@ function loadRecentSales() {
   (async () => {
     try {
       const { data: allSales, error } = await withBranchFilter(
-        supabase.from('sales').select('*')
+        window.supabase.from('sales').select('*')
       )
         .order('created_at', { ascending: false })
         .limit(5);

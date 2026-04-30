@@ -361,42 +361,89 @@ async function createNewUser() {
   }
 
   try {
-    // Create user with selected business
-    const { data, error } = await window.supabase
-      .from('users')
-      .insert([{
-        name,
-        email,
-        password, // Note: This should be hashed on the server side
-        role: 'employee', // All new users start as employees
+    // Call Netlify function to create user (handles Auth + Database)
+    const response = await fetch('/.netlify/functions/create-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+        name: name,
+        role: 'employee',
         business_id: parseInt(businessId)
-      }])
-      .select();
+      })
+    });
 
-    if (error) throw error;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to create user');
+    }
+
+    const result = await response.json();
+    const createdUser = result.user;
 
     const business = allBusinesses.find(b => b.id === parseInt(businessId));
     let successMsg = `✅ User "${name}" created successfully in "${business.name}"`;
 
-    // If branch was selected, assign user to branch access (if implemented)
-    if (branchId && data && data[0]) {
+    // If branch was selected, assign user to branch access
+    if (branchId && createdUser) {
       const branch = allBranches.find(br => br.id === parseInt(branchId));
       successMsg += ` (${branch.name})`;
 
-      // Try to assign branch access (if user_branch_access table exists)
+      // Assign branch access
       try {
         await window.supabase
           .from('user_branch_access')
           .insert([{
-            user_id: data[0].id,
-            branch_id: parseInt(branchId)
+            user_id: createdUser.id,
+            branch_id: parseInt(branchId),
+            role: 'employee',
+            is_primary_branch: true,
+            status: 'ACTIVE'
           }]);
       } catch (err) {
-        console.warn('Branch assignment note (table may not exist):', err.message);
+        console.warn('Branch assignment error:', err.message);
+        successMsg += ' (⚠️ branch assignment pending)';
       }
     }
 
-    showMessage(successMsg, 'success', 'userMessage');
+    // Auto-create employee record for the user
+    try {
+      const nameParts = name.trim().split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.slice(1).join(' ') || firstName;
+
+      // Generate employee code (format: EMP-YYYYMMDD-XXXXX for uniqueness)
+      const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+      const randomSuffix = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+      const employeeCode = `EMP-${today}-${randomSuffix}`;
+
+      const { error: empError } = await window.supabase
+        .from('employees')
+        .insert({
+          business_id: parseInt(businessId),
+          branch_id: branchId ? parseInt(branchId) : null,
+          employee_code: employeeCode,
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          position: 'employee',
+          hire_date: new Date().toISOString().split('T')[0],
+          status: 'ACTIVE'
+        });
+
+      if (empError) {
+        console.warn('Employee auto-creation warning:', empError.message);
+        successMsg += ' (⚠️ HR record pending manual setup)';
+      } else {
+        successMsg += ' + HR record created';
+      }
+    } catch (err) {
+      console.warn('Employee auto-creation error:', err.message);
+      successMsg += ' (⚠️ HR record needs manual setup)';
+    }
+
+    showMessage(successMsg + ' - User can now login!', 'success', 'userMessage');
 
     // Clear form
     document.getElementById('newUserBusiness').value = '';
@@ -534,7 +581,7 @@ async function assignRolesToUser() {
     // Assign main role
     const { data, error } = await window.supabase.rpc('assign_user_role', {
       p_user_id: userUUID,
-      p_assigned_by: context.user_id,
+      p_assigned_by: getAuthUUID(),
       p_business_id: context.business_id,
       p_role_id: role.id
     });

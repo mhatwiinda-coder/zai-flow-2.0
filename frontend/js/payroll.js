@@ -15,7 +15,7 @@ function runPayroll() {
       }
 
       // Call RPC function to process payroll
-      const { data, error } = await supabase.rpc('process_payroll', {
+      const { data, error } = await window.supabase.rpc('process_payroll', {
         p_month: month,
         p_year: year
       });
@@ -42,7 +42,7 @@ function loadPayrollSummary() {
       const year = parseInt(document.getElementById("payrollYear").value);
 
       // Get payroll run
-      const { data: payrollRuns, error: runError } = await supabase
+      const { data: payrollRuns, error: runError } = await window.supabase
         .from('payroll_runs')
         .select('*')
         .eq('month', month)
@@ -415,7 +415,7 @@ function reversePayroll() {
         return;
       }
 
-      const { data, error } = await supabase.rpc('reverse_payroll', {
+      const { data, error } = await window.supabase.rpc('reverse_payroll', {
         p_payroll_run_id: payrollRuns[0].id
       });
 

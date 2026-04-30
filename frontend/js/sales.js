@@ -286,7 +286,7 @@ function checkDrawerStatus() {
 
       // Get the most recent open drawer for this user (using PostgREST instead of RPC)
       const { data: drawers, error: drawerError } = await withBranchFilter(
-        supabase.from('cash_drawer').select('*')
+        window.supabase.from('cash_drawer').select('*')
       )
         .eq('user_id', String(user?.id))
         .order('opened_at', { ascending: false })
@@ -382,9 +382,9 @@ function openDrawer() {
         p_opening_balance: opening
       });
 
-      const { data, error } = await supabase.rpc('open_cash_drawer', {
+      const { data, error } = await window.supabase.rpc('open_cash_drawer', {
         p_branch_id: context.branch_id,
-        p_user_id: user?.id,
+        p_user_id: getAuthUUID(),
         p_opening_balance: opening
       });
 
@@ -749,7 +749,7 @@ function completeSale() {
         return;
       }
 
-      const { data, error } = await supabase.rpc('create_sale', {
+      const { data, error } = await window.supabase.rpc('create_sale', {
         p_branch_id: context.branch_id,
         p_total: total,
         p_payment_method: paymentMethod,
@@ -1420,13 +1420,13 @@ function closeTill() {
             // Debit/Credit based on variance
             if (variance > 0) {
               // SHORTAGE: Debit Till Variance Expense, credit Cash
-              await supabase.from('journal_lines').insert([
+              await window.supabase.from('journal_lines').insert([
                 { journal_id: journalId, account_id: varianceAccount.id, debit: Math.abs(variance), branch_id: context.branch_id },
                 { journal_id: journalId, account_id: cashAccount.id, credit: Math.abs(variance), branch_id: context.branch_id }
               ]);
             } else {
               // OVERAGE: Debit Cash, credit Till Variance Expense
-              await supabase.from('journal_lines').insert([
+              await window.supabase.from('journal_lines').insert([
                 { journal_id: journalId, account_id: cashAccount.id, debit: Math.abs(variance), branch_id: context.branch_id },
                 { journal_id: journalId, account_id: varianceAccount.id, credit: Math.abs(variance), branch_id: context.branch_id }
               ]);
@@ -1586,7 +1586,7 @@ function reverseSaleTransaction(saleId) {
     try {
       console.log('📤 Calling RPC: reverse_sale');
 
-      const { data, error } = await supabase.rpc('reverse_sale', {
+      const { data, error } = await window.supabase.rpc('reverse_sale', {
         p_sale_id: saleId
       });
 

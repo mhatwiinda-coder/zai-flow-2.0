@@ -65,16 +65,16 @@ export default async (req, context) => {
 
     console.log(`✅ Auth user created: ${authUser.user.id}`);
 
-    // Step 2: Create user in database
+    // Step 2: Create user in database (auth_id links to Supabase Auth UUID)
     const { data: dbUser, error: dbError } = await supabase
       .from("users")
       .insert({
-        id: authUser.user.id, // Link to Auth user
+        auth_id: authUser.user.id, // Link to Auth user UUID
         email: email,
         name: name,
         role: role,
-        business_id: business_id,
-        password: password, // Store for reference (should ideally not be stored)
+        business_id: business_id
+        // Do NOT store password in database
       })
       .select()
       .single();
@@ -94,7 +94,7 @@ export default async (req, context) => {
       );
     }
 
-    console.log(`✅ Database user created: ${dbUser.id}`);
+    console.log(`✅ Database user created: ${dbUser.id} (auth_id: ${authUser.user.id})`);
 
     // Step 3: Create default branch access
     const { data: branches } = await supabase
@@ -120,19 +120,20 @@ export default async (req, context) => {
       }
     }
 
-    console.log(`✅ User ${email} created successfully`);
+    console.log(`✅ User ${email} created successfully with ID ${dbUser.id}`);
 
     return new Response(
       JSON.stringify({
         success: true,
         user: {
           id: dbUser.id,
+          auth_id: authUser.user.id,
           email: dbUser.email,
           name: dbUser.name,
           role: dbUser.role,
           business_id: dbUser.business_id,
         },
-        message: `User ${email} created successfully with ${role} role`,
+        message: `User ${email} created successfully with ${role} role and automatic Supabase Auth setup`,
       }),
       {
         status: 200,

@@ -5,6 +5,11 @@ let currentInvoicePoId = null;
 let currentPaymentInvoiceId = null;
 let currentPaymentPoId = null;
 
+// Chart instance tracking (prevent canvas reuse errors)
+let topSuppliersChartInstance = null;
+let spendByStatusChartInstance = null;
+let paymentAgingChartInstance = null;
+
 /* =====================================================
    PURCHASE INVOICES
 ===================================================== */
@@ -67,7 +72,7 @@ function openRecordInvoiceModal(poId) {
     try {
       currentInvoicePoId = poId;
 
-      const { data, error } = await supabase
+      const { data, error } = await window.supabase
         .from('purchase_orders')
         .select('id, po_number, total_amount, suppliers(name)')
         .eq('id', poId)
@@ -118,7 +123,7 @@ function recordInvoice(event) {
         return;
       }
 
-      const { data, error } = await supabase.rpc('record_purchase_invoice', {
+      const { data, error } = await window.supabase.rpc('record_purchase_invoice', {
         p_po_id: currentInvoicePoId,
         p_supplier_invoice_no: invoiceNumber,
         p_invoice_date: invoiceDate,
@@ -144,7 +149,7 @@ function recordInvoice(event) {
 function loadSupplierPayments() {
   (async () => {
     try {
-      const { data: invoices, error } = await supabase
+      const { data: invoices, error } = await window.supabase
         .from('purchase_invoices')
         .select('id, po_id, supplier_invoice_no, amount, invoice_date, status, purchase_orders(po_number, suppliers(name))')
         .eq('status', 'MATCHED')
@@ -195,7 +200,7 @@ function openPaymentModal(poId, invoiceId) {
       currentPaymentPoId = poId;
       currentPaymentInvoiceId = invoiceId;
 
-      const { data, error } = await supabase
+      const { data, error } = await window.supabase
         .from('purchase_invoices')
         .select('id, amount, purchase_orders(po_number, suppliers(name))')
         .eq('id', invoiceId)
@@ -240,7 +245,7 @@ function processPayment(event) {
         return;
       }
 
-      const { data, error } = await supabase.rpc('process_purchase_payment', {
+      const { data, error } = await window.supabase.rpc('process_purchase_payment', {
         p_invoice_id: currentPaymentInvoiceId,
         p_amount: amount,
         p_payment_date: paymentDate,
@@ -269,7 +274,7 @@ function loadPurchasingAnalytics() {
   (async () => {
     try {
       // Load all PO data
-      const { data: allPOs, error: poError } = await supabase
+      const { data: allPOs, error: poError } = await window.supabase
         .from('purchase_orders')
         .select('id, status, total_amount, suppliers(name)');
 
@@ -299,7 +304,10 @@ function loadPurchasingAnalytics() {
 
       const topSupplierCtx = document.getElementById('topSuppliersChart');
       if (topSupplierCtx && topSuppliers.length > 0) {
-        new Chart(topSupplierCtx, {
+        if (topSuppliersChartInstance) {
+          topSuppliersChartInstance.destroy();
+        }
+        topSuppliersChartInstance = new Chart(topSupplierCtx, {
           type: 'pie',
           data: {
             labels: topSuppliers.map(([name]) => name),
@@ -333,7 +341,10 @@ function loadPurchasingAnalytics() {
 
       const statusCtx = document.getElementById('spendByStatusChart');
       if (statusCtx) {
-        new Chart(statusCtx, {
+        if (spendByStatusChartInstance) {
+          spendByStatusChartInstance.destroy();
+        }
+        spendByStatusChartInstance = new Chart(statusCtx, {
           type: 'bar',
           data: {
             labels: Object.keys(statusSpend),
@@ -351,7 +362,7 @@ function loadPurchasingAnalytics() {
       }
 
       // Payment aging chart
-      const { data: invoices, error: invoiceError } = await supabase
+      const { data: invoices, error: invoiceError } = await window.supabase
         .from('purchase_invoices')
         .select('invoice_date, amount, status')
         .eq('status', 'MATCHED');
@@ -369,7 +380,10 @@ function loadPurchasingAnalytics() {
 
       const agingCtx = document.getElementById('paymentAgingChart');
       if (agingCtx) {
-        new Chart(agingCtx, {
+        if (paymentAgingChartInstance) {
+          paymentAgingChartInstance.destroy();
+        }
+        paymentAgingChartInstance = new Chart(agingCtx, {
           type: 'line',
           data: {
             labels: Object.keys(agingBuckets),

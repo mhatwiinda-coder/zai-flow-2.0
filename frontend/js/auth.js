@@ -13,7 +13,7 @@ async function login() {
 
   try {
     // Sign in with Supabase Auth
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await window.supabase.auth.signInWithPassword({
       email: email,
       password: password
     });
@@ -29,7 +29,7 @@ async function login() {
     console.log("✅ Supabase Auth successful:", data.user.email);
 
     // Get user profile from database using auth_id
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await window.supabase
       .from('users')
       .select('id, name, email, role, business_id')
       .eq('auth_id', data.user.id)
@@ -43,7 +43,7 @@ async function login() {
     console.log("✅ Profile found:", {id: profile.id, name: profile.name, business_id: profile.business_id});
 
     // Fetch user's assigned branches from user_branch_access
-    const { data: branches, error: branchError } = await supabase
+    const { data: branches, error: branchError } = await window.supabase
       .from('user_branch_access')
       .select(`
         branch_id,
@@ -117,7 +117,7 @@ async function login() {
 // Logout function
 async function logout() {
   try {
-    await supabase.auth.signOut();
+    await window.supabase.auth.signOut();
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     window.location.href = "login.html";
