@@ -446,7 +446,12 @@
   if (!user) {
     window.location.href = "login.html";
   }
-  document.getElementById("userInfo").innerText = user.name + " (" + user.role + ")";
+  // Initialize branch context display BEFORE module loads
+  setTimeout(() => {
+    initializeBranchDisplay();
+    updatePageTitle('Accounting');
+  }, 500);
+
   function logout() {
     localStorage.clear();
     window.location.href = "login.html";
@@ -456,6 +461,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-init.js"></script>
 <script src="js/branch-context.js"></script>
+<script src="js/display-branch-context.js"></script>
 <script src="js/accounting.js"></script>
 
 </body>

@@ -7,7 +7,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-init.js"></script>
-  <script src="branch-context.js"></script>
+  <script src="js/branch-context.js"></script>
+  <script src="js/display-branch-context.js"></script>
 </head>
 <body>
 <script>
@@ -176,8 +177,11 @@
     window.location.href = "login.html";
   }
 
-  document.getElementById("userInfo").innerText =
-    user.name + " (" + user.role + ")";
+  // Initialize branch context display
+  setTimeout(() => {
+    initializeBranchDisplay();
+    updatePageTitle('Dashboard');
+  , 500);
 
   function logout() {
     localStorage.clear();
@@ -186,7 +190,8 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-init.js"></script>
-<script src="branch-context.js"></script>
+<script src="js/branch-context.js"></script>
+<script src="js/display-branch-context.js"></script>
 <script src="js/sidebar-manager.js"></script>
 <script src="js/dashboard.js"></script>
 </body>

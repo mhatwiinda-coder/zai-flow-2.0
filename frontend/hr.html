@@ -561,7 +561,11 @@
   if (!user) {
     window.location.href = "login.html";
   }
-  document.getElementById("userInfo").innerText = user.name + " (" + user.role + ")";
+  // Initialize branch context display
+  setTimeout(() => {
+    initializeBranchDisplay();
+    updatePageTitle('HR & Payroll');
+  , 500);
 
   function logout() {
     localStorage.clear();
