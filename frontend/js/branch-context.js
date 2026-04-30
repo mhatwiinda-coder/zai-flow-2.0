@@ -23,7 +23,7 @@ function getBranchContext() {
       business_id: user.current_business_id,
       business_name: branch?.business_name || 'Unknown',
       branch_name: branch?.branch_name || 'Unknown',
-      user_id: user.id,
+      user_id: user.auth_id,
       user_role: user.role
     };
   } catch (err) {
