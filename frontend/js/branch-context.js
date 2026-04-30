@@ -20,7 +20,21 @@ async function getBranchContext() {
 
     const authId = session.user.id; // UUID from Supabase Auth
 
-    // Fetch user's primary branch from database
+    // Step 1: Get the INTEGER user_id from the users table using auth_id
+    const { data: userProfile, error: userError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('auth_id', authId)
+      .single();
+
+    if (userError || !userProfile?.id) {
+      console.error('❌ User profile not found:', userError?.message);
+      return null;
+    }
+
+    const userId = userProfile.id; // INTEGER user ID
+
+    // Step 2: Fetch user's primary branch from database using the INTEGER user_id
     const { data: branches, error: branchError } = await supabase
       .from('user_branch_access')
       .select(`
@@ -29,7 +43,7 @@ async function getBranchContext() {
         role,
         branches(name, business_id, business_entities(name))
       `)
-      .eq('user_id', authId)
+      .eq('user_id', userId)
       .eq('status', 'ACTIVE')
       .order('is_primary_branch', { ascending: false })
       .limit(1);
