@@ -384,7 +384,7 @@ function openDrawer() {
 
       const { data, error } = await window.supabase.rpc('open_cash_drawer', {
         p_branch_id: context.branch_id,
-        p_user_id: getAuthUUID(),
+        p_user_id: user?.id,
         p_opening_balance: opening
       });
 
