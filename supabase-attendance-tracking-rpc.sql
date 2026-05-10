@@ -140,9 +140,9 @@ BEGIN
 
   -- Step 3: Find today's attendance record
   SELECT * INTO v_attendance_record
-  FROM public.attendance
-  WHERE employee_id = v_employee_id
-  AND attendance_date = CURRENT_DATE
+  FROM public.attendance a
+  WHERE a.employee_id = v_employee_id
+  AND a.attendance_date = CURRENT_DATE
   LIMIT 1;
 
   IF v_attendance_record IS NULL THEN
