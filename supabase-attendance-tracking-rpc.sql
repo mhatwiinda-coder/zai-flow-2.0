@@ -171,5 +171,67 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================================================
+-- RPC FUNCTION 3: Get Attendance Status
+-- ============================================================================
+DROP FUNCTION IF EXISTS get_attendance_status(UUID, INTEGER);
+CREATE OR REPLACE FUNCTION get_attendance_status(
+  p_user_id UUID,
+  p_business_id INTEGER
+)
+RETURNS TABLE (
+  is_clocked_in BOOLEAN,
+  elapsed_minutes INTEGER
+) AS $$
+DECLARE
+  v_user_id INTEGER;
+  v_employee_id INTEGER;
+  v_attendance_record RECORD;
+  v_elapsed_minutes INTEGER;
+BEGIN
+  -- Step 1: Find the internal user ID from auth_id (UUID)
+  SELECT id INTO v_user_id
+  FROM public.users
+  WHERE auth_id = p_user_id AND business_id = p_business_id
+  LIMIT 1;
+
+  IF v_user_id IS NULL THEN
+    RETURN QUERY SELECT FALSE, 0;
+    RETURN;
+  END IF;
+
+  -- Step 2: Find the employee record by email
+  SELECT id INTO v_employee_id
+  FROM public.employees
+  WHERE business_id = p_business_id
+  AND email = (SELECT email FROM public.users WHERE id = v_user_id)
+  LIMIT 1;
+
+  IF v_employee_id IS NULL THEN
+    RETURN QUERY SELECT FALSE, 0;
+    RETURN;
+  END IF;
+
+  -- Step 3: Check for today's attendance record
+  SELECT * INTO v_attendance_record
+  FROM public.attendance
+  WHERE employee_id = v_employee_id
+  AND attendance_date = CURRENT_DATE
+  LIMIT 1;
+
+  IF v_attendance_record IS NULL THEN
+    -- Not clocked in
+    RETURN QUERY SELECT FALSE, 0;
+    RETURN;
+  END IF;
+
+  -- Step 4: Calculate elapsed minutes since clock in
+  v_elapsed_minutes := EXTRACT(EPOCH FROM (NOW() - v_attendance_record.created_at))::INTEGER / 60;
+
+  -- Return clocked in status and elapsed minutes
+  RETURN QUERY SELECT TRUE, v_elapsed_minutes;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================================================
 -- ALL ATTENDANCE RPC FUNCTIONS CREATED SUCCESSFULLY
 -- ============================================================================
