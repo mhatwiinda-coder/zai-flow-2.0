@@ -224,7 +224,14 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Step 4: Calculate elapsed minutes since clock in
+  -- Step 4: Check if already clocked out (hours_worked is set)
+  IF v_attendance_record.hours_worked IS NOT NULL THEN
+    -- Already clocked out
+    RETURN QUERY SELECT FALSE, 0;
+    RETURN;
+  END IF;
+
+  -- Step 5: Calculate elapsed minutes since clock in
   v_elapsed_minutes := EXTRACT(EPOCH FROM (NOW() - v_attendance_record.created_at))::INTEGER / 60;
 
   -- Return clocked in status and elapsed minutes
