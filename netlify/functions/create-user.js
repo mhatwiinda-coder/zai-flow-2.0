@@ -36,14 +36,26 @@ export default async (req, context) => {
 
     console.log(`✅ Supabase client initialized`);
 
-    // Parse request
+    // Parse request (handle different body formats)
     let requestData;
     try {
-      requestData = JSON.parse(req.body);
+      console.log(`📥 Request body type:`, typeof req.body);
+      console.log(`📥 Request body:`, req.body);
+
+      // Handle different body formats
+      if (typeof req.body === 'string') {
+        requestData = JSON.parse(req.body);
+      } else if (typeof req.body === 'object') {
+        requestData = req.body;
+      } else {
+        return jsonResponse({ error: `Invalid request body type: ${typeof req.body}` }, 400);
+      }
+
       console.log(`📥 Request parsed: email=${requestData.email}`);
     } catch (e) {
       console.error(`❌ JSON parse error:`, e.message);
-      return jsonResponse({ error: `Invalid JSON: ${e.message}` }, 400);
+      console.error(`❌ Body was:`, req.body);
+      return jsonResponse({ error: `Invalid request: ${e.message}` }, 400);
     }
 
     const { email, password, name, role, business_id } = requestData;

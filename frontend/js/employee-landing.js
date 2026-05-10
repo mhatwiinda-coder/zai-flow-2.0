@@ -179,15 +179,28 @@ async function performCreateTask() {
 }
 
 function switchTaskTab(tabName) {
-  document.getElementById('task-tab-todo').classList.remove('active');
-  document.getElementById('task-tab-in-progress').classList.remove('active');
-  document.getElementById('task-tab-completed').classList.remove('active');
-  document.querySelectorAll('.tabs .tab-button').forEach(btn => {
+  // Hide all tab content divs and remove active class
+  document.getElementById('task-tab-todo').style.display = 'none';
+  document.getElementById('task-tab-in-progress').style.display = 'none';
+  document.getElementById('task-tab-completed').style.display = 'none';
+
+  // Remove active class from all tab buttons
+  document.querySelectorAll('.task-tabs .tab-button').forEach(btn => {
     btn.classList.remove('active');
+    btn.style.color = '#94a3b8';
+    btn.style.fontWeight = '500';
+    btn.style.borderBottomColor = 'transparent';
   });
-  document.getElementById(`task-tab-${tabName}`).classList.add('active');
+
+  // Show selected tab content
+  document.getElementById(`task-tab-${tabName}`).style.display = 'block';
+
+  // Highlight clicked tab button
   if (event && event.target) {
     event.target.classList.add('active');
+    event.target.style.color = '#3b82f6';
+    event.target.style.fontWeight = '600';
+    event.target.style.borderBottomColor = '#3b82f6';
   }
 }
 
