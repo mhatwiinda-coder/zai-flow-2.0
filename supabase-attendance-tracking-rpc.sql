@@ -36,12 +36,18 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Step 2: Find the employee record by email
-  SELECT e.id, e.branch_id
-  INTO v_employee_id, v_branch_id
+  -- Step 2: Find the employee record by email and get branch from user_branch_access
+  SELECT e.id
+  INTO v_employee_id
   FROM public.employees e
   JOIN public.users u ON u.email = e.email
   WHERE u.id = v_user_id AND e.business_id = p_business_id
+  LIMIT 1;
+
+  -- Step 2b: Get branch_id from user_branch_access
+  SELECT branch_id INTO v_branch_id
+  FROM public.user_branch_access
+  WHERE user_id = v_user_id AND status = 'ACTIVE'
   LIMIT 1;
 
   IF v_employee_id IS NULL THEN
