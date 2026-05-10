@@ -89,34 +89,45 @@ function loadEmployeeList() {
 }
 
 function loadDepartments() {
-  (async () => {
-    try {
-      const context = getBranchContext();
-      if (!context) return;
+  return new Promise((resolve) => {
+    (async () => {
+      try {
+        const context = getBranchContext();
+        if (!context) {
+          console.warn("⚠️ No context for departments");
+          resolve();
+          return;
+        }
 
-      console.log(`📡 Loading departments for business_id: ${context.business_id}`);
+        console.log(`📡 Loading departments for business_id: ${context.business_id}`);
 
-      const { data: departments, error } = await window.supabase.rpc('get_business_departments', {
-        p_business_id: context.business_id
-      });
-
-      if (error) {
-        console.error("❌ Department RPC Error:", error);
-        throw error;
-      }
-
-      if (Array.isArray(departments)) {
-        let html = '<option value="">Select Department</option>';
-        departments.forEach(dept => {
-          html += `<option value="${dept.department_id}">${dept.name}</option>`;
+        const { data: departments, error } = await window.supabase.rpc('get_business_departments', {
+          p_business_id: context.business_id
         });
-        document.getElementById("empDepartment").innerHTML = html;
-        console.log(`✅ Loaded ${departments.length} departments`);
+
+        if (error) {
+          console.error("❌ Department RPC Error:", error);
+          resolve();
+          return;
+        }
+
+        if (Array.isArray(departments) && departments.length > 0) {
+          let html = '<option value="">Select Department</option>';
+          departments.forEach(dept => {
+            html += `<option value="${dept.department_id}">${dept.name}</option>`;
+          });
+          document.getElementById("empDepartment").innerHTML = html;
+          console.log(`✅ Loaded ${departments.length} departments`);
+        } else {
+          console.warn("⚠️ No departments found");
+        }
+        resolve();
+      } catch (err) {
+        console.error("❌ Department load error:", err);
+        resolve();
       }
-    } catch (err) {
-      console.error("❌ Department load error:", err);
-    }
-  })();
+    })();
+  });
 }
 
 function filterEmployeeTable() {
@@ -162,6 +173,9 @@ function openEmployeeModal() {
 function editEmployee(empId) {
   (async () => {
     try {
+      // Ensure departments are loaded first
+      await loadDepartments();
+
       const { data: employee, error } = await supabase
         .from('employees')
         .select('*, salary_structures(*)')
