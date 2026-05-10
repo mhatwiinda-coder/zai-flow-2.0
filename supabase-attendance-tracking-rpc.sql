@@ -57,9 +57,9 @@ BEGIN
 
   -- Step 3: Check if attendance record already exists for today
   SELECT * INTO v_existing_record
-  FROM public.attendance
-  WHERE employee_id = v_employee_id
-  AND attendance_date = CURRENT_DATE
+  FROM public.attendance a
+  WHERE a.employee_id = v_employee_id
+  AND a.attendance_date = CURRENT_DATE
   LIMIT 1;
 
   IF v_existing_record IS NOT NULL THEN
