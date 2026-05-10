@@ -395,6 +395,56 @@
       font-size: 13px;
     }
 
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+    }
+
+    .module-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #475569;
+      transition: all 0.3s;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .module-link:hover {
+      background: #e0e7ff;
+      color: #3b82f6;
+      transform: translateY(-2px);
+    }
+
+    .module-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .notifications-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .notification-item {
+      padding: 12px;
+      background: #f8fafc;
+      border-left: 4px solid #3b82f6;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .notification-item.unread {
+      background: #eff6ff;
+    }
+
     /* Calendar */
     .calendar-grid {
       display: grid;
@@ -614,175 +664,86 @@
       <!-- Profile Card -->
       <div class="profile-card">
         <div class="profile-avatar">👤</div>
-        <div class="profile-name" id="user-name">Employee</div>
-        <div class="profile-title" id="user-role">Loading...</div>
-        <div class="profile-salary">$1,500</div>
+        <div class="profile-name" id="user-name">--</div>
+        <div class="profile-title" id="user-role">--</div>
+        <div class="profile-title" id="business-name" style="font-size: 12px; color: #94a3b8;">Loading business...</div>
 
-        <!-- Sidebar Sections -->
+        <!-- Attendance Status -->
         <div class="sidebar-section">
-          <div class="sidebar-section-title">Pension Contributions</div>
+          <div class="sidebar-section-title">Status</div>
           <div class="sidebar-item">
-            <strong>Status:</strong> <span id="pension-status">Active</span>
+            <span id="attendance-status">Offline</span>
           </div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-section-title">Device</div>
-          <div class="sidebar-item">MacBook Air</div>
-          <div class="sidebar-item" style="margin-top: 8px;">
-            <small id="device-info">M1 Chip, 256GB</small>
-          </div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-section-title">Compensation Summary</div>
-          <div class="sidebar-item">
-            <strong>Base:</strong> <span>$1,500</span>
-          </div>
-        </div>
-
-        <div class="sidebar-section">
-          <div class="sidebar-section-title">Employee Benefits</div>
-          <div class="sidebar-item">✓ Health Insurance</div>
-          <div class="sidebar-item">✓ Dental Plan</div>
-          <div class="sidebar-item">✓ Retirement Plan</div>
         </div>
       </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-      <!-- Status Badges -->
-      <div class="status-badges">
-        <div class="status-badge active">DCA</div>
-        <div class="status-badge active">JYS</div>
-        <div class="status-badge">ASE</div>
-        <div class="status-badge">AEL</div>
-      </div>
 
       <!-- KPI Cards -->
       <div class="kpi-cards">
         <div class="kpi-card">
-          <div class="kpi-label">Employees</div>
-          <div class="kpi-value" id="employee-count">92</div>
+          <div class="kpi-label">Unread Notifications</div>
+          <div class="kpi-value" id="notification-count">0</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Projects</div>
-          <div class="kpi-value" id="project-count">75</div>
+          <div class="kpi-label">Tasks Due Today</div>
+          <div class="kpi-value" id="task-count">0</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Modules Available</div>
-          <div class="kpi-value" id="module-count">16</div>
+          <div class="kpi-value" id="module-count">0</div>
         </div>
       </div>
 
-      <!-- Content Grid -->
-      <div class="content-grid">
-        <!-- Progress Card -->
-        <div class="card">
-          <div class="card-title">
-            <span class="card-title-icon">📊</span>
-            Progress
-          </div>
-
-          <div class="progress-section">
-            <div class="progress-label">Work Time (Q1)</div>
-            <div class="progress-value">6.1h</div>
-            <div class="progress-meta">Work Time (90 Days)</div>
-            <div class="progress-bar">
-              <div class="progress-bar-fill" style="width: 61%;"></div>
-            </div>
-          </div>
-
-          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-            <div class="progress-label">Q1 Target</div>
-            <div class="progress-value">10h</div>
-          </div>
+      <!-- Time Tracker Card -->
+      <div class="card" style="margin-bottom: 24px; grid-column: 1/-1;">
+        <div class="card-title">
+          <span class="card-title-icon">⏱️</span>
+          Time Tracker
         </div>
 
-        <!-- Time Tracker Card -->
-        <div class="card">
-          <div class="card-title">
-            <span class="card-title-icon">⏱️</span>
-            Time Tracker
-          </div>
-
-          <div class="time-tracker">
-            <div class="status-badge-lg" id="clock-status">Not Clocked In</div>
-            <div class="time-display" id="current-time">--:--</div>
-            <div class="time-label" id="elapsed-time-display">Not clocked in</div>
-            <div class="clock-buttons">
-              <button class="btn-clock btn-clock-in" id="clock-in-btn" onclick="showClockInModal()">
-                ✓ Clock In
-              </button>
-              <button class="btn-clock btn-clock-out" id="clock-out-btn" onclick="showClockOutModal()" style="display:none;">
-                ✕ Clock Out
-              </button>
-            </div>
+        <div class="time-tracker">
+          <div class="status-badge-lg" id="clock-status">Not Clocked In</div>
+          <div class="time-display" id="current-time">--:--</div>
+          <div class="time-label" id="elapsed-time-display">Not clocked in</div>
+          <div class="clock-buttons">
+            <button class="btn-clock btn-clock-in" id="clock-in-btn" onclick="showClockInModal()">
+              ✓ Clock In
+            </button>
+            <button class="btn-clock btn-clock-out" id="clock-out-btn" onclick="showClockOutModal()" style="display:none;">
+              ✕ Clock Out
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- Bottom Row -->
-      <div class="content-grid">
-        <!-- Onboarding Card -->
-        <div class="card">
-          <div class="card-title">
-            <span class="card-title-icon">🎯</span>
-            Onboarding
-            <span style="margin-left: auto; color: #3b82f6; font-size: 16px;">42%</span>
-          </div>
 
-          <div class="task-item">
-            <input type="checkbox" class="task-checkbox" checked>
-            <div class="task-text">Client Meetings</div>
-            <div class="task-badge">3/8</div>
-          </div>
-          <div class="task-item">
-            <input type="checkbox" class="task-checkbox" checked>
-            <div class="task-text">Design Review</div>
-          </div>
-          <div class="task-item">
-            <input type="checkbox" class="task-checkbox">
-            <div class="task-text">Project Kickoff</div>
-          </div>
-          <div class="task-item">
-            <input type="checkbox" class="task-checkbox">
-            <div class="task-text">Team Orientation</div>
+      <!-- Modules Card -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <span class="card-title-icon">🔗</span>
+          Your Modules
+        </div>
+        <div class="modules-grid" id="quick-links-container">
+          <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <p>Loading your accessible modules...</p>
           </div>
         </div>
+      </div>
 
-        <!-- Calendar Card -->
-        <div class="card">
-          <div class="card-title">
-            <span class="card-title-icon">📅</span>
-            September 2024
-          </div>
-
-          <div class="calendar-grid">
-            <div class="calendar-day calendar-day-header">Mon</div>
-            <div class="calendar-day calendar-day-header">Tue</div>
-            <div class="calendar-day calendar-day-header">Wed</div>
-            <div class="calendar-day calendar-day-header">Thu</div>
-            <div class="calendar-day calendar-day-header">Fri</div>
-            <div class="calendar-day calendar-day-header">Sat</div>
-            <div class="calendar-day calendar-day-header">Sun</div>
-
-            <div class="calendar-day"><span class="calendar-date">23</span></div>
-            <div class="calendar-day"><span class="calendar-date">24</span></div>
-            <div class="calendar-day"><span class="calendar-date">25</span></div>
-            <div class="calendar-day"><span class="calendar-date">26</span></div>
-            <div class="calendar-day"><span class="calendar-date">27</span></div>
-            <div class="calendar-day"><span class="calendar-date">28</span></div>
-            <div class="calendar-day"><span class="calendar-date">29</span></div>
-
-            <div class="calendar-day"><span class="calendar-date">30</span></div>
-            <div class="calendar-day"><span class="calendar-date active">1</span></div>
-            <div class="calendar-day"><span class="calendar-date">2</span></div>
-            <div class="calendar-day"><span class="calendar-date">3</span></div>
-            <div class="calendar-day"><span class="calendar-date">4</span></div>
-            <div class="calendar-day"><span class="calendar-date">5</span></div>
-            <div class="calendar-day"><span class="calendar-date">6</span></div>
+      <!-- Notifications Card -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <span class="card-title-icon">🔔</span>
+          Notifications
+        </div>
+        <div class="notifications-list" id="notification-list">
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>No notifications yet</p>
           </div>
         </div>
       </div>
@@ -910,91 +871,5 @@
   <script src="js/branch-context.js"></script>
   <script src="js/display-branch-context.js"></script>
   <script src="js/employee-landing.js"></script>
-
-  <!-- Utility Functions -->
-  <script>
-    // Modal Functions
-    function showClockInModal() {
-      const modal = document.getElementById('clock-in-modal');
-      const timeInput = document.getElementById('clock-in-time');
-      timeInput.value = new Date().toLocaleTimeString();
-      modal.classList.add('active');
-    }
-
-    function closeClockInModal() {
-      document.getElementById('clock-in-modal').classList.remove('active');
-    }
-
-    function showClockOutModal() {
-      const modal = document.getElementById('clock-out-modal');
-      const timeInput = document.getElementById('clock-out-time');
-      timeInput.value = new Date().toLocaleTimeString();
-      modal.classList.add('active');
-    }
-
-    function closeClockOutModal() {
-      document.getElementById('clock-out-modal').classList.remove('active');
-    }
-
-    function showCreateTaskModal() {
-      document.getElementById('create-task-modal').classList.add('active');
-    }
-
-    function closeCreateTaskModal() {
-      document.getElementById('create-task-modal').classList.remove('active');
-    }
-
-    function switchTaskTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-      document.getElementById('task-tab-' + tabName).style.display = 'block';
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-      let modal = document.getElementById('clock-in-modal');
-      if (event.target == modal) modal.classList.remove('active');
-
-      modal = document.getElementById('clock-out-modal');
-      if (event.target == modal) modal.classList.remove('active');
-
-      modal = document.getElementById('create-task-modal');
-      if (event.target == modal) modal.classList.remove('active');
-    }
-
-    // Stub functions - these will be provided by employee-landing.js
-    function performClockIn() {
-      if (typeof performClockIn_impl !== 'undefined') {
-        performClockIn_impl();
-      }
-    }
-
-    function performClockOut() {
-      if (typeof performClockOut_impl !== 'undefined') {
-        performClockOut_impl();
-      }
-    }
-
-    function performCreateTask() {
-      if (typeof performCreateTask_impl !== 'undefined') {
-        performCreateTask_impl();
-      }
-    }
-
-    function markAllNotificationsRead() {
-      if (typeof markAllNotificationsRead_impl !== 'undefined') {
-        markAllNotificationsRead_impl();
-      }
-    }
-
-    // Update current time display
-    setInterval(() => {
-      const now = new Date();
-      document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
-    }, 1000);
-  </script>
 </body>
 </html>
