@@ -108,7 +108,7 @@ function loadDepartments() {
       if (Array.isArray(departments)) {
         let html = '<option value="">Select Department</option>';
         departments.forEach(dept => {
-          html += `<option value="${dept.id}">${dept.name}</option>`;
+          html += `<option value="${dept.department_id}">${dept.name}</option>`;
         });
         document.getElementById("empDepartment").innerHTML = html;
         console.log(`✅ Loaded ${departments.length} departments`);
