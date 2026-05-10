@@ -7,464 +7,443 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .employee-container {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .welcome-section {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .welcome-section h1 {
-      margin: 0 0 10px 0;
-      font-size: 28px;
-    }
-
-    .welcome-section p {
+    * {
       margin: 0;
-      opacity: 0.9;
-      font-size: 14px;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .role-badge {
+    body {
+      background: linear-gradient(135deg, #f0f4ff 0%, #f5f3ff 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation */
+    .navbar {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 32px;
+      height: 64px;
+    }
+
+    .nav-brand h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: #666;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #3b82f6;
+    }
+
+    .nav-link.active {
+      color: #3b82f6;
+      font-weight: 600;
+    }
+
+    /* Main Layout */
+    .dashboard-wrapper {
+      display: flex;
+      padding: 32px;
+      gap: 32px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: white;
+      margin: 0 auto 16px;
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+
+    .profile-title {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .profile-salary {
+      font-size: 14px;
+      font-weight: 600;
+      color: #3b82f6;
+      background: #eff6ff;
+      padding: 8px 12px;
+      border-radius: 8px;
       display: inline-block;
-      background: rgba(255,255,255,0.3);
-      padding: 4px 12px;
+      margin-bottom: 16px;
+    }
+
+    .profile-divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 16px 0;
+    }
+
+    .sidebar-section {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .sidebar-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .sidebar-item strong {
+      color: #1e293b;
+      margin-right: 8px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+    }
+
+    .status-badges {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      padding: 8px 16px;
+      background: #0f172a;
+      color: white;
       border-radius: 20px;
       font-size: 12px;
-      margin-top: 10px;
+      font-weight: 600;
+      display: inline-block;
     }
 
-    .grid-2col {
+    .status-badge.active {
+      background: #3b82f6;
+    }
+
+    .kpi-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .kpi-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin: 8px 0;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .content-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 24px;
+      margin-bottom: 24px;
     }
 
     .card {
       background: white;
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    .card h2 {
-      margin: 0 0 15px 0;
-      font-size: 18px;
-      color: #333;
-      border-bottom: 2px solid #667eea;
-      padding-bottom: 10px;
-    }
-
-    .clock-widget {
-      text-align: center;
-      padding: 20px;
-    }
-
-    .clock-display {
-      font-size: 48px;
-      font-weight: bold;
-      color: #667eea;
-      margin: 20px 0;
-      font-family: 'Courier New', monospace;
-    }
-
-    .elapsed-time {
-      font-size: 18px;
-      color: #666;
-      margin: 10px 0;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
-
-    .status-badge.clocked-in {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-badge.clocked-out {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .button-group {
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 20px;
       display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 15px;
+      align-items: center;
+      gap: 8px;
     }
 
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    .card-title-icon {
+      font-size: 20px;
+    }
+
+    /* Progress Card */
+    .progress-section {
+      margin-bottom: 16px;
+    }
+
+    .progress-label {
       font-size: 14px;
-      font-weight: bold;
-      transition: all 0.3s ease;
-    }
-
-    .btn-primary {
-      background: #667eea;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #5568d3;
-      transform: translateY(-2px);
-    }
-
-    .btn-primary:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-      background: #e9ecef;
-      color: #333;
-    }
-
-    .btn-secondary:hover {
-      background: #dee2e6;
-    }
-
-    .btn-success {
-      background: #28a745;
-      color: white;
-    }
-
-    .btn-success:hover {
-      background: #218838;
-    }
-
-    .btn-danger {
-      background: #dc3545;
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: #c82333;
-    }
-
-    .notes-input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin-top: 10px;
-      font-family: Arial, sans-serif;
-      font-size: 13px;
-    }
-
-    .task-list {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .task-item {
-      background: #f8f9fa;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-left: 4px solid #667eea;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .task-item:hover {
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transform: translateX(2px);
-    }
-
-    .task-item.urgent {
-      border-left-color: #dc3545;
-      background: #fff5f5;
-    }
-
-    .task-item.high {
-      border-left-color: #ffc107;
-      background: #fffbf0;
-    }
-
-    .task-item.normal {
-      border-left-color: #667eea;
-      background: #f8f9fa;
-    }
-
-    .task-item.low {
-      border-left-color: #6c757d;
-      background: #f5f5f5;
-    }
-
-    .task-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
+      font-weight: 600;
+      color: #1e293b;
       margin-bottom: 8px;
     }
 
-    .task-title {
-      font-weight: bold;
-      color: #333;
-      flex: 1;
+    .progress-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #3b82f6;
     }
 
-    .task-priority {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .task-priority.URGENT {
-      background: #dc3545;
-      color: white;
-    }
-
-    .task-priority.HIGH {
-      background: #ffc107;
-      color: black;
-    }
-
-    .task-priority.NORMAL {
-      background: #667eea;
-      color: white;
-    }
-
-    .task-priority.LOW {
-      background: #6c757d;
-      color: white;
-    }
-
-    .task-meta {
+    .progress-meta {
       font-size: 12px;
-      color: #666;
-      margin-top: 5px;
-    }
-
-    .notification-list {
-      max-height: 350px;
-      overflow-y: auto;
-    }
-
-    .notification-item {
-      background: #f8f9fa;
-      padding: 12px;
-      margin-bottom: 8px;
-      border-left: 4px solid #667eea;
-      border-radius: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-    }
-
-    .notification-item.unread {
-      background: #e7f3ff;
-      border-left-color: #007bff;
-    }
-
-    .notification-item.warning {
-      border-left-color: #ffc107;
-      background: #fffbf0;
-    }
-
-    .notification-item.error {
-      border-left-color: #dc3545;
-      background: #fff5f5;
-    }
-
-    .notification-item.success {
-      border-left-color: #28a745;
-      background: #f0fdf4;
-    }
-
-    .notification-content {
-      flex: 1;
-    }
-
-    .notification-title {
-      font-weight: bold;
-      color: #333;
-      font-size: 13px;
-    }
-
-    .notification-message {
-      color: #666;
-      font-size: 12px;
+      color: #94a3b8;
       margin-top: 4px;
     }
 
-    .notification-close {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #999;
-      font-size: 18px;
-      padding: 0;
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      margin-top: 12px;
+      overflow: hidden;
     }
 
-    .notification-close:hover {
-      color: #333;
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      width: 60%;
     }
 
-    .quick-links {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 10px;
-    }
-
-    .quick-link {
-      background: white;
-      border: 2px solid #e9ecef;
-      border-radius: 8px;
-      padding: 15px;
+    /* Time Tracker */
+    .time-tracker {
       text-align: center;
-      text-decoration: none;
-      color: #333;
-      transition: all 0.3s ease;
-      cursor: pointer;
     }
 
-    .quick-link:hover {
-      border-color: #667eea;
-      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+    .time-display {
+      font-size: 48px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin: 24px 0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .time-label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    .status-badge-lg {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #fef3c7;
+      color: #b45309;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .clock-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-clock {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-clock-in {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-clock-in:hover {
+      background: #059669;
       transform: translateY(-2px);
     }
 
-    .quick-link.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      border-color: #ddd;
+    .btn-clock-out {
+      background: #ef4444;
+      color: white;
     }
 
-    .quick-link.disabled:hover {
-      border-color: #ddd;
-      box-shadow: none;
-      transform: none;
+    .btn-clock-out:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
     }
 
-    .quick-link-icon {
-      font-size: 24px;
+    /* Tasks/Onboarding */
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
       margin-bottom: 8px;
+      font-size: 13px;
     }
 
-    .quick-link-name {
-      font-size: 12px;
-      font-weight: bold;
+    .task-checkbox {
+      width: 18px;
+      height: 18px;
+      margin-right: 12px;
+      cursor: pointer;
+    }
+
+    .task-text {
+      flex: 1;
+      color: #475569;
+    }
+
+    .task-badge {
+      padding: 4px 8px;
+      background: #dbeafe;
+      color: #1e40af;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
     }
 
     .empty-state {
       text-align: center;
-      color: #999;
-      padding: 40px 20px;
+      padding: 32px 16px;
+      color: #94a3b8;
     }
 
     .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 10px;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 0;
-      border-bottom: 2px solid #e9ecef;
-    }
-
-    .tab-button {
-      background: none;
-      border: none;
-      padding: 12px 20px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      color: #666;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s ease;
-    }
-
-    .tab-button.active {
-      color: #667eea;
-      border-bottom-color: #667eea;
-    }
-
-    .tab-button:hover:not(.active) {
-      color: #333;
-    }
-
-    .tab-content {
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .dashboard-metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .metric-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-    }
-
-    .metric-card.warning {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    .metric-value {
       font-size: 32px;
-      font-weight: bold;
-      margin: 10px 0;
+      margin-bottom: 12px;
     }
 
-    .metric-label {
-      font-size: 12px;
-      text-transform: uppercase;
-      opacity: 0.9;
+    .empty-state p {
+      font-size: 13px;
     }
 
+    /* Calendar */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .calendar-day {
+      padding: 8px;
+      text-align: center;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .calendar-day-header {
+      font-weight: 600;
+      color: #64748b;
+      padding: 8px 0;
+    }
+
+    .calendar-date {
+      padding: 8px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .calendar-date:hover {
+      background: #e0e7ff;
+    }
+
+    .calendar-date.active {
+      background: #3b82f6;
+      color: white;
+    }
+
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      right: 0;
+      bottom: 0;
       background: rgba(0,0,0,0.5);
       z-index: 1000;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
     }
 
     .modal.active {
@@ -473,41 +452,52 @@
 
     .modal-content {
       background: white;
-      padding: 30px;
-      border-radius: 8px;
+      border-radius: 12px;
+      padding: 32px;
       max-width: 500px;
       width: 90%;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px rgba(0,0,0,0.15);
     }
 
     .modal-content h3 {
-      margin-top: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e293b;
       margin-bottom: 20px;
-      color: #333;
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 16px;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: #333;
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 6px;
     }
 
     .form-group input,
-    .form-group select,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
       font-size: 14px;
-      font-family: Arial, sans-serif;
-      box-sizing: border-box;
+      font-family: inherit;
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
     }
 
     .form-group textarea {
@@ -515,185 +505,327 @@
       min-height: 100px;
     }
 
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
     .modal-buttons {
       display: flex;
-      gap: 10px;
+      gap: 12px;
+      margin-top: 24px;
       justify-content: flex-end;
-      margin-top: 20px;
     }
 
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #667eea;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    .modal-btn {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .modal-btn.primary {
+      background: #3b82f6;
+      color: white;
     }
 
-    /* Clock In/Out Modal Textarea Styling */
-    #clock-in-notes,
-    #clock-out-notes {
-      color: #333 !important;
-      background: white !important;
+    .modal-btn.primary:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
     }
 
-    #clock-in-notes::placeholder,
-    #clock-out-notes::placeholder {
-      color: #999;
+    .modal-btn.secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .modal-btn.secondary:hover {
+      background: #e5e7eb;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .dashboard-wrapper {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .kpi-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0 16px;
+      }
+
+      .dashboard-wrapper {
+        padding: 16px;
+        gap: 16px;
+      }
+
+      .kpi-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .status-badges {
+        flex-direction: column;
+      }
+
+      .status-badge {
+        width: 100%;
+        text-align: center;
+      }
+
+      .time-display {
+        font-size: 36px;
+      }
+
+      .modal-content {
+        padding: 24px;
+      }
     }
   </style>
 </head>
 <body>
   <!-- Navigation -->
   <nav class="navbar">
-    <div class="nav-container">
-      <div class="nav-brand">
-        <h2>ZAI FLOW 2.0</h2>
-      </div>
-      <div class="nav-menu">
-        <a href="employee-landing.html" class="nav-link active">Dashboard</a>
-        <a href="#" id="nav-modules" class="nav-link">Modules</a>
-        <a href="#" id="nav-profile" class="nav-link">Profile</a>
-        <a href="#" id="logout-link" class="nav-link">Logout</a>
-      </div>
+    <div class="nav-brand">
+      <h2>🚀 ZAI FLOW 2.0</h2>
+    </div>
+    <div class="nav-menu">
+      <a href="employee-landing.html" class="nav-link active">Dashboard</a>
+      <a href="#" id="nav-modules" class="nav-link">Modules</a>
+      <a href="#" id="nav-profile" class="nav-link">Profile</a>
+      <a href="#" id="logout-link" class="nav-link">Logout</a>
     </div>
   </nav>
 
-  <!-- Main Content -->
-  <div class="employee-container">
-    <!-- Welcome Section -->
-    <div class="welcome-section">
-      <h1>Welcome, <span id="user-name">Employee</span>!</h1>
-      <p id="business-name">Loading business info...</p>
-      <div class="role-badge">
-        Role: <span id="user-role">Loading...</span>
-      </div>
-    </div>
+  <!-- Main Dashboard -->
+  <div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <div class="profile-avatar">👤</div>
+        <div class="profile-name" id="user-name">Employee</div>
+        <div class="profile-title" id="user-role">Loading...</div>
+        <div class="profile-salary">$1,500</div>
 
-    <!-- Metrics -->
-    <div class="dashboard-metrics">
-      <div class="metric-card">
-        <div class="metric-label">Today's Status</div>
-        <div class="metric-value" id="attendance-status">Offline</div>
-        <div class="metric-label" id="elapsed-label">--</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Today's Tasks</div>
-        <div class="metric-value" id="task-count">0</div>
-        <div class="metric-label">Due Today</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-label">Unread Notifications</div>
-        <div class="metric-value" id="notification-count">0</div>
-        <div class="metric-label">Pending</div>
-      </div>
-      <div class="metric-card warning">
-        <div class="metric-label">Accessible Modules</div>
-        <div class="metric-value" id="module-count">0</div>
-        <div class="metric-label">Available</div>
-      </div>
-    </div>
-
-    <!-- Grid: Clock Widget & Quick Links -->
-    <div class="grid-2col">
-      <!-- Clock In/Out Card -->
-      <div class="card">
-        <h2>⏰ Time Tracking</h2>
-        <div class="clock-widget">
-          <div class="clock-display" id="current-time">--:--:--</div>
-          <div class="status-badge" id="clock-status">Offline</div>
-          <div class="elapsed-time" id="elapsed-time-display">Not clocked in</div>
-          <div class="button-group">
-            <button class="btn btn-success" id="clock-in-btn" onclick="showClockInModal()">
-              🚀 Clock In
-            </button>
-            <button class="btn btn-danger" id="clock-out-btn" onclick="showClockOutModal()" style="display:none;">
-              🛑 Clock Out
-            </button>
+        <!-- Sidebar Sections -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Pension Contributions</div>
+          <div class="sidebar-item">
+            <strong>Status:</strong> <span id="pension-status">Active</span>
           </div>
         </div>
-      </div>
 
-      <!-- Quick Module Links -->
-      <div class="card">
-        <h2>🔗 Your Modules</h2>
-        <div class="quick-links" id="quick-links-container">
-          <div class="empty-state">
-            <div class="empty-state-icon">📦</div>
-            <p>Loading your accessible modules...</p>
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Device</div>
+          <div class="sidebar-item">MacBook Air</div>
+          <div class="sidebar-item" style="margin-top: 8px;">
+            <small id="device-info">M1 Chip, 256GB</small>
           </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Compensation Summary</div>
+          <div class="sidebar-item">
+            <strong>Base:</strong> <span>$1,500</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Employee Benefits</div>
+          <div class="sidebar-item">✓ Health Insurance</div>
+          <div class="sidebar-item">✓ Dental Plan</div>
+          <div class="sidebar-item">✓ Retirement Plan</div>
         </div>
       </div>
     </div>
 
-    <!-- Tasks & Notifications -->
-    <div class="grid-2col">
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Status Badges -->
+      <div class="status-badges">
+        <div class="status-badge active">DCA</div>
+        <div class="status-badge active">JYS</div>
+        <div class="status-badge">ASE</div>
+        <div class="status-badge">AEL</div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-cards">
+        <div class="kpi-card">
+          <div class="kpi-label">Employees</div>
+          <div class="kpi-value" id="employee-count">92</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Projects</div>
+          <div class="kpi-value" id="project-count">75</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Modules Available</div>
+          <div class="kpi-value" id="module-count">16</div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="content-grid">
+        <!-- Progress Card -->
+        <div class="card">
+          <div class="card-title">
+            <span class="card-title-icon">📊</span>
+            Progress
+          </div>
+
+          <div class="progress-section">
+            <div class="progress-label">Work Time (Q1)</div>
+            <div class="progress-value">6.1h</div>
+            <div class="progress-meta">Work Time (90 Days)</div>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" style="width: 61%;"></div>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            <div class="progress-label">Q1 Target</div>
+            <div class="progress-value">10h</div>
+          </div>
+        </div>
+
+        <!-- Time Tracker Card -->
+        <div class="card">
+          <div class="card-title">
+            <span class="card-title-icon">⏱️</span>
+            Time Tracker
+          </div>
+
+          <div class="time-tracker">
+            <div class="status-badge-lg" id="clock-status">Not Clocked In</div>
+            <div class="time-display" id="current-time">--:--</div>
+            <div class="time-label" id="elapsed-time-display">Not clocked in</div>
+            <div class="clock-buttons">
+              <button class="btn-clock btn-clock-in" id="clock-in-btn" onclick="showClockInModal()">
+                ✓ Clock In
+              </button>
+              <button class="btn-clock btn-clock-out" id="clock-out-btn" onclick="showClockOutModal()" style="display:none;">
+                ✕ Clock Out
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="content-grid">
+        <!-- Onboarding Card -->
+        <div class="card">
+          <div class="card-title">
+            <span class="card-title-icon">🎯</span>
+            Onboarding
+            <span style="margin-left: auto; color: #3b82f6; font-size: 16px;">42%</span>
+          </div>
+
+          <div class="task-item">
+            <input type="checkbox" class="task-checkbox" checked>
+            <div class="task-text">Client Meetings</div>
+            <div class="task-badge">3/8</div>
+          </div>
+          <div class="task-item">
+            <input type="checkbox" class="task-checkbox" checked>
+            <div class="task-text">Design Review</div>
+          </div>
+          <div class="task-item">
+            <input type="checkbox" class="task-checkbox">
+            <div class="task-text">Project Kickoff</div>
+          </div>
+          <div class="task-item">
+            <input type="checkbox" class="task-checkbox">
+            <div class="task-text">Team Orientation</div>
+          </div>
+        </div>
+
+        <!-- Calendar Card -->
+        <div class="card">
+          <div class="card-title">
+            <span class="card-title-icon">📅</span>
+            September 2024
+          </div>
+
+          <div class="calendar-grid">
+            <div class="calendar-day calendar-day-header">Mon</div>
+            <div class="calendar-day calendar-day-header">Tue</div>
+            <div class="calendar-day calendar-day-header">Wed</div>
+            <div class="calendar-day calendar-day-header">Thu</div>
+            <div class="calendar-day calendar-day-header">Fri</div>
+            <div class="calendar-day calendar-day-header">Sat</div>
+            <div class="calendar-day calendar-day-header">Sun</div>
+
+            <div class="calendar-day"><span class="calendar-date">23</span></div>
+            <div class="calendar-day"><span class="calendar-date">24</span></div>
+            <div class="calendar-day"><span class="calendar-date">25</span></div>
+            <div class="calendar-day"><span class="calendar-date">26</span></div>
+            <div class="calendar-day"><span class="calendar-date">27</span></div>
+            <div class="calendar-day"><span class="calendar-date">28</span></div>
+            <div class="calendar-day"><span class="calendar-date">29</span></div>
+
+            <div class="calendar-day"><span class="calendar-date">30</span></div>
+            <div class="calendar-day"><span class="calendar-date active">1</span></div>
+            <div class="calendar-day"><span class="calendar-date">2</span></div>
+            <div class="calendar-day"><span class="calendar-date">3</span></div>
+            <div class="calendar-day"><span class="calendar-date">4</span></div>
+            <div class="calendar-day"><span class="calendar-date">5</span></div>
+            <div class="calendar-day"><span class="calendar-date">6</span></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Tasks Card -->
-      <div class="card">
-        <h2>✅ Tasks</h2>
-        <div class="tabs">
-          <button class="tab-button active" onclick="switchTaskTab('todo')">To Do</button>
-          <button class="tab-button" onclick="switchTaskTab('in-progress')">In Progress</button>
-          <button class="tab-button" onclick="switchTaskTab('completed')">Completed</button>
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          <span class="card-title-icon">✅</span>
+          My Tasks
         </div>
-        <div style="margin-top: 15px;">
-          <div id="task-tab-todo" class="tab-content active">
-            <div class="task-list" id="task-list-todo">
-              <div class="empty-state">
-                <p>No tasks yet! 🎉</p>
-              </div>
-            </div>
-          </div>
-          <div id="task-tab-in-progress" class="tab-content">
-            <div class="task-list" id="task-list-in-progress">
-              <div class="empty-state">
-                <p>No tasks in progress</p>
-              </div>
-            </div>
-          </div>
-          <div id="task-tab-completed" class="tab-content">
-            <div class="task-list" id="task-list-completed">
-              <div class="empty-state">
-                <p>No completed tasks yet</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style="margin-top: 15px;">
-          <button class="btn btn-primary" onclick="showCreateTaskModal()" style="width: 100%;">
-            ➕ New Task
-          </button>
-        </div>
-      </div>
 
-      <!-- Notifications Card -->
-      <div class="card">
-        <h2>🔔 Notifications</h2>
-        <div class="notification-list" id="notification-list">
-          <div class="empty-state">
-            <p>No notifications yet</p>
+        <div class="task-tabs" style="display: flex; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
+          <button class="task-tab" onclick="switchTaskTab('todo')" style="padding: 8px 12px; border: none; background: none; cursor: pointer; color: #94a3b8; font-weight: 500; border-bottom: 2px solid transparent;">To Do</button>
+          <button class="task-tab" onclick="switchTaskTab('in-progress')" style="padding: 8px 12px; border: none; background: none; cursor: pointer; color: #94a3b8; font-weight: 500; border-bottom: 2px solid transparent;">In Progress</button>
+          <button class="task-tab" onclick="switchTaskTab('completed')" style="padding: 8px 12px; border: none; background: none; cursor: pointer; color: #94a3b8; font-weight: 500; border-bottom: 2px solid transparent;">Completed</button>
+        </div>
+
+        <div id="task-tab-todo" class="tab-content" style="display:block;">
+          <div id="task-list-todo">
+            <div class="empty-state">
+              <div class="empty-state-icon">🎉</div>
+              <p>No tasks yet!</p>
+            </div>
           </div>
         </div>
-        <div style="margin-top: 15px;">
-          <button class="btn btn-secondary" onclick="markAllNotificationsRead()" style="width: 100%;">
-            ✓ Mark All as Read
-          </button>
+        <div id="task-tab-in-progress" class="tab-content" style="display:none;">
+          <div id="task-list-in-progress">
+            <div class="empty-state">
+              <div class="empty-state-icon">⏳</div>
+              <p>No tasks in progress</p>
+            </div>
+          </div>
         </div>
+        <div id="task-tab-completed" class="tab-content" style="display:none;">
+          <div id="task-list-completed">
+            <div class="empty-state">
+              <div class="empty-state-icon">✨</div>
+              <p>No completed tasks yet</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="new-task-btn" onclick="showCreateTaskModal()" style="margin-top: 16px; padding: 10px 16px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">➕ New Task</button>
       </div>
     </div>
   </div>
@@ -704,15 +836,15 @@
       <h3>🚀 Clock In</h3>
       <div class="form-group">
         <label>Time</label>
-        <input type="text" id="clock-in-time" readonly style="background: #f5f5f5;">
+        <input type="text" id="clock-in-time" readonly>
       </div>
       <div class="form-group">
         <label>Notes (Optional)</label>
         <textarea id="clock-in-notes" placeholder="Add notes about your shift..."></textarea>
       </div>
       <div class="modal-buttons">
-        <button class="btn btn-secondary" onclick="closeClockInModal()">Cancel</button>
-        <button class="btn btn-success" onclick="performClockIn()">Clock In</button>
+        <button class="modal-btn secondary" onclick="closeClockInModal()">Cancel</button>
+        <button class="modal-btn primary" onclick="performClockIn()">Clock In</button>
       </div>
     </div>
   </div>
@@ -723,19 +855,19 @@
       <h3>🛑 Clock Out</h3>
       <div class="form-group">
         <label>Time</label>
-        <input type="text" id="clock-out-time" readonly style="background: #f5f5f5;">
+        <input type="text" id="clock-out-time" readonly>
       </div>
       <div class="form-group">
         <label>Hours Worked</label>
-        <input type="text" id="hours-worked" readonly style="background: #f5f5f5;">
+        <input type="text" id="hours-worked" readonly>
       </div>
       <div class="form-group">
         <label>Notes (Optional)</label>
         <textarea id="clock-out-notes" placeholder="Anything to note about this shift?"></textarea>
       </div>
       <div class="modal-buttons">
-        <button class="btn btn-secondary" onclick="closeClockOutModal()">Cancel</button>
-        <button class="btn btn-danger" onclick="performClockOut()">Clock Out</button>
+        <button class="modal-btn secondary" onclick="closeClockOutModal()">Cancel</button>
+        <button class="modal-btn primary" onclick="performClockOut()">Clock Out</button>
       </div>
     </div>
   </div>
@@ -766,8 +898,8 @@
         </select>
       </div>
       <div class="modal-buttons">
-        <button class="btn btn-secondary" onclick="closeCreateTaskModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="performCreateTask()">Create Task</button>
+        <button class="modal-btn secondary" onclick="closeCreateTaskModal()">Cancel</button>
+        <button class="modal-btn primary" onclick="performCreateTask()">Create Task</button>
       </div>
     </div>
   </div>
@@ -778,5 +910,91 @@
   <script src="js/branch-context.js"></script>
   <script src="js/display-branch-context.js"></script>
   <script src="js/employee-landing.js"></script>
+
+  <!-- Utility Functions -->
+  <script>
+    // Modal Functions
+    function showClockInModal() {
+      const modal = document.getElementById('clock-in-modal');
+      const timeInput = document.getElementById('clock-in-time');
+      timeInput.value = new Date().toLocaleTimeString();
+      modal.classList.add('active');
+    }
+
+    function closeClockInModal() {
+      document.getElementById('clock-in-modal').classList.remove('active');
+    }
+
+    function showClockOutModal() {
+      const modal = document.getElementById('clock-out-modal');
+      const timeInput = document.getElementById('clock-out-time');
+      timeInput.value = new Date().toLocaleTimeString();
+      modal.classList.add('active');
+    }
+
+    function closeClockOutModal() {
+      document.getElementById('clock-out-modal').classList.remove('active');
+    }
+
+    function showCreateTaskModal() {
+      document.getElementById('create-task-modal').classList.add('active');
+    }
+
+    function closeCreateTaskModal() {
+      document.getElementById('create-task-modal').classList.remove('active');
+    }
+
+    function switchTaskTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+      document.getElementById('task-tab-' + tabName).style.display = 'block';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      let modal = document.getElementById('clock-in-modal');
+      if (event.target == modal) modal.classList.remove('active');
+
+      modal = document.getElementById('clock-out-modal');
+      if (event.target == modal) modal.classList.remove('active');
+
+      modal = document.getElementById('create-task-modal');
+      if (event.target == modal) modal.classList.remove('active');
+    }
+
+    // Stub functions - these will be provided by employee-landing.js
+    function performClockIn() {
+      if (typeof performClockIn_impl !== 'undefined') {
+        performClockIn_impl();
+      }
+    }
+
+    function performClockOut() {
+      if (typeof performClockOut_impl !== 'undefined') {
+        performClockOut_impl();
+      }
+    }
+
+    function performCreateTask() {
+      if (typeof performCreateTask_impl !== 'undefined') {
+        performCreateTask_impl();
+      }
+    }
+
+    function markAllNotificationsRead() {
+      if (typeof markAllNotificationsRead_impl !== 'undefined') {
+        markAllNotificationsRead_impl();
+      }
+    }
+
+    // Update current time display
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    }, 1000);
+  </script>
 </body>
 </html>
