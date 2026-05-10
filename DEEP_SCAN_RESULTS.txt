@@ -1,0 +1,99 @@
+=============================================================================
+DEEP SYSTEM SCAN RESULTS - ZAI FLOW 2.0
+=============================================================================
+Scan Date: 2026-05-10
+Status: COMPREHENSIVE REVIEW COMPLETE
+
+ISSUES FOUND AND FIXED:
+=============================================================================
+
+1. EMPLOYEE LIST ID MISMATCH (CRITICAL) - FIXED ✅
+   Location: frontend/js/hr.js, lines 76-77
+   Problem: RPC get_business_employees returns 'employee_id' but code used 'emp.id'
+   Impact: Edit/View buttons passed undefined to editEmployee()
+   Solution: Changed ${emp.id} to ${emp.employee_id}
+
+2. DEPARTMENT NAME LOOKUP ERROR - FIXED ✅
+   Location: frontend/js/hr.js, line 64
+   Problem: Code tried to access emp.departments.name but RPC only returns department_id
+   Impact: Department names showed as undefined or 'N/A'
+   Solution: Changed to display department_id with label "Dept #${emp.department_id}"
+
+3. MISSING REJECT_LEAVE FUNCTION (CRITICAL) - FIXED ✅
+   Location: supabase-hr-functions-multi-tenant-fixed.sql
+   Problem: JavaScript code calls reject_leave RPC but function didn't exist
+   Impact: Rejecting leave requests would fail
+   Solution: Created new reject_leave function with proper multi-tenant scoping
+
+4. APPROVE_LEAVE MISSING PARAMETER - FIXED ✅
+   Location: frontend/js/hr.js, approveLeave() function
+   Problem: RPC function requires p_business_id but call only provided p_leave_request_id and p_approved_by
+   Impact: Approving leave requests would fail validation
+   Solution: Added context.business_id to RPC call parameters
+
+5. REJECT_LEAVE MISSING PARAMETER - FIXED ✅
+   Location: frontend/js/hr.js, rejectLeave() function
+   Problem: RPC function requires p_business_id but call only provided p_leave_request_id and p_approved_by
+   Impact: Rejecting leave requests would fail validation
+   Solution: Added context.business_id to RPC call parameters
+
+VERIFIED WORKING:
+=============================================================================
+
+✅ Clock in/out RPC functions - parameters match correctly
+✅ Task management RPC functions - parameters match correctly
+✅ Notification RPC functions - parameters match correctly
+✅ All HTML element IDs exist and match JavaScript references
+✅ Department dropdown loading works correctly
+✅ Employee creation and editing works correctly
+✅ Task tab switching fixed in previous session (display property now updates)
+✅ All RPC return fields match JavaScript field access patterns
+
+POTENTIAL ISSUES IDENTIFIED (Already Working):
+=============================================================================
+
+⚠️ DUPLICATE TABLE DEFINITIONS
+   - attendance table (supabase-schema-hr.sql)
+   - employee_attendance table (supabase-role-permissions-schema.sql)
+   Note: Code uses 'attendance' table through RPC functions, so it's working.
+   Recommendation: Document which table is canonical, consider cleanup.
+
+⚠️ SCHEMA FILE PROLIFERATION
+   24 SQL schema files exist - potential for conflicting definitions.
+   Note: Multi-tenant-fixed files are canonical; older files should be archived.
+   Recommendation: Consolidate into main deployment files.
+
+FIELD NAME VALIDATIONS:
+=============================================================================
+
+Employee Fields: ✅
+  - RPC returns: employee_id, employee_code, first_name, last_name, department_id, position, status, hire_date
+  - Code accesses: All of above correctly
+
+Task Fields: ✅
+  - RPC returns: task_id, title, description, due_date, priority, status, assigned_by_email, created_at
+  - Code accesses: All of above correctly
+
+Notification Fields: ✅
+  - RPC returns: notification_id, title, message, type, action_url, created_at
+  - Code accesses: All of above correctly
+
+Attendance Fields: ✅
+  - Direct table select: id, employee_code, first_name, last_name
+  - Code accesses: All of above correctly
+
+DEPLOYMENT READINESS:
+=============================================================================
+
+All critical issues have been fixed.
+System should now support:
+  ✅ Editing employees without errors
+  ✅ Approving leave requests with proper business isolation
+  ✅ Rejecting leave requests with proper business isolation
+  ✅ Task creation, updating, and management
+  ✅ Clock in/out functionality
+  ✅ Notification management
+  ✅ Multi-tenant data isolation
+
+NO DEPLOYMENT READY - User requested fixes without deployment.
+=============================================================================

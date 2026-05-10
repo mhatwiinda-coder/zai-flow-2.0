@@ -61,7 +61,7 @@ function loadEmployeeList() {
       let html = '';
       employees.forEach(emp => {
         const hireDate = new Date(emp.hire_date).toLocaleDateString('en-ZM');
-        const deptName = emp.departments && emp.departments.name ? emp.departments.name : 'N/A';
+        const deptName = emp.department_id ? `Dept #${emp.department_id}` : 'N/A';
         const statusClass = `status-${emp.status.toLowerCase()}`;
 
         html += `
@@ -73,8 +73,8 @@ function loadEmployeeList() {
             <td><span class="status-badge ${statusClass}">${emp.status}</span></td>
             <td>${hireDate}</td>
             <td class="action-buttons">
-              <button class="btn-view" onclick="viewEmployee(${emp.id})">View</button>
-              <button class="btn-edit" onclick="editEmployee(${emp.id})">Edit</button>
+              <button class="btn-view" onclick="viewEmployee(${emp.employee_id})">View</button>
+              <button class="btn-edit" onclick="editEmployee(${emp.employee_id})">Edit</button>
             </td>
           </tr>
         `;
@@ -538,8 +538,14 @@ function approveLeave(leaveRequestId) {
   (async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+      const context = getBranchContext();
+      if (!context) {
+        alert('❌ Branch context not available');
+        return;
+      }
       const { data, error } = await window.supabase.rpc('approve_leave', {
         p_leave_request_id: leaveRequestId,
+        p_business_id: context.business_id,
         p_approved_by: user.id
       });
 
@@ -557,8 +563,14 @@ function rejectLeave(leaveRequestId) {
   (async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+      const context = getBranchContext();
+      if (!context) {
+        alert('❌ Branch context not available');
+        return;
+      }
       const { data, error } = await window.supabase.rpc('reject_leave', {
         p_leave_request_id: leaveRequestId,
+        p_business_id: context.business_id,
         p_approved_by: user.id
       });
 

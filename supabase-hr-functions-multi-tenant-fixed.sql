@@ -395,6 +395,46 @@ END;
 $$;
 
 -- ============================================================================
+-- 10. REJECT LEAVE (MULTI-TENANT)
+-- ============================================================================
+DROP FUNCTION IF EXISTS public.reject_leave(INTEGER, INTEGER, INTEGER);
+CREATE OR REPLACE FUNCTION public.reject_leave(
+  p_leave_request_id INTEGER,
+  p_business_id INTEGER,
+  p_approved_by INTEGER
+)
+RETURNS TABLE (
+  success BOOLEAN,
+  message TEXT
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  v_employee_id INTEGER;
+BEGIN
+  -- Validate leave request belongs to this business
+  SELECT lr.employee_id
+  INTO v_employee_id
+  FROM public.leave_requests lr
+  WHERE lr.id = p_leave_request_id
+  AND EXISTS (SELECT 1 FROM public.employees e WHERE e.id = lr.employee_id AND e.business_id = p_business_id);
+
+  IF v_employee_id IS NULL THEN
+    RETURN QUERY SELECT FALSE, 'Leave request not found'::TEXT;
+    RETURN;
+  END IF;
+
+  -- Update leave request status to REJECTED
+  UPDATE public.leave_requests
+  SET
+    status = 'REJECTED',
+    approved_by = p_approved_by,
+    approved_at = NOW()
+  WHERE id = p_leave_request_id;
+
+  RETURN QUERY SELECT TRUE, 'Leave request rejected successfully'::TEXT;
+END;
+$$;
+
+-- ============================================================================
 -- SUMMARY
 -- ============================================================================
 -- All HR/Payroll RPC functions have been updated to:
