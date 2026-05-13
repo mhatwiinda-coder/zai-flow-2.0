@@ -80,7 +80,7 @@ doc.fillOpacity(1);
 doc.fontSize(12).font('Helvetica-Bold').fillColor(turquoise).text('Key Benefits:', 60, doc.y + 15);
 addBullet('50% cheaper than ZamTech ERP');
 addBullet('Professional plans at ZMW 15,000/month');
-addBullet('Free setup and training included');
+addBullet('2-week money-back guarantee if not satisfied');
 
 doc.moveDown(1);
 
@@ -414,7 +414,7 @@ doc.moveDown(1);
 
 // CTA
 doc.fillColor(turquoise).rect(50, doc.y, 495, 50).fill();
-doc.fontSize(13).font('Helvetica-Bold').fillColor(darkBg).text('Book Your FREE 30-Day Trial Today', 65, doc.y + 18);
+doc.fontSize(13).font('Helvetica-Bold').fillColor(darkBg).text('Start Now With 2-Week Money-Back Guarantee', 65, doc.y + 18);
 
 // Footer
 doc.moveDown(5);

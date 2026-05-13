@@ -58,7 +58,7 @@ doc.fontSize(56).font('Helvetica-Bold').fillColor(white).text('Than Competitors'
 doc.fontSize(14).font('Helvetica').fillColor(lightGray).text('Professional ERP starting from just ZMW 5,000/month', 50, 400, { width: 495 });
 
 // Stats - NO SPECIAL SYMBOLS
-doc.fontSize(11).font('Helvetica-Bold').fillColor(gold).text('- 2-Week Implementation  - 24/7 Local Support  - 30-Day Money-Back Guarantee', 50, 450);
+doc.fontSize(11).font('Helvetica-Bold').fillColor(gold).text('- 2-Week Implementation  - 24/7 Local Support  - 2-Week Money-Back Guarantee', 50, 450);
 
 // CTA Button
 doc.fillColor(turquoise).rect(50, 520, 200, 50).fill();
@@ -412,8 +412,8 @@ doc.moveDown(3);
 
 // Main CTA
 doc.fillColor(turquoise).rect(50, 520, 495, 60).fill();
-doc.fontSize(16).font('Helvetica-Bold').fillColor(darkBg).text('START YOUR 30-DAY FREE TRIAL', 65, 535);
-doc.fontSize(10).font('Helvetica').fillColor(darkBg).text('No credit card required | Full access to all features | Local Zambian support', 65, 560);
+doc.fontSize(16).font('Helvetica-Bold').fillColor(darkBg).text('START WITH 2-WEEK MONEY-BACK GUARANTEE', 65, 535);
+doc.fontSize(10).font('Helvetica').fillColor(darkBg).text('Not satisfied? Get your money back within 2 weeks | No questions asked', 65, 560);
 
 // Footer benefits
 doc.moveDown(8);
