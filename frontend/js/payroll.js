@@ -14,8 +14,15 @@ function runPayroll() {
         return;
       }
 
+      // Get branch context
+      const context = getBranchContext();
+      if (!context) {
+        throw new Error('No branch context available - please log in again');
+      }
+
       // Call RPC function to process payroll
       const { data, error } = await window.supabase.rpc('process_payroll', {
+        p_branch_id: context.branch_id,
         p_month: month,
         p_year: year
       });

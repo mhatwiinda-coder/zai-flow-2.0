@@ -38,10 +38,10 @@ function loadEmployeeList() {
         return;
       }
 
-      console.log(`📡 Loading employees for business_id: ${context.business_id}`);
+      console.log(`📡 Loading employees for branch_id: ${context.branch_id}`);
 
       const { data: employees, error } = await window.supabase.rpc('get_business_employees', {
-        p_business_id: context.business_id
+        p_branch_id: context.branch_id
       });
 
       if (error) {
@@ -99,10 +99,10 @@ function loadDepartments() {
           return;
         }
 
-        console.log(`📡 Loading departments for business_id: ${context.business_id}`);
+        console.log(`📡 Loading departments for branch_id: ${context.branch_id}`);
 
         const { data: departments, error } = await window.supabase.rpc('get_business_departments', {
-          p_business_id: context.business_id
+          p_branch_id: context.branch_id
         });
 
         if (error) {
