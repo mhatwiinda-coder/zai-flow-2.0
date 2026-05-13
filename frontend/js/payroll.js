@@ -101,7 +101,8 @@ function loadPayrollSummary() {
             <td>${empName}</td>
             <td>${formatMoney(ded.gross_salary)}</td>
             <td>${formatMoney(ded.paye_tax)}</td>
-            <td>${formatMoney(ded.pension_contribution)}</td>
+            <td>${formatMoney(ded.napsa_contribution || 0)}</td>
+            <td>${formatMoney(ded.health_insurance || 0)}</td>
             <td>${formatMoney(ded.other_deductions)}</td>
             <td><strong>${formatMoney(ded.net_salary)}</strong></td>
             <td>
