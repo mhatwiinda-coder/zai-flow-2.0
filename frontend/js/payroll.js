@@ -154,239 +154,117 @@ function generatePayslip(deductionId, payrollRunId) {
           <meta charset="UTF-8">
           <title>Payslip - ${emp.employee_code}</title>
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              margin: 20px;
-              color: #333;
-              background: white;
-            }
-            .payslip-container {
-              max-width: 800px;
-              margin: 0 auto;
-              border: 2px solid #333;
-              padding: 30px;
-            }
-            .header {
-              text-align: center;
-              margin-bottom: 30px;
-            }
-            .company-name {
-              font-size: 24px;
-              font-weight: bold;
-              color: #f7c948;
-            }
-            .payslip-title {
-              font-size: 18px;
-              font-weight: bold;
-              margin-top: 10px;
-            }
-            .employee-info {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 20px;
-              margin-bottom: 30px;
-              padding: 15px;
-              background: #f5f5f5;
-              border-radius: 5px;
-            }
-            .info-row {
-              display: grid;
-              grid-template-columns: 120px 1fr;
-              gap: 10px;
-              margin-bottom: 8px;
-            }
-            .info-label {
-              font-weight: bold;
-              color: #666;
-            }
-            .info-value {
-              color: #333;
-            }
-            .earnings-table,
-            .deductions-table {
-              width: 100%;
-              margin-bottom: 30px;
-              border-collapse: collapse;
-            }
-            .table-title {
-              font-weight: bold;
-              font-size: 14px;
-              margin-top: 20px;
-              margin-bottom: 10px;
-              border-bottom: 2px solid #333;
-              padding-bottom: 5px;
-            }
-            .earnings-table th,
-            .deductions-table th {
-              background: #f0f0f0;
-              padding: 10px;
-              text-align: left;
-              border: 1px solid #ddd;
-              font-weight: bold;
-            }
-            .earnings-table td,
-            .deductions-table td {
-              padding: 10px;
-              border: 1px solid #ddd;
-              text-align: right;
-            }
-            .earnings-table td:first-child,
-            .deductions-table td:first-child {
-              text-align: left;
-            }
-            .summary-row {
-              display: grid;
-              grid-template-columns: 1fr 200px;
-              gap: 20px;
-              margin-top: 30px;
-              padding-top: 20px;
-              border-top: 2px solid #333;
-            }
-            .summary-item {
-              display: grid;
-              grid-template-columns: 150px 1fr;
-              gap: 20px;
-              padding: 10px 0;
-              font-weight: bold;
-              font-size: 16px;
-            }
-            .summary-label {
-              text-align: right;
-            }
-            .summary-value {
-              text-align: right;
-              color: #f7c948;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 40px;
-              padding-top: 20px;
-              border-top: 1px solid #ddd;
-              font-size: 12px;
-              color: #666;
-            }
-            @media print {
-              body { margin: 0; padding: 0; }
-              .payslip-container { border: none; margin: 0; padding: 0; }
-              .no-print { display: none; }
-            }
-            .no-print {
-              text-align: center;
-              margin-bottom: 20px;
-            }
-            .no-print button {
-              padding: 10px 20px;
-              font-size: 14px;
-              background: #f7c948;
-              border: none;
-              border-radius: 5px;
-              cursor: pointer;
-              margin: 0 5px;
-            }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Arial', sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
+            .no-print { text-align: center; margin-bottom: 20px; padding: 10px; }
+            .no-print button { padding: 12px 24px; margin: 0 5px; background: #2c5aa0; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; }
+            .no-print button:hover { background: #1e3f5a; }
+            .payslip-container { max-width: 900px; margin: 0 auto; background: white; border: 3px solid #333; position: relative; }
+            .confidential { position: absolute; top: 20px; right: 20px; background: #90EE90; padding: 8px 12px; font-weight: bold; font-size: 14px; border: 2px solid #333; transform: rotate(-15deg); opacity: 0.9; }
+            .header { text-align: center; padding: 20px; border-bottom: 2px solid #333; }
+            .company-name { font-size: 28px; font-weight: bold; color: #2c5aa0; margin-bottom: 5px; }
+            .payslip-title { font-size: 16px; font-weight: bold; color: #333; }
+            .pay-period { font-size: 12px; color: #666; margin-top: 5px; }
+            .employee-info { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 20px; border-bottom: 2px solid #ddd; }
+            .info-column { font-size: 13px; line-height: 1.8; }
+            .info-label { font-weight: bold; display: inline-block; width: 120px; }
+            .info-value { display: inline-block; color: #333; }
+            .table-header { display: grid; grid-template-columns: 1fr 1fr 1fr; background: #4a7c3b; color: white; font-weight: bold; padding: 12px 10px; font-size: 13px; margin-bottom: 10px; }
+            .earnings-deductions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border: 1px solid #ddd; margin-bottom: 20px; }
+            .column { border-right: 1px solid #ddd; padding: 10px; min-height: 100px; }
+            .column:last-child { border-right: none; }
+            .item { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 8px 0; font-size: 12px; border-bottom: 1px solid #eee; }
+            .item:last-child { border-bottom: none; }
+            .amount { text-align: right; min-width: 80px; font-weight: 500; }
+            .totals { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 1px solid #333; border-top: 2px solid #333; background: #f0f0f0; font-weight: bold; font-size: 13px; }
+            .total { padding: 12px 10px; border-right: 1px solid #333; text-align: left; }
+            .total:last-child { border-right: none; }
+            .net-pay { background: #4a7c3b; color: white; padding: 15px; margin: 20px 0; text-align: center; }
+            .net-label { font-weight: bold; font-size: 14px; margin-bottom: 5px; }
+            .net-amount { font-size: 24px; font-weight: bold; }
+            .in-words { text-align: center; font-size: 11px; color: #666; padding: 10px 0; font-style: italic; }
+            .footer { border-top: 2px solid #ddd; padding: 15px 20px; background: #f9f9f9; font-size: 11px; color: #666; text-align: center; }
+            .footer p { margin: 5px 0; }
+            .content { padding: 20px; }
+            @media print { body { margin: 0; padding: 0; background: white; } .no-print { display: none !important; } }
           </style>
         </head>
         <body>
           <div class="no-print">
-            <button onclick="window.print()">🖨️ Print</button>
+            <button onclick="window.print()">🖨️ Print Payslip</button>
             <button onclick="window.close()">❌ Close</button>
           </div>
 
           <div class="payslip-container">
+            <div class="confidential">CONFIDENTIAL</div>
             <div class="header">
               <div class="company-name">ZAI FLOW</div>
-              <div class="payslip-title">PAYSLIP for ${monthYear}</div>
+              <div class="payslip-title">PAY SLIP</div>
+              <div class="pay-period">For the month of ${monthYear}</div>
             </div>
 
             <div class="employee-info">
-              <div>
-                <div class="info-row">
-                  <div class="info-label">Employee Code:</div>
-                  <div class="info-value">${emp.employee_code}</div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Name:</div>
-                  <div class="info-value">${emp.first_name} ${emp.last_name}</div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Position:</div>
-                  <div class="info-value">${emp.position}</div>
-                </div>
+              <div class="info-column">
+                <div><span class="info-label">Name</span><span class="info-value">: ${emp.first_name} ${emp.last_name}</span></div>
+                <div><span class="info-label">Employee ID</span><span class="info-value">: ${emp.employee_code}</span></div>
               </div>
-              <div>
-                <div class="info-row">
-                  <div class="info-label">Pay Period:</div>
-                  <div class="info-value">${monthYear}</div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Date Issued:</div>
-                  <div class="info-value">${new Date().toLocaleDateString('en-ZM')}</div>
-                </div>
+              <div class="info-column">
+                <div><span class="info-label">Title</span><span class="info-value">: ${emp.position || 'N/A'}</span></div>
+                <div><span class="info-label">Pay Period</span><span class="info-value">: ${monthYear}</span></div>
               </div>
             </div>
 
-            <div class="table-title">EARNINGS</div>
-            <table class="earnings-table">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Amount (ZMW)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Gross Salary</td>
-                  <td>${formatMoney(ded.gross_salary)}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="content">
+              <div class="table-header">
+                <div>Description</div>
+                <div>Earnings</div>
+                <div>Deductions</div>
+              </div>
 
-            <div class="table-title">DEDUCTIONS (ZRA 2026 COMPLIANT)</div>
-            <table class="deductions-table">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Amount (ZMW)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>PAYE Tax (Progressive)</td>
-                  <td>${formatMoney(ded.paye_tax)}</td>
-                </tr>
-                <tr>
-                  <td>NAPSA Contributions (5%)</td>
-                  <td>${formatMoney(ded.napsa_contribution || 0)}</td>
-                </tr>
-                <tr>
-                  <td>National Health Insurance (1%)</td>
-                  <td>${formatMoney(ded.health_insurance || 0)}</td>
-                </tr>
-                ${ded.other_deductions > 0 ? `
-                <tr>
-                  <td>Other Deductions</td>
-                  <td>${formatMoney(ded.other_deductions)}</td>
-                </tr>
-                ` : ''}
-                <tr style="background: #f0f0f0; font-weight: bold;">
-                  <td>Total Deductions</td>
-                  <td>${formatMoney((ded.paye_tax || 0) + (ded.napsa_contribution || 0) + (ded.health_insurance || 0) + (ded.other_deductions || 0))}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div class="summary-row">
-              <div></div>
-              <div>
-                <div class="summary-item">
-                  <div class="summary-label">Net Pay:</div>
-                  <div class="summary-value">${formatMoney(ded.net_salary)}</div>
+              <div class="earnings-deductions">
+                <div class="column">
+                  <div class="item">
+                    <span>Basic Salary</span>
+                    <span class="amount">${formatMoney(ded.gross_salary)}</span>
+                  </div>
                 </div>
+                <div style="border-right: 1px solid #ddd;"></div>
+                <div class="column" style="border-right: none;">
+                  <div class="item">
+                    <span>PAYE Tax (Progressive)</span>
+                    <span class="amount">${formatMoney(ded.paye_tax)}</span>
+                  </div>
+                  <div class="item">
+                    <span>NAPSA (5%)</span>
+                    <span class="amount">${formatMoney(ded.napsa_contribution || 0)}</span>
+                  </div>
+                  <div class="item">
+                    <span>Health Insurance (1%)</span>
+                    <span class="amount">${formatMoney(ded.health_insurance || 0)}</span>
+                  </div>
+                  ${ded.other_deductions > 0 ? `<div class="item"><span>Other Deductions</span><span class="amount">${formatMoney(ded.other_deductions)}</span></div>` : ''}
+                </div>
+              </div>
+
+              <div class="totals">
+                <div class="total">Total</div>
+                <div class="total"><span style="float: right;">${formatMoney(ded.gross_salary)}</span></div>
+                <div class="total"><span style="float: right;">${formatMoney((ded.paye_tax || 0) + (ded.napsa_contribution || 0) + (ded.health_insurance || 0) + (ded.other_deductions || 0))}</span></div>
+              </div>
+
+              <div class="net-pay">
+                <div class="net-label">NET PAY</div>
+                <div class="net-amount">${formatMoney(ded.net_salary)}</div>
+              </div>
+
+              <div class="in-words">
+                Kwacha: ${formatMoney(ded.net_salary)}
               </div>
             </div>
 
             <div class="footer">
-              <p>This is an automatically generated payslip. For queries, contact HR.</p>
-              <p>ZAI FLOW © 2026 - Confidential</p>
+              <p>This is an electronically generated payslip. For queries, contact Human Resources.</p>
+              <p>ZAI FLOW © 2026 - Confidential and Proprietary</p>
             </div>
           </div>
         </body>
