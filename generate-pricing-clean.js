@@ -78,7 +78,7 @@ doc.fillColor(purple).fillOpacity(0.2).rect(40, doc.y, 515, 100).fill();
 doc.fillOpacity(1);
 
 doc.fontSize(12).font('Helvetica-Bold').fillColor(turquoise).text('Key Benefits:', 60, doc.y + 15);
-addBullet('50% cheaper than ZamTech ERP');
+addBullet('50% cheaper than Odoo and local Zambian competitors');
 addBullet('Professional plans at ZMW 15,000/month');
 addBullet('2-week money-back guarantee if not satisfied');
 
@@ -308,12 +308,12 @@ addBodyText('Annual cost comparison for professional plans (10 users, all module
 
 doc.moveDown(0.5);
 
-// Comparison table
+// Comparison table - REAL COMPETITORS
 const competitors = [
   { name: 'ZAI FLOW', monthly: 15000, annual: 180000, setup: 50000, total: 230000 },
-  { name: 'ZamTech ERP', monthly: 40000, annual: 480000, setup: 300000, total: 780000 },
-  { name: 'AfricaFlow Pro', monthly: 50000, annual: 600000, setup: 500000, total: 1100000 },
-  { name: 'SmartBiz Systems', monthly: 45000, annual: 540000, setup: 400000, total: 940000 }
+  { name: 'Odoo ERP', monthly: 35000, annual: 420000, setup: 200000, total: 620000 },
+  { name: 'SAP Business One', monthly: 120000, annual: 1440000, setup: 500000, total: 1940000 },
+  { name: 'Matiyas Solutions', monthly: 50000, annual: 600000, setup: 300000, total: 900000 }
 ];
 
 const tableY = doc.y + 20;

@@ -192,7 +192,7 @@ doc.moveDown(2);
 // Comparison header
 doc.fontSize(12).font('Helvetica-Bold').fillColor(white).text('Professional Plan Comparison (Annual Cost)', 50, 90);
 
-// Pricing comparison with modern design
+// Pricing comparison with modern design - REAL COMPETITORS
 const competitors = [
   {
     name: 'ZAI FLOW',
@@ -203,26 +203,26 @@ const competitors = [
     color: turquoise
   },
   {
-    name: 'ZamTech ERP',
-    monthly: 40000,
-    annual: 480000,
-    setup: 300000,
+    name: 'Odoo ERP',
+    monthly: 35000,
+    annual: 420000,
+    setup: 200000,
     isWinner: false,
     color: accent
   },
   {
-    name: 'AfricaFlow Pro',
-    monthly: 50000,
-    annual: 600000,
+    name: 'SAP Business One',
+    monthly: 120000,
+    annual: 1440000,
     setup: 500000,
     isWinner: false,
     color: accent
   },
   {
-    name: 'SmartBiz Systems',
-    monthly: 45000,
-    annual: 540000,
-    setup: 400000,
+    name: 'Matiyas Solutions',
+    monthly: 50000,
+    annual: 600000,
+    setup: 300000,
     isWinner: false,
     color: accent
   }
