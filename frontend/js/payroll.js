@@ -339,7 +339,7 @@ function generatePayslip(deductionId, payrollRunId) {
               </tbody>
             </table>
 
-            <div class="table-title">DEDUCTIONS</div>
+            <div class="table-title">DEDUCTIONS (ZRA 2026 COMPLIANT)</div>
             <table class="deductions-table">
               <thead>
                 <tr>
@@ -349,12 +349,16 @@ function generatePayslip(deductionId, payrollRunId) {
               </thead>
               <tbody>
                 <tr>
-                  <td>PAYE Tax</td>
+                  <td>PAYE Tax (Progressive)</td>
                   <td>${formatMoney(ded.paye_tax)}</td>
                 </tr>
                 <tr>
-                  <td>Pension Contribution</td>
-                  <td>${formatMoney(ded.pension_contribution)}</td>
+                  <td>NAPSA Contributions (5%)</td>
+                  <td>${formatMoney(ded.napsa_contribution || 0)}</td>
+                </tr>
+                <tr>
+                  <td>National Health Insurance (1%)</td>
+                  <td>${formatMoney(ded.health_insurance || 0)}</td>
                 </tr>
                 ${ded.other_deductions > 0 ? `
                 <tr>
@@ -364,7 +368,7 @@ function generatePayslip(deductionId, payrollRunId) {
                 ` : ''}
                 <tr style="background: #f0f0f0; font-weight: bold;">
                   <td>Total Deductions</td>
-                  <td>${formatMoney(ded.paye_tax + ded.pension_contribution + ded.other_deductions)}</td>
+                  <td>${formatMoney((ded.paye_tax || 0) + (ded.napsa_contribution || 0) + (ded.health_insurance || 0) + (ded.other_deductions || 0))}</td>
                 </tr>
               </tbody>
             </table>
