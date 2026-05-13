@@ -297,7 +297,102 @@ keyFeatures.forEach(kf => {
   featureTableY += 18;
 });
 
-// ===== PAGE 4: PRICING PLANS =====
+// ===== PAGE 4: MARKET RESEARCH & COMPETITOR ANALYSIS =====
+newPage();
+
+doc.fillColor(darkBg).rect(0, 0, 595, 842).fill();
+
+// Header
+doc.fillColor(turquoise).rect(0, 0, 595, 70).fill();
+doc.fontSize(32).font('Helvetica-Bold').fillColor(darkBg).text('Market Research & Analysis', 50, 18);
+
+doc.moveDown(2);
+
+// Introduction
+doc.fontSize(11).font('Helvetica').fillColor(white).text('We analyzed the top ERP solutions available to Zambian businesses. Here is what the market offers:', 50, 100, { width: 495 });
+
+doc.moveDown(1);
+
+// Competitor 1: Odoo
+doc.fillColor(turquoise).rect(0, doc.y, 595, 25).fill();
+doc.fontSize(13).font('Helvetica-Bold').fillColor(darkBg).text('Odoo ERP - Open Source Solution', 50, doc.y + 5);
+
+doc.moveDown(2);
+doc.fontSize(10).font('Helvetica').fillColor(white).text('Odoo is a popular open-source ERP available in Africa. Pricing for Zambia typically ranges from ZMW 35,000 to 50,000 per month for professional plans.', 50, doc.y, { width: 495 });
+doc.moveDown(0.5);
+
+doc.fontSize(10).font('Helvetica-Bold').fillColor(turquoise).text('Advantages:', 50, doc.y);
+doc.moveDown(0.2);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Open source platform', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Large community support', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Multiple modules available', 50, doc.y);
+
+doc.moveDown(0.5);
+doc.fontSize(10).font('Helvetica-Bold').fillColor(accent).text('Disadvantages:', 50, doc.y);
+doc.moveDown(0.2);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Complex implementation', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Requires technical expertise', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- ZMW 35,000 per month (2.3x more expensive than ZAI FLOW)', 50, doc.y);
+
+doc.moveDown(1);
+
+// Competitor 2: SAP Business One
+doc.fillColor(turquoise).rect(0, doc.y, 595, 25).fill();
+doc.fontSize(13).font('Helvetica-Bold').fillColor(darkBg).text('SAP Business One - Enterprise Solution', 50, doc.y + 5);
+
+doc.moveDown(2);
+doc.fontSize(10).font('Helvetica').fillColor(white).text('SAP Business One is an enterprise-grade ERP system. In Zambia, costs start at ZMW 120,000 per month for basic implementations.', 50, doc.y, { width: 495 });
+doc.moveDown(0.5);
+
+doc.fontSize(10).font('Helvetica-Bold').fillColor(turquoise).text('Advantages:', 50, doc.y);
+doc.moveDown(0.2);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Global brand recognition', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Mature, proven platform', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Enterprise-grade security', 50, doc.y);
+
+doc.moveDown(0.5);
+doc.fontSize(10).font('Helvetica-Bold').fillColor(accent).text('Disadvantages:', 50, doc.y);
+doc.moveDown(0.2);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- ZMW 120,000 per month (8x more expensive)', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Expensive implementation and training', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Total Year 1 cost: ZMW 1.94 million', 50, doc.y);
+
+doc.moveDown(1);
+
+// Competitor 3: Local Solutions
+doc.fillColor(turquoise).rect(0, doc.y, 595, 25).fill();
+doc.fontSize(13).font('Helvetica-Bold').fillColor(darkBg).text('Local Zambian Solutions (Matiyas, Bsquare, Uplift)', 50, doc.y + 5);
+
+doc.moveDown(2);
+doc.fontSize(10).font('Helvetica').fillColor(white).text('Several local providers offer custom ERP solutions. Matiyas Solutions is a popular choice for Zambian businesses, averaging ZMW 50,000 per month.', 50, doc.y, { width: 495 });
+doc.moveDown(0.5);
+
+doc.fontSize(10).font('Helvetica-Bold').fillColor(turquoise).text('Advantages:', 50, doc.y);
+doc.moveDown(0.2);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Local support and understanding', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- ZRA compliance built-in', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Customizable for local needs', 50, doc.y);
+
+doc.moveDown(0.5);
+doc.fontSize(10).font('Helvetica-Bold').fillColor(accent).text('Disadvantages:', 50, doc.y);
+doc.moveDown(0.2);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- ZMW 50,000 per month (3.3x more expensive)', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Limited documentation', 50, doc.y);
+doc.moveDown(0.3);
+doc.fontSize(10).font('Helvetica').fillColor(lightGray).text('- Smaller support teams', 50, doc.y);
+
+// ===== PAGE 5: PRICING PLANS =====
 newPage();
 
 doc.fillColor(darkBg).rect(0, 0, 595, 842).fill();
@@ -371,7 +466,7 @@ plans.forEach(plan => {
   planX += planWidth + 10;
 });
 
-// ===== PAGE 5: CONTACT & CTA =====
+// ===== PAGE 6: CONTACT & CTA =====
 newPage();
 
 doc.fillColor(darkBg).rect(0, 0, 595, 842).fill();
