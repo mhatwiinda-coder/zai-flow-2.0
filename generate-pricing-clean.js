@@ -91,7 +91,7 @@ doc.fillColor(darkBg).rect(0, 0, 595, 842).fill();
 
 addTitle('Subscription Plans');
 
-addBodyText('Simple, transparent pricing. No hidden fees. Cancel anytime.');
+addBodyText('Simple, transparent pricing. No hidden fees. Standard contract and terms apply.');
 
 doc.moveDown(0.5);
 
@@ -400,6 +400,12 @@ const methods = ['Bank Transfer (All major banks)', 'Mobile Money (MTN, Airtel)'
 methods.forEach(m => addBullet(m));
 
 doc.moveDown(1);
+
+addSectionTitle('Money-Back Guarantee Terms');
+
+addBodyText('Our 2-week money-back guarantee applies to all new customers. If you are not satisfied with ZAI FLOW within 2 weeks of signing your service agreement, we will refund your setup and first month fees, no questions asked. Standard contract terms and conditions apply.');
+
+doc.moveDown(0.5);
 
 addSectionTitle('Get in Touch');
 

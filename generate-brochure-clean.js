@@ -424,8 +424,8 @@ const whyChoose = [
   '- 50% cheaper than competitors',
   '- 2-week quick start',
   '- Local Zambian team',
-  '- No contracts, cancel anytime',
-  '- 30-day money-back guarantee'
+  '- No long-term contracts, cancel anytime',
+  '- 2-week money-back guarantee if not satisfied'
 ];
 
 whyChoose.forEach(reason => {
