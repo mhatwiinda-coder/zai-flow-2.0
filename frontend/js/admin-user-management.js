@@ -7,6 +7,21 @@ let allUsers = [];
 let allRoles = [];
 let userRoleMap = new Map(); // Map of user_id -> [role_ids]
 
+// Logout function
+async function logoutUser() {
+  if (confirm('Are you sure you want to logout?')) {
+    try {
+      await window.supabase.auth.signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+    localStorage.removeItem('user');
+    localStorage.removeItem('session');
+    localStorage.removeItem('branch_context');
+    window.location.href = 'login.html';
+  }
+}
+
 async function loadAllUsers() {
   const context = getBranchContext();
   if (!context || context.user_role !== 'admin') {

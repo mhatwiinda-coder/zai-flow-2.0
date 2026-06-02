@@ -563,8 +563,13 @@ function searchUsers() {
 // LOGOUT
 // ============================================================================
 
-function logout() {
+async function logout() {
   if (confirm('Are you sure you want to logout?')) {
+    try {
+      await window.supabase.auth.signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
     // Clear localStorage
     localStorage.removeItem('user');
     localStorage.removeItem('session');

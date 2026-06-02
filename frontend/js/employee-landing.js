@@ -307,8 +307,13 @@ async function markAllNotificationsRead() {
   }
 }
 
-function logout() {
+async function logout() {
   if (confirm('Are you sure you want to logout?')) {
+    try {
+      await window.supabase.auth.signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
     if (clockUpdateInterval) clearInterval(clockUpdateInterval);
     if (dataRefreshInterval) clearInterval(dataRefreshInterval);
     localStorage.removeItem('user');

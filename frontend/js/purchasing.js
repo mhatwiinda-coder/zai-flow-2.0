@@ -929,9 +929,15 @@ function loadPurchasingAnalytics() {
 /**
  * Logout function - clear session and redirect to login
  */
-function logout() {
+async function logout() {
   if (!confirm('Are you sure you want to logout?')) {
     return;
+  }
+
+  try {
+    await window.supabase.auth.signOut();
+  } catch (err) {
+    console.error('Logout error:', err);
   }
 
   try {

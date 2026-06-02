@@ -363,12 +363,18 @@ CREATE POLICY chart_of_accounts_isolation ON chart_of_accounts
 -- RLS POLICIES FOR LOOKUP TABLES (No branch filtering needed, all can read)
 -- ============================================================================
 
--- Users can see other users (might want to restrict this)
+-- Users can only see users from their own business or admins can see all
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY users_visibility ON users
   FOR SELECT
-  USING (TRUE);  -- All authenticated users can see all users
+  USING (
+    -- Admin users can see all users
+    (SELECT role FROM users WHERE id = auth.uid()::INTEGER LIMIT 1) = 'admin'
+    OR
+    -- Users can see users from their business
+    business_id = (SELECT business_id FROM users WHERE id = auth.uid()::INTEGER LIMIT 1)
+  );
 
 -- ============================================================================
 -- VERIFICATION QUERIES
