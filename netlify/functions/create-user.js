@@ -1,8 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
+import { createHmac } from "crypto";
 
 /**
  * Netlify Function: Create User in Both Auth and Database
  * Handles user creation with automatic Supabase Auth + Database sync
+ * REQUIRES: Valid Authorization header with admin token
  */
 export default async (req, context) => {
   // Ensure all responses return JSON, even on errors
@@ -17,6 +19,19 @@ export default async (req, context) => {
     // Only allow POST requests
     if (req.method !== "POST") {
       return jsonResponse({ error: "Method not allowed" }, 405);
+    }
+
+    // SECURITY: Verify authorization - only admins can create users
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return jsonResponse({ error: "Unauthorized: Missing or invalid authorization" }, 401);
+    }
+
+    const token = authHeader.slice(7);
+    const expectedAdminToken = process.env.ADMIN_API_TOKEN;
+
+    if (!expectedAdminToken || token !== expectedAdminToken) {
+      return jsonResponse({ error: "Unauthorized: Invalid credentials" }, 401);
     }
 
     // Initialize Supabase inside function for better error handling
@@ -158,12 +173,10 @@ export default async (req, context) => {
       200
     );
   } catch (error) {
-    console.error(`❌ UNHANDLED ERROR:`, error);
-    console.error(`Stack:`, error.stack);
+    console.error(`❌ UNHANDLED ERROR:`, error.message);
     return jsonResponse(
       {
-        error: `Server error: ${error.message}`,
-        details: error.stack,
+        error: `Server error`,
       },
       500
     );

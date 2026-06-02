@@ -13,27 +13,40 @@ const supabase = createClient(supabaseUrl, supabaseAdminKey, {
 /**
  * Netlify Function: Delete User from Auth and Database
  * Deletes user from Supabase auth and all database records
+ * REQUIRES: Valid Authorization header with admin token
  */
 export default async (req, context) => {
-  if (req.method !== "POST") {
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
+  const jsonResponse = (data, status = 200) => {
+    return new Response(JSON.stringify(data), {
+      status,
       headers: { "Content-Type": "application/json" },
     });
+  };
+
+  if (req.method !== "POST") {
+    return jsonResponse({ error: "Method not allowed" }, 405);
   }
 
   try {
+    // SECURITY: Verify authorization - only admins can delete users
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return jsonResponse({ error: "Unauthorized: Missing or invalid authorization" }, 401);
+    }
+
+    const token = authHeader.slice(7);
+    const expectedAdminToken = process.env.ADMIN_API_TOKEN;
+
+    if (!expectedAdminToken || token !== expectedAdminToken) {
+      return jsonResponse({ error: "Unauthorized: Invalid credentials" }, 401);
+    }
+
     const { auth_id, user_id } = JSON.parse(req.body);
 
     if (!auth_id || !user_id) {
-      return new Response(
-        JSON.stringify({
-          error: "Missing required fields: auth_id, user_id",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+      return jsonResponse(
+        { error: "Missing required fields: auth_id, user_id" },
+        400
       );
     }
 
@@ -74,14 +87,9 @@ export default async (req, context) => {
         .eq("id", user_id);
 
       if (dbError) {
-        return new Response(
-          JSON.stringify({
-            error: `Failed to delete database user: ${dbError.message}`,
-          }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          }
+        return jsonResponse(
+          { error: "Failed to delete database user" },
+          400
         );
       }
     } else {
@@ -90,26 +98,18 @@ export default async (req, context) => {
 
     console.log(`✅ User ${user_id} deleted successfully`);
 
-    return new Response(
-      JSON.stringify({
+    return jsonResponse(
+      {
         success: true,
         message: `User deleted successfully`,
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
+      },
+      200
     );
   } catch (error) {
-    console.error("❌ Error:", error);
-    return new Response(
-      JSON.stringify({
-        error: `Server error: ${error.message}`,
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+    console.error("❌ Error:", error.message);
+    return jsonResponse(
+      { error: "Server error" },
+      500
     );
   }
 };

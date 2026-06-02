@@ -58,9 +58,9 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Create user tied to business
+  -- Create user tied to business with bcrypt password hashing
   INSERT INTO public.users (email, password, name, role, business_id)
-  VALUES (p_email, p_password, p_name, p_role, p_business_id)
+  VALUES (p_email, crypt(p_password, gen_salt('bf')), p_name, p_role, p_business_id)
   RETURNING id INTO v_user_id;
 
   -- Create default branch access for primary branch of business
@@ -230,12 +230,12 @@ DECLARE
   v_branches JSONB;
   v_primary_branch_id INTEGER;
 BEGIN
-  -- Find user by email and password
+  -- Find user by email and password (using bcrypt hash verification)
   -- Use table alias to avoid column ambiguity
   SELECT u.id, u.name, u.email, u.role, u.business_id
   INTO v_user
   FROM public.users u
-  WHERE u.email = p_email AND u.password = p_password
+  WHERE u.email = p_email AND u.password = crypt(p_password, u.password)
   LIMIT 1;
 
   IF v_user IS NULL THEN

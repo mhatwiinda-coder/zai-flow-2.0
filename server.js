@@ -3,12 +3,25 @@ require("dotenv").config();
 const express = require("express");
 const cors    = require("cors");
 const path    = require("path");
+const bcrypt  = require("bcryptjs");
+const helmet  = require("helmet");
 const app     = express();
 
 /* =========================
    MIDDLEWARE
 ========================= */
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "https://zai-digital-studio.com",
+  process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : []
+].flat().filter(Boolean);
+
+app.use(helmet());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "frontend")));
 
@@ -27,36 +40,13 @@ console.log("✅ Server ready to serve frontend (Supabase-native mode)");
 // app.use("/api/zra",        require("./routes/smartinvoice.routes"));
 
 /* =========================
-   CONFIG ENDPOINT — Supabase frontend config
+   CONFIG ENDPOINT — Supabase frontend config (CREDENTIALS ARE INTENTIONALLY LIMITED)
 ========================= */
 app.get("/api/config", (req, res) => {
   res.json({
     supabase_url: process.env.SUPABASE_URL,
     supabase_anon_key: process.env.SUPABASE_ANON_KEY
   });
-});
-app.get("/api/test-db", async (req, res) => {
-  try {
-    const { Pool } = await import("pg");
-    const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
-    });
-
-    const result = await pool.query("SELECT id, email, password FROM public.users WHERE email = 'admin@lodiachi-enterprises-ltd.local'");
-    await pool.end();
-    
-    res.json({
-      success: true,
-      rowCount: result.rows.length,
-      data: result.rows
-    });
-  } catch (err) {
-    res.json({
-      success: false,
-      error: err.message
-    });
-  }
 });
 /* =========================
    NO HARDCODED USERS - TRUE SAAS MULTI-TENANCY
@@ -101,7 +91,8 @@ app.post("/api/login", async (req, res) => {
       }
 
       const user = userResult.rows[0];
-      if (user.password !== password) {
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
         console.log(`❌ Password mismatch for ${email}`);
         await pool.end();
         return res.json({ success: false, message: "Invalid email or password" });
@@ -169,7 +160,8 @@ app.post("/api/login", async (req, res) => {
         return res.json({ success: false, message: "Invalid email or password" });
       }
 
-      if (user.password !== password) {
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
         console.log(`❌ Password mismatch for ${email}`);
         return res.json({ success: false, message: "Invalid email or password" });
       }

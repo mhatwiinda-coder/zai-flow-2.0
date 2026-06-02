@@ -82,6 +82,8 @@ async function login() {
     }));
 
     // Store user info in localStorage with branch context
+    // SECURITY: Do NOT store refresh tokens or full sessions in localStorage
+    // Supabase handles token management automatically via secure mechanisms
     const userInfo = {
       id: profile.id,
       auth_id: data.user.id,
@@ -91,12 +93,10 @@ async function login() {
       business_id: profile.business_id,
       current_branch_id: primaryBranch.branch_id,
       current_business_id: primaryBranch.branches.business_id,
-      branches: branchesArray,
-      auth_session: data.session
+      branches: branchesArray
     };
 
     localStorage.setItem("user", JSON.stringify(userInfo));
-    localStorage.setItem("token", data.session.access_token);
 
     console.log("✅ User logged in:", userInfo.email);
     console.log("✅ Primary branch set:", {
