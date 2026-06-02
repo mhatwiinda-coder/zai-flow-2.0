@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const biController = require("../controllers/bi.controller");
+const auth = require("../middleware/auth");
+
+// All BI routes require authentication
+router.use(auth);
 
 // Existing
 router.get("/sales-summary", biController.salesSummary);

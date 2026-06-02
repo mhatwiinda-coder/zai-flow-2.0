@@ -4,6 +4,18 @@
 // Enforces single-business isolation per user
 // ============================================================================
 
+// HTML escape function to prevent XSS attacks
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 let businessUsersData = [];
 let currentBusinessId = null;
 let availableBusinesses = [];
@@ -109,14 +121,14 @@ async function loadBusinessUsers() {
 
     const html = businessUsersData.map(user => `
       <tr style="border-bottom: 1px solid #333;">
-        <td style="padding: 12px;"><strong>${user.name}</strong></td>
-        <td style="padding: 12px;">${user.email}</td>
+        <td style="padding: 12px;"><strong>${escapeHtml(user.name)}</strong></td>
+        <td style="padding: 12px;">${escapeHtml(user.email)}</td>
         <td style="padding: 12px;">
           <span class="badge" style="background: #667eea; padding: 4px 8px; border-radius: 3px; font-size: 11px; text-transform: capitalize;">
-            ${user.role}
+            ${escapeHtml(user.role)}
           </span>
         </td>
-        <td style="padding: 12px;">${user.branch_count} branch(es)</td>
+        <td style="padding: 12px;">${escapeHtml(String(user.branch_count))} branch(es)</td>
         <td style="padding: 12px;">
           <button onclick="editUser(${user.user_id})" style="background: #3498db; padding: 6px 12px; font-size: 12px; margin-right: 5px;">Edit</button>
           <button onclick="deleteUser(${user.user_id})" class="danger" style="padding: 6px 12px; font-size: 12px; background: #e74c3c;">Delete</button>

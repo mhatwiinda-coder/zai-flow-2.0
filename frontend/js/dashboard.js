@@ -4,6 +4,18 @@ const CURRENCY = "ZMW";
 let charts = {};
 let dashboardRefreshInterval;
 
+// HTML escape function to prevent XSS attacks
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return String(text).replace(/[&<>"']/g, m => map[m]);
+}
+
 /* =====================================================
    INITIALIZE DASHBOARD
 ===================================================== */
@@ -443,11 +455,13 @@ function loadLowStockAlerts() {
       lowStock.forEach(product => {
         const stock = Number(product.stock || 0);
         const severity = stock === 0 ? "critical" : "warning";
+        const productName = escapeHtml(product.name || product.product_name || '');
+        const sku = product.sku ? ' | SKU: ' + escapeHtml(product.sku) : '';
         html += `
           <div class="alert-item">
             <div>
-              <strong>${product.name || product.product_name}</strong><br>
-              <small>Stock: ${stock} units${product.sku ? ' | SKU: ' + product.sku : ''}</small>
+              <strong>${productName}</strong><br>
+              <small>Stock: ${stock} units${sku}</small>
             </div>
           </div>
         `;
@@ -487,11 +501,12 @@ function loadRecentSales() {
       allSales.forEach(sale => {
         const saleDate = new Date(sale.created_at);
         const timeStr = saleDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const paymentMethod = escapeHtml(sale.payment_method || 'Cash');
         html += `
           <div class="transaction-item">
             <div>
               <strong>Sale #${sale.id}</strong><br>
-              <small>${timeStr} • ${sale.payment_method || 'Cash'}</small>
+              <small>${timeStr} • ${paymentMethod}</small>
             </div>
             <div class="transaction-amount">${money(sale.total || 0)}</div>
           </div>

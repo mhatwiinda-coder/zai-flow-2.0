@@ -27,7 +27,7 @@ router.get("/drawer/:id/summary", auth, controller.drawerSummary);
 
 /* ================= SUPERVISOR ================= */
 
-router.post("/authorize-supervisor", controller.authorizeSupervisor);
+router.post("/authorize-supervisor", auth, role(["supervisor", "admin"]), controller.authorizeSupervisor);
 
 /* ================= BI ================= */
 

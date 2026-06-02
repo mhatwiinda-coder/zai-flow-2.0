@@ -22,12 +22,12 @@ router.get("/trial-balance", auth, controller.trialBalance);
 /* ===============================
    GENERAL LEDGER
 =============================== */
-router.get("/general-ledger", controller.generalLedger);
+router.get("/general-ledger", auth, controller.generalLedger);
 
-router.get("/profit-loss", controller.profitAndLoss);
+router.get("/profit-loss", auth, controller.profitAndLoss);
 
-router.get("/trial-balance/export", controller.exportTrialBalance);
+router.get("/trial-balance/export", auth, controller.exportTrialBalance);
 
-router.get("/ledger/export", controller.exportLedger);
+router.get("/ledger/export", auth, controller.exportLedger);
 
 module.exports = router;
