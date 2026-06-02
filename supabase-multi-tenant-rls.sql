@@ -369,11 +369,14 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY users_visibility ON users
   FOR SELECT
   USING (
-    -- Admin users can see all users
-    (SELECT role FROM users WHERE id = auth.uid()::INTEGER LIMIT 1) = 'admin'
+    -- Users can see their own record (needed for login)
+    auth_id = auth.uid()
     OR
-    -- Users can see users from their business
-    business_id = (SELECT business_id FROM users WHERE id = auth.uid()::INTEGER LIMIT 1)
+    -- Admin users can see all users
+    (SELECT role FROM users WHERE auth_id = auth.uid() LIMIT 1) = 'admin'
+    OR
+    -- Users can see other users from their business
+    business_id = (SELECT business_id FROM users WHERE auth_id = auth.uid() LIMIT 1)
   );
 
 -- ============================================================================
