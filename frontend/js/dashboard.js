@@ -135,7 +135,7 @@ function loadFinancialMetrics() {
       if (!context) return;
 
       const { data: profitLoss, error } = await window.supabase.rpc('get_profit_loss', {
-        p_business_id: context.business_id
+        p_branch_id: context.branch_id
       });
 
       if (error) {

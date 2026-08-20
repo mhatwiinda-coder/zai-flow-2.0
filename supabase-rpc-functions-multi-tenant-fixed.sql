@@ -257,9 +257,9 @@ $$;
 -- ACCOUNTING MODULE RPC FUNCTIONS - MULTI-TENANT SCOPED
 -- ============================================================================
 
--- 6. GET TRIAL BALANCE (MULTI-TENANT)
+-- 6. GET TRIAL BALANCE (BRANCH-SCOPED - matches every other module's isolation)
 DROP FUNCTION IF EXISTS public.get_trial_balance(INTEGER);
-CREATE OR REPLACE FUNCTION public.get_trial_balance(p_business_id INTEGER)
+CREATE OR REPLACE FUNCTION public.get_trial_balance(p_branch_id INTEGER)
 RETURNS TABLE (
   account_code TEXT,
   account_name TEXT,
@@ -278,15 +278,15 @@ BEGIN
   FROM public.chart_of_accounts coa
   LEFT JOIN public.journal_lines jl ON coa.id = jl.account_id
   LEFT JOIN public.journal_entries je ON jl.journal_id = je.id
-    AND je.branch_id IN (SELECT id FROM public.branches WHERE business_id = p_business_id)
+    AND je.branch_id = p_branch_id
   GROUP BY coa.id, coa.account_code, coa.account_name, coa.account_type
   ORDER BY coa.account_code;
 END;
 $$;
 
--- 7. GET PROFIT & LOSS (MULTI-TENANT)
+-- 7. GET PROFIT & LOSS (BRANCH-SCOPED)
 DROP FUNCTION IF EXISTS public.get_profit_loss(INTEGER);
-CREATE OR REPLACE FUNCTION public.get_profit_loss(p_business_id INTEGER)
+CREATE OR REPLACE FUNCTION public.get_profit_loss(p_branch_id INTEGER)
 RETURNS TABLE (
   revenue NUMERIC,
   cogs NUMERIC,
@@ -299,19 +299,19 @@ DECLARE
   v_cogs NUMERIC;
   v_expenses NUMERIC;
 BEGIN
-  -- Get revenue (account 4000) scoped to business
+  -- Get revenue (account 4000) scoped to branch
   SELECT COALESCE(SUM(total_credit), 0) INTO v_revenue
-  FROM (SELECT * FROM get_trial_balance(p_business_id)) tb
+  FROM (SELECT * FROM get_trial_balance(p_branch_id)) tb
   WHERE account_code = '4000';
 
-  -- Get COGS (account 5000) scoped to business
+  -- Get COGS (account 5000) scoped to branch
   SELECT COALESCE(SUM(total_debit), 0) INTO v_cogs
-  FROM (SELECT * FROM get_trial_balance(p_business_id)) tb
+  FROM (SELECT * FROM get_trial_balance(p_branch_id)) tb
   WHERE account_code = '5000';
 
-  -- Get expenses (accounts 5100+) scoped to business
+  -- Get expenses (accounts 5100+) scoped to branch
   SELECT COALESCE(SUM(total_debit), 0) INTO v_expenses
-  FROM (SELECT * FROM get_trial_balance(p_business_id)) tb
+  FROM (SELECT * FROM get_trial_balance(p_branch_id)) tb
   WHERE account_code LIKE '51%' OR account_code LIKE '52%';
 
   RETURN QUERY SELECT
@@ -323,9 +323,9 @@ BEGIN
 END;
 $$;
 
--- 8. GET GENERAL LEDGER (MULTI-TENANT)
+-- 8. GET GENERAL LEDGER (BRANCH-SCOPED)
 DROP FUNCTION IF EXISTS public.get_general_ledger(INTEGER);
-CREATE OR REPLACE FUNCTION public.get_general_ledger(p_business_id INTEGER)
+CREATE OR REPLACE FUNCTION public.get_general_ledger(p_branch_id INTEGER)
 RETURNS TABLE (
   id INTEGER,
   created_at TIMESTAMPTZ,
@@ -348,8 +348,7 @@ BEGIN
   FROM public.journal_lines jl
   JOIN public.journal_entries je ON jl.journal_id = je.id
   JOIN public.chart_of_accounts coa ON jl.account_id = coa.id
-  JOIN public.branches b ON je.branch_id = b.id
-  WHERE b.business_id = p_business_id
+  WHERE je.branch_id = p_branch_id
   ORDER BY je.created_at DESC, jl.id;
 END;
 $$;
