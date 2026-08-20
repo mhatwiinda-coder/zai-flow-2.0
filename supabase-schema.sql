@@ -165,10 +165,13 @@ INSERT INTO chart_of_accounts (account_code, account_name, account_type) VALUES
   ('1100', 'Bank', 'ASSET'),
   ('1200', 'Inventory', 'ASSET'),
   ('2000', 'Accounts Payable', 'LIABILITY'),
+  ('2100', 'PAYE Tax Payable', 'LIABILITY'),
+  ('2200', 'Pension Contribution Payable', 'LIABILITY'),
   ('3000', 'Owner Equity', 'EQUITY'),
   ('4000', 'Sales Revenue', 'REVENUE'),
+  ('4100', 'Other Income', 'REVENUE'),
   ('5000', 'Cost of Goods Sold', 'EXPENSE'),
-  ('5100', 'Utilities Expense', 'EXPENSE'),
+  ('5100', 'Salary & Wages Expense', 'EXPENSE'),
   ('5200', 'Till Variance', 'EXPENSE')
 ON CONFLICT (account_code) DO NOTHING;
 

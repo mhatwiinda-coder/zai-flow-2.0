@@ -170,7 +170,8 @@ RETURNS TABLE (
   balanced BOOLEAN,
   expected NUMERIC,
   declared NUMERIC,
-  difference NUMERIC
+  difference NUMERIC,
+  journal_entry_id INTEGER
 ) LANGUAGE plpgsql SECURITY DEFINER AS $$
 DECLARE
   v_opening_balance NUMERIC;
@@ -178,6 +179,10 @@ DECLARE
   v_expected_balance NUMERIC;
   v_difference NUMERIC;
   v_branch_id INTEGER;
+  v_journal_id INTEGER;
+  v_cash_account_id INTEGER;
+  v_variance_account_id INTEGER;
+  v_income_account_id INTEGER;
 BEGIN
   -- Get drawer info
   SELECT opening_balance, branch_id INTO v_opening_balance, v_branch_id
@@ -194,6 +199,40 @@ BEGIN
   v_expected_balance := v_opening_balance + v_sales_total;
   v_difference := p_declared_balance - v_expected_balance;
 
+  -- Get GL accounts
+  SELECT id INTO v_cash_account_id FROM public.chart_of_accounts
+  WHERE account_code = '1000' AND branch_id = v_branch_id;
+
+  SELECT id INTO v_variance_account_id FROM public.chart_of_accounts
+  WHERE account_code = '5200' AND branch_id = v_branch_id;
+
+  SELECT id INTO v_income_account_id FROM public.chart_of_accounts
+  WHERE account_code = '4100' AND branch_id = v_branch_id;
+
+  -- If there's a variance, post GL entry
+  IF ABS(v_difference) >= 0.01 THEN
+    -- Create journal entry
+    INSERT INTO public.journal_entries (reference, description, branch_id)
+    VALUES ('DRAWER-' || p_drawer_id, 'Till variance - drawer closure', v_branch_id)
+    RETURNING id INTO v_journal_id;
+
+    IF v_difference > 0 THEN
+      -- Surplus: Dr. Cash, Cr. Other Income
+      INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+      VALUES (v_journal_id, v_cash_account_id, v_difference, 0, v_branch_id);
+
+      INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+      VALUES (v_journal_id, v_income_account_id, 0, v_difference, v_branch_id);
+    ELSE
+      -- Shortage: Dr. Till Variance, Cr. Cash
+      INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+      VALUES (v_journal_id, v_variance_account_id, ABS(v_difference), 0, v_branch_id);
+
+      INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+      VALUES (v_journal_id, v_cash_account_id, 0, ABS(v_difference), v_branch_id);
+    END IF;
+  END IF;
+
   -- Update drawer
   UPDATE public.cash_drawer
   SET
@@ -209,7 +248,8 @@ BEGIN
     (ABS(v_difference) < 1)::BOOLEAN,
     v_expected_balance,
     p_declared_balance,
-    v_difference;
+    v_difference,
+    v_journal_id;
 END;
 $$;
 

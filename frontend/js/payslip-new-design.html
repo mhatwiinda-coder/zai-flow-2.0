@@ -1,0 +1,284 @@
+<!-- PROFESSIONAL PAYSLIP TEMPLATE (Replace generatePayslip function with this design) -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Payslip</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .no-print {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 10px;
+    }
+    .no-print button {
+      padding: 12px 24px;
+      margin: 0 5px;
+      background: #2c5aa0;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .no-print button:hover {
+      background: #1e3f5a;
+    }
+    .payslip-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border: 3px solid #333;
+      position: relative;
+    }
+    .confidential {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #90EE90;
+      padding: 8px 12px;
+      font-weight: bold;
+      font-size: 14px;
+      border: 2px solid #333;
+      transform: rotate(-15deg);
+      opacity: 0.9;
+    }
+    .header-section {
+      text-align: center;
+      padding: 20px;
+      border-bottom: 2px solid #333;
+    }
+    .company-name {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2c5aa0;
+      margin-bottom: 5px;
+    }
+    .payslip-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
+    .pay-period {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .employee-info-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      padding: 20px;
+      border-bottom: 2px solid #ddd;
+    }
+    .info-column {
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .info-label {
+      font-weight: bold;
+      display: inline-block;
+      width: 120px;
+    }
+    .info-value {
+      display: inline-block;
+      color: #333;
+    }
+    .content-section {
+      padding: 20px;
+    }
+    .table-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      background: #4a7c3b;
+      color: white;
+      font-weight: bold;
+      padding: 12px 10px;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .earnings-deductions-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    .column {
+      border-right: 1px solid #ddd;
+      padding: 10px;
+      min-height: 100px;
+    }
+    .column:last-child {
+      border-right: none;
+    }
+    .earning-item,
+    .deduction-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .earning-item:last-child,
+    .deduction-item:last-child {
+      border-bottom: none;
+    }
+    .amount {
+      text-align: right;
+      min-width: 80px;
+      font-weight: 500;
+    }
+    .totals-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+      border: 1px solid #333;
+      border-top: 2px solid #333;
+      background: #f0f0f0;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .total-item {
+      padding: 12px 10px;
+      border-right: 1px solid #333;
+      text-align: left;
+    }
+    .total-item:last-child {
+      border-right: none;
+    }
+    .total-amount {
+      text-align: right;
+    }
+    .net-pay-section {
+      background: #4a7c3b;
+      color: white;
+      padding: 15px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .net-pay-label {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    .net-pay-amount {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .amount-in-words {
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+      padding: 10px 0;
+      font-style: italic;
+    }
+    .footer-section {
+      border-top: 2px solid #ddd;
+      padding: 15px 20px;
+      background: #f9f9f9;
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+    }
+    .footer-section p {
+      margin: 5px 0;
+    }
+    @media print {
+      body { margin: 0; padding: 0; background: white; }
+      .no-print { display: none !important; }
+      .payslip-container { border: 1px solid #ccc; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print">
+    <button onclick="window.print()">🖨️ Print Payslip</button>
+    <button onclick="window.close()">❌ Close</button>
+  </div>
+
+  <div class="payslip-container">
+    <div class="confidential">CONFIDENTIAL</div>
+
+    <div class="header-section">
+      <div class="company-name">ZAI FLOW</div>
+      <div class="payslip-title">PAY SLIP</div>
+      <div class="pay-period">For the month of [MONTH YEAR]</div>
+    </div>
+
+    <div class="employee-info-section">
+      <div class="info-column">
+        <div><span class="info-label">Name</span><span class="info-value">: [EMPLOYEE NAME]</span></div>
+        <div><span class="info-label">Employee ID</span><span class="info-value">: [EMPLOYEE CODE]</span></div>
+      </div>
+      <div class="info-column">
+        <div><span class="info-label">Title</span><span class="info-value">: [POSITION]</span></div>
+        <div><span class="info-label">Pay Period</span><span class="info-value">: [MONTH YEAR]</span></div>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <div class="table-header">
+        <div>Description</div>
+        <div>Earnings</div>
+        <div>Deductions</div>
+      </div>
+
+      <div class="earnings-deductions-section">
+        <div class="column">
+          <div class="earning-item">
+            <span>Basic Salary</span>
+            <span class="amount">[GROSS]</span>
+          </div>
+        </div>
+        <div class="column" style="border-right: none;"></div>
+        <div class="column" style="border-right: none;">
+          <div class="deduction-item">
+            <span>PAYE Tax</span>
+            <span class="amount">[PAYE]</span>
+          </div>
+          <div class="deduction-item">
+            <span>NAPSA (5%)</span>
+            <span class="amount">[NAPSA]</span>
+          </div>
+          <div class="deduction-item">
+            <span>Health Insurance (1%)</span>
+            <span class="amount">[HEALTH]</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="totals-section">
+        <div class="total-item">Total</div>
+        <div class="total-item"><span class="total-amount">[GROSS TOTAL]</span></div>
+        <div class="total-item"><span class="total-amount">[TOTAL DEDUCTIONS]</span></div>
+      </div>
+
+      <div class="net-pay-section">
+        <div class="net-pay-label">NET PAY</div>
+        <div class="net-pay-amount">[NET AMOUNT]</div>
+      </div>
+
+      <div class="amount-in-words">
+        [AMOUNT IN WORDS] Kwacha
+      </div>
+    </div>
+
+    <div class="footer-section">
+      <p>This is an electronically generated payslip. For queries, contact Human Resources.</p>
+      <p>ZAI FLOW © 2026 - Confidential and Proprietary</p>
+    </div>
+  </div>
+</body>
+</html>

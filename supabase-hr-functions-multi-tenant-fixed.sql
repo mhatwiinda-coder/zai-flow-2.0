@@ -4,10 +4,10 @@
 -- ============================================================================
 
 -- ============================================================================
--- 1. GET EMPLOYEES BY BUSINESS
+-- 1. GET EMPLOYEES BY BRANCH
 -- ============================================================================
 DROP FUNCTION IF EXISTS public.get_business_employees(INTEGER);
-CREATE OR REPLACE FUNCTION public.get_business_employees(p_business_id INTEGER)
+CREATE OR REPLACE FUNCTION public.get_business_employees(p_branch_id INTEGER)
 RETURNS TABLE (
   employee_id INTEGER,
   employee_code TEXT,
@@ -30,7 +30,7 @@ BEGIN
     e.status,
     e.hire_date
   FROM public.employees e
-  WHERE e.business_id = p_business_id
+  WHERE e.branch_id = p_branch_id
   ORDER BY e.employee_code;
 END;
 $$;
@@ -40,7 +40,7 @@ $$;
 -- ============================================================================
 DROP FUNCTION IF EXISTS public.create_employee(INTEGER, TEXT, TEXT, TEXT, INTEGER, TEXT, DATE, TEXT);
 CREATE OR REPLACE FUNCTION public.create_employee(
-  p_business_id INTEGER,
+  p_branch_id INTEGER,
   p_employee_code TEXT,
   p_first_name TEXT,
   p_last_name TEXT,
@@ -57,21 +57,21 @@ RETURNS TABLE (
 DECLARE
   v_employee_id INTEGER;
 BEGIN
-  -- Validate business exists
-  IF NOT EXISTS (SELECT 1 FROM public.business_entities WHERE id = p_business_id) THEN
-    RETURN QUERY SELECT NULL::INTEGER, NULL::TEXT, 'Business not found'::TEXT;
+  -- Validate branch exists
+  IF NOT EXISTS (SELECT 1 FROM public.branches WHERE id = p_branch_id) THEN
+    RETURN QUERY SELECT NULL::INTEGER, NULL::TEXT, 'Branch not found'::TEXT;
     RETURN;
   END IF;
 
-  -- Check if employee code already exists in this business
-  IF EXISTS (SELECT 1 FROM public.employees WHERE employee_code = p_employee_code AND business_id = p_business_id) THEN
-    RETURN QUERY SELECT NULL::INTEGER, NULL::TEXT, 'Employee code already exists in this business'::TEXT;
+  -- Check if employee code already exists in this branch
+  IF EXISTS (SELECT 1 FROM public.employees WHERE employee_code = p_employee_code AND branch_id = p_branch_id) THEN
+    RETURN QUERY SELECT NULL::INTEGER, NULL::TEXT, 'Employee code already exists in this branch'::TEXT;
     RETURN;
   END IF;
 
   -- Create employee
-  INSERT INTO public.employees (business_id, employee_code, first_name, last_name, department_id, "position", hire_date, email, status)
-  VALUES (p_business_id, p_employee_code, p_first_name, p_last_name, p_department_id, p_position, p_hire_date, p_email, 'ACTIVE')
+  INSERT INTO public.employees (branch_id, employee_code, first_name, last_name, department_id, "position", hire_date, email, status)
+  VALUES (p_branch_id, p_employee_code, p_first_name, p_last_name, p_department_id, p_position, p_hire_date, p_email, 'ACTIVE')
   RETURNING id INTO v_employee_id;
 
   RETURN QUERY SELECT v_employee_id, p_employee_code, 'Employee created successfully'::TEXT;
@@ -82,7 +82,7 @@ $$;
 -- 3. GET DEPARTMENTS (MULTI-TENANT)
 -- ============================================================================
 DROP FUNCTION IF EXISTS public.get_business_departments(INTEGER);
-CREATE OR REPLACE FUNCTION public.get_business_departments(p_business_id INTEGER)
+CREATE OR REPLACE FUNCTION public.get_business_departments(p_branch_id INTEGER)
 RETURNS TABLE (
   department_id INTEGER,
   name TEXT,
@@ -95,7 +95,7 @@ BEGIN
     d.name,
     d.description
   FROM public.departments d
-  WHERE d.business_id = p_business_id
+  WHERE d.branch_id = p_branch_id
   ORDER BY d.name;
 END;
 $$;
@@ -105,7 +105,7 @@ $$;
 -- ============================================================================
 DROP FUNCTION IF EXISTS public.process_payroll(INTEGER, INTEGER, INTEGER);
 CREATE OR REPLACE FUNCTION public.process_payroll(
-  p_business_id INTEGER,
+  p_branch_id INTEGER,
   p_month INTEGER,
   p_year INTEGER
 )
@@ -115,6 +115,7 @@ RETURNS TABLE (
   total_deductions NUMERIC,
   total_net NUMERIC,
   employee_count INTEGER,
+  journal_entry_id INTEGER,
   message TEXT
 ) LANGUAGE plpgsql SECURITY DEFINER AS $$
 DECLARE
@@ -122,73 +123,202 @@ DECLARE
   v_employee RECORD;
   v_gross NUMERIC;
   v_paye NUMERIC;
-  v_pension NUMERIC;
+  v_napsa NUMERIC;
+  v_health_insurance NUMERIC;
   v_net NUMERIC;
   v_total_gross NUMERIC := 0;
   v_total_paye NUMERIC := 0;
-  v_total_pension NUMERIC := 0;
+  v_total_napsa NUMERIC := 0;
+  v_total_health_insurance NUMERIC := 0;
+  v_total_deductions NUMERIC := 0;
   v_total_net NUMERIC := 0;
   v_employee_count INTEGER := 0;
+  v_journal_id INTEGER;
+  v_salary_exp_account_id INTEGER;
+  v_cash_account_id INTEGER;
+  v_paye_account_id INTEGER;
+  v_napsa_account_id INTEGER;
+  v_health_insurance_account_id INTEGER;
+  v_tax_band RECORD;
+  v_taxable_income NUMERIC;
+  v_tax_for_band NUMERIC;
 BEGIN
-  -- Validate business exists
-  IF NOT EXISTS (SELECT 1 FROM public.business_entities WHERE id = p_business_id) THEN
-    RETURN QUERY SELECT NULL::INTEGER, NULL::NUMERIC, NULL::NUMERIC, NULL::NUMERIC, 0, 'Business not found'::TEXT;
+  -- Validate branch exists
+  IF NOT EXISTS (SELECT 1 FROM public.branches WHERE id = p_branch_id) THEN
+    RETURN QUERY SELECT NULL::INTEGER, NULL::NUMERIC, NULL::NUMERIC, NULL::NUMERIC, 0, NULL::INTEGER, 'Branch not found'::TEXT;
     RETURN;
   END IF;
 
-  -- Check if payroll already exists for this month/year
+  -- Check if payroll already exists for this month/year on this branch
   IF EXISTS (SELECT 1 FROM public.payroll_runs
-             WHERE business_id = p_business_id AND month = p_month AND year = p_year AND status != 'REVERSED') THEN
-    RETURN QUERY SELECT NULL::INTEGER, NULL::NUMERIC, NULL::NUMERIC, NULL::NUMERIC, 0, 'Payroll already exists for this period'::TEXT;
+             WHERE branch_id = p_branch_id AND month = p_month AND year = p_year AND status != 'REVERSED') THEN
+    RETURN QUERY SELECT NULL::INTEGER, NULL::NUMERIC, NULL::NUMERIC, NULL::NUMERIC, 0, NULL::INTEGER, 'Payroll already exists for this period'::TEXT;
     RETURN;
+  END IF;
+
+  -- Get GL account IDs (create if they don't exist)
+  SELECT id INTO v_salary_exp_account_id FROM public.chart_of_accounts
+  WHERE account_code = '5100' AND branch_id = p_branch_id;
+
+  IF v_salary_exp_account_id IS NULL THEN
+    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type, branch_id)
+    VALUES ('5100', 'Salary & Wages Expense', 'EXPENSE', p_branch_id)
+    RETURNING id INTO v_salary_exp_account_id;
+  END IF;
+
+  SELECT id INTO v_cash_account_id FROM public.chart_of_accounts
+  WHERE account_code = '1000' AND branch_id = p_branch_id;
+
+  SELECT id INTO v_paye_account_id FROM public.chart_of_accounts
+  WHERE account_code = '2100' AND branch_id = p_branch_id;
+
+  IF v_paye_account_id IS NULL THEN
+    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type, branch_id)
+    VALUES ('2100', 'PAYE Tax Payable', 'LIABILITY', p_branch_id)
+    RETURNING id INTO v_paye_account_id;
+  END IF;
+
+  SELECT id INTO v_napsa_account_id FROM public.chart_of_accounts
+  WHERE account_code = '2200' AND branch_id = p_branch_id;
+
+  IF v_napsa_account_id IS NULL THEN
+    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type, branch_id)
+    VALUES ('2200', 'NAPSA Contributions Payable', 'LIABILITY', p_branch_id)
+    RETURNING id INTO v_napsa_account_id;
+  END IF;
+
+  SELECT id INTO v_health_insurance_account_id FROM public.chart_of_accounts
+  WHERE account_code = '2300' AND branch_id = p_branch_id;
+
+  IF v_health_insurance_account_id IS NULL THEN
+    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type, branch_id)
+    VALUES ('2300', 'National Health Insurance Payable', 'LIABILITY', p_branch_id)
+    RETURNING id INTO v_health_insurance_account_id;
   END IF;
 
   -- Create payroll run
-  INSERT INTO public.payroll_runs (business_id, month, year, status, run_date)
-  VALUES (p_business_id, p_month, p_year, 'PROCESSING', NOW())
+  INSERT INTO public.payroll_runs (branch_id, month, year, status, run_date)
+  VALUES (p_branch_id, p_month, p_year, 'PROCESSING', NOW())
   RETURNING id INTO v_payroll_run_id;
 
-  -- Process each active employee
+  -- Process each active employee in this branch
   FOR v_employee IN
-    SELECT e.id, e.first_name, e.last_name
+    SELECT e.id, e.first_name, e.last_name, COALESCE(e.basic_salary, 0) as basic_salary
     FROM public.employees e
-    WHERE e.business_id = p_business_id AND e.status = 'ACTIVE'
+    WHERE e.branch_id = p_branch_id AND e.status = 'ACTIVE'
+    ORDER BY e.id
   LOOP
+    -- Skip if no salary configured
+    IF v_employee.basic_salary IS NULL OR v_employee.basic_salary <= 0 THEN
+      RAISE WARNING 'Employee % has no salary configured. Skipping.', v_employee.id;
+      CONTINUE;
+    END IF;
+
     v_employee_count := v_employee_count + 1;
+    v_gross := v_employee.basic_salary;
+    v_paye := 0;
 
-    -- Get salary structure and calculate deductions
-    -- (Assuming basic salary for now - can be extended)
-    v_gross := 5000; -- Placeholder basic salary
-    v_paye := v_gross * 0.15; -- 15% PAYE (simplified)
-    v_pension := v_gross * 0.10; -- 10% pension
-    v_net := v_gross - v_paye - v_pension;
+    -- Calculate PAYE using ZRA 2026 progressive tax bands
+    -- Loop through each tax band and calculate tax on the portion of salary in that band
+    FOR v_tax_band IN
+      SELECT min_income, max_income, tax_rate
+      FROM public.tax_rules
+      WHERE effective_date <= NOW()
+      ORDER BY min_income
+    LOOP
+      -- Calculate how much of this employee's salary falls in this tax band
+      IF v_gross > v_tax_band.min_income THEN
+        -- Determine the upper limit for this band (either max_income or actual salary, whichever is lower)
+        v_taxable_income := LEAST(v_gross, v_tax_band.max_income) - v_tax_band.min_income;
+        v_tax_for_band := v_taxable_income * (v_tax_band.tax_rate / 100.0);
+        v_paye := v_paye + v_tax_for_band;
+      END IF;
+    END LOOP;
 
-    -- Insert payroll deduction record
-    INSERT INTO public.payroll_deductions (payroll_run_id, employee_id, gross_salary, paye_tax, pension_contribution, net_salary)
-    VALUES (v_payroll_run_id, v_employee.id, v_gross, v_paye, v_pension, v_net);
+    -- Calculate statutory contributions (ZRA 2026 rates)
+    v_napsa := v_gross * 0.05;              -- NAPSA: 5% employee contribution
+    v_health_insurance := v_gross * 0.01;   -- National Health Insurance: 1%
 
+    -- Calculate net salary
+    v_net := v_gross - v_paye - v_napsa - v_health_insurance;
+
+    -- Insert payroll deduction record with all deductions
+    INSERT INTO public.payroll_deductions
+    (payroll_run_id, employee_id, basic_salary, gross_salary, paye_tax, napsa_contribution, health_insurance, net_salary)
+    VALUES (v_payroll_run_id, v_employee.id, v_gross, v_gross, v_paye, v_napsa, v_health_insurance, v_net);
+
+    -- Accumulate totals
     v_total_gross := v_total_gross + v_gross;
     v_total_paye := v_total_paye + v_paye;
-    v_total_pension := v_total_pension + v_pension;
+    v_total_napsa := v_total_napsa + v_napsa;
+    v_total_health_insurance := v_total_health_insurance + v_health_insurance;
+    v_total_deductions := v_total_paye + v_total_napsa + v_total_health_insurance;
     v_total_net := v_total_net + v_net;
   END LOOP;
 
-  -- Update payroll run with totals
-  UPDATE public.payroll_runs
-  SET
-    total_gross = v_total_gross,
-    total_deductions = (v_total_paye + v_total_pension),
-    total_net = v_total_net,
-    status = 'COMPLETED'
-  WHERE id = v_payroll_run_id;
+  -- Create GL journal entry for payroll run (ZRA 2026 compliant)
+  IF v_employee_count > 0 AND v_total_gross > 0 THEN
+    INSERT INTO public.journal_entries (reference, description, branch_id)
+    VALUES ('PAYROLL-' || p_year || LPAD(p_month::TEXT, 2, '0'),
+            'Payroll for ' || p_month || '/' || p_year || ' (' || v_employee_count || ' employees)', p_branch_id)
+    RETURNING id INTO v_journal_id;
+
+    -- Post Dr. Salary & Wages Expense (5100)
+    INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+    VALUES (v_journal_id, v_salary_exp_account_id, v_total_gross, 0, p_branch_id);
+
+    -- Post Cr. Cash (1000) for net salaries paid
+    INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+    VALUES (v_journal_id, v_cash_account_id, 0, v_total_net, p_branch_id);
+
+    -- Post Cr. PAYE Tax Payable (2100) - ZRA 2026 progressive PAYE
+    IF v_total_paye > 0 THEN
+      INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+      VALUES (v_journal_id, v_paye_account_id, 0, v_total_paye, p_branch_id);
+    END IF;
+
+    -- Post Cr. NAPSA Contributions Payable (2200) - 5% employee contribution
+    IF v_total_napsa > 0 THEN
+      INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+      VALUES (v_journal_id, v_napsa_account_id, 0, v_total_napsa, p_branch_id);
+    END IF;
+
+    -- Post Cr. National Health Insurance Payable (2300) - 1% employee contribution
+    IF v_total_health_insurance > 0 THEN
+      INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
+      VALUES (v_journal_id, v_health_insurance_account_id, 0, v_total_health_insurance, p_branch_id);
+    END IF;
+
+    -- Update payroll run with GL reference and totals (ZRA 2026 compliant)
+    UPDATE public.payroll_runs
+    SET
+      total_gross = v_total_gross,
+      total_paye = v_total_paye,
+      total_napsa = v_total_napsa,
+      total_health_insurance = v_total_health_insurance,
+      total_deductions = (v_total_paye + v_total_napsa + v_total_health_insurance),
+      total_net = v_total_net,
+      employee_count = v_employee_count,
+      journal_entry_id = v_journal_id,
+      status = 'COMPLETED'
+    WHERE id = v_payroll_run_id;
+  ELSE
+    -- No employees to process
+    UPDATE public.payroll_runs
+    SET status = 'COMPLETED'
+    WHERE id = v_payroll_run_id;
+  END IF;
 
   RETURN QUERY SELECT
     v_payroll_run_id,
     v_total_gross,
-    (v_total_paye + v_total_pension),
+    (v_total_paye + v_total_napsa + v_total_health_insurance),
     v_total_net,
     v_employee_count,
-    'Payroll processed successfully for ' || v_employee_count::TEXT || ' employees'::TEXT;
+    v_journal_id,
+    'Payroll processed successfully for ' || v_employee_count::TEXT || ' employees (ZRA 2026 compliant: PAYE ' ||
+    TO_CHAR(v_total_paye, '9999999.99') || ' + NAPSA ' || TO_CHAR(v_total_napsa, '9999999.99') ||
+    ' + Health ' || TO_CHAR(v_total_health_insurance, '9999999.99') || ')'::TEXT;
 END;
 $$;
 
@@ -197,7 +327,7 @@ $$;
 -- ============================================================================
 DROP FUNCTION IF EXISTS public.get_payroll_summary(INTEGER, INTEGER, INTEGER);
 CREATE OR REPLACE FUNCTION public.get_payroll_summary(
-  p_business_id INTEGER,
+  p_branch_id INTEGER,
   p_month INTEGER,
   p_year INTEGER
 )
@@ -205,8 +335,11 @@ RETURNS TABLE (
   payroll_run_id INTEGER,
   status TEXT,
   total_gross NUMERIC,
+  total_paye NUMERIC,
+  total_pension NUMERIC,
   total_net NUMERIC,
-  employee_count INTEGER
+  employee_count INTEGER,
+  journal_entry_id INTEGER
 ) LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
   RETURN QUERY
@@ -214,21 +347,24 @@ BEGIN
     pr.id,
     pr.status,
     pr.total_gross,
+    pr.total_paye,
+    pr.total_pension,
     pr.total_net,
-    (SELECT COUNT(*) FROM public.payroll_deductions WHERE payroll_run_id = pr.id)::INTEGER
+    pr.employee_count,
+    pr.journal_entry_id
   FROM public.payroll_runs pr
-  WHERE pr.business_id = p_business_id
+  WHERE pr.branch_id = p_branch_id
     AND pr.month = p_month
     AND pr.year = p_year;
 END;
 $$;
 
 -- ============================================================================
--- 6. GET ATTENDANCE BY BUSINESS (MULTI-TENANT)
+-- 6. GET ATTENDANCE BY BRANCH (MULTI-TENANT)
 -- ============================================================================
 DROP FUNCTION IF EXISTS public.get_attendance_summary(INTEGER, DATE, DATE);
 CREATE OR REPLACE FUNCTION public.get_attendance_summary(
-  p_business_id INTEGER,
+  p_branch_id INTEGER,
   p_start_date DATE,
   p_end_date DATE
 )
@@ -258,7 +394,7 @@ BEGIN
               WHERE a.employee_id = e.id AND a.status = 'LEAVE'
               AND a.attendance_date BETWEEN p_start_date AND p_end_date), 0)::INTEGER
   FROM public.employees e
-  WHERE e.business_id = p_business_id
+  WHERE e.branch_id = p_branch_id
   ORDER BY e.employee_code;
 END;
 $$;
@@ -269,7 +405,7 @@ $$;
 DROP FUNCTION IF EXISTS public.record_attendance(INTEGER, INTEGER, DATE, TEXT);
 CREATE OR REPLACE FUNCTION public.record_attendance(
   p_employee_id INTEGER,
-  p_business_id INTEGER,
+  p_branch_id INTEGER,
   p_attendance_date DATE,
   p_status TEXT
 )
@@ -280,9 +416,9 @@ RETURNS TABLE (
 DECLARE
   v_exists BOOLEAN;
 BEGIN
-  -- Validate employee belongs to business
-  IF NOT EXISTS (SELECT 1 FROM public.employees WHERE id = p_employee_id AND business_id = p_business_id) THEN
-    RETURN QUERY SELECT FALSE, 'Employee not found in this business'::TEXT;
+  -- Validate employee belongs to branch
+  IF NOT EXISTS (SELECT 1 FROM public.employees WHERE id = p_employee_id AND branch_id = p_branch_id) THEN
+    RETURN QUERY SELECT FALSE, 'Employee not found in this branch'::TEXT;
     RETURN;
   END IF;
 
