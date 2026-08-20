@@ -79,15 +79,20 @@
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
 
+# JS/CSS use stable filenames (js/accounting.js, not js/accounting.a1b2c3.js)
+# with no cache-busting query strings, so they MUST NOT be marked immutable -
+# browsers would then serve a year-old cached copy and never even revalidate,
+# meaning deployed fixes never reach users. "no-cache" still allows caching
+# but forces a revalidation request, so unchanged files return a cheap 304.
 [[headers]]
   for = "/js/*"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "no-cache"
 
 [[headers]]
   for = "/style.css"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "no-cache"
 
 [[headers]]
   for = "/assets/*"

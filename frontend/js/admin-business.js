@@ -407,13 +407,14 @@ async function createNewUser() {
       }
     }
 
-    // Auto-create employee record for the user (employees table has no business_id
-    // column - it's branch-scoped only, so branch_id is required)
+    // Auto-create employee record for the user.
+    // NOTE: employees.business_id is NOT NULL in the live database (verified via
+    // information_schema), even though supabase-schema-hr.sql omits it. branch_id
+    // is what all HR queries filter on, so populate both.
     try {
       let resolvedBranchId = branchId ? parseInt(branchId) : null;
 
-      // employees.branch_id is NOT NULL - if no branch was picked in the form,
-      // fall back to the business's first/primary branch
+      // If no branch was picked in the form, fall back to the business's first branch
       if (!resolvedBranchId) {
         const { data: firstBranch } = await window.supabase
           .from('branches')
@@ -440,6 +441,7 @@ async function createNewUser() {
         const { error: empError } = await window.supabase
           .from('employees')
           .insert({
+            business_id: parseInt(businessId),
             branch_id: resolvedBranchId,
             employee_code: employeeCode,
             first_name: firstName,

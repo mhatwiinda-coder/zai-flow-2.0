@@ -285,11 +285,15 @@ function saveEmployee() {
           return;
         }
 
-        console.log(`📝 Creating employee for branch_id: ${context.branch_id}`);
+        console.log(`📝 Creating employee for business_id: ${context.business_id}, branch_id: ${context.branch_id}`);
 
+        // NOTE: employees.business_id is NOT NULL in the live database (verified
+        // via information_schema), even though supabase-schema-hr.sql omits it.
+        // branch_id is what all scoping/queries filter on, but both are required.
         const { data: newEmp, error: empError } = await window.supabase
           .from('employees')
           .insert({
+            business_id: context.business_id,
             branch_id: context.branch_id,
             employee_code: code,
             first_name: firstName,
