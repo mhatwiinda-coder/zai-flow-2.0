@@ -278,8 +278,7 @@ BEGIN
   FROM public.chart_of_accounts coa
   LEFT JOIN public.journal_lines jl ON coa.id = jl.account_id
   LEFT JOIN public.journal_entries je ON jl.journal_id = je.id
-  WHERE je.branch_id IN (SELECT id FROM public.branches WHERE business_id = p_business_id)
-     OR je.branch_id IS NULL
+    AND je.branch_id IN (SELECT id FROM public.branches WHERE business_id = p_business_id)
   GROUP BY coa.id, coa.account_code, coa.account_name, coa.account_type
   ORDER BY coa.account_code;
 END;
