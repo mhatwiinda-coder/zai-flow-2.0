@@ -156,43 +156,47 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Get GL account IDs (create if they don't exist)
+  -- Get GL account IDs (create if they don't exist).
+  -- chart_of_accounts.account_code is GLOBALLY unique (one shared chart of
+  -- accounts across all branches/businesses) - actual per-branch separation
+  -- happens via journal_entries.branch_id, not by duplicating account rows.
+  -- So these lookups/inserts must NOT filter or set branch_id.
   SELECT id INTO v_salary_exp_account_id FROM public.chart_of_accounts
-  WHERE account_code = '5100' AND branch_id = p_branch_id;
+  WHERE account_code = '5100';
 
   IF v_salary_exp_account_id IS NULL THEN
-    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type, branch_id)
-    VALUES ('5100', 'Salary & Wages Expense', 'EXPENSE', p_branch_id)
+    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type)
+    VALUES ('5100', 'Salary & Wages Expense', 'EXPENSE')
     RETURNING id INTO v_salary_exp_account_id;
   END IF;
 
   SELECT id INTO v_cash_account_id FROM public.chart_of_accounts
-  WHERE account_code = '1000' AND branch_id = p_branch_id;
+  WHERE account_code = '1000';
 
   SELECT id INTO v_paye_account_id FROM public.chart_of_accounts
-  WHERE account_code = '2100' AND branch_id = p_branch_id;
+  WHERE account_code = '2100';
 
   IF v_paye_account_id IS NULL THEN
-    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type, branch_id)
-    VALUES ('2100', 'PAYE Tax Payable', 'LIABILITY', p_branch_id)
+    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type)
+    VALUES ('2100', 'PAYE Tax Payable', 'LIABILITY')
     RETURNING id INTO v_paye_account_id;
   END IF;
 
   SELECT id INTO v_napsa_account_id FROM public.chart_of_accounts
-  WHERE account_code = '2200' AND branch_id = p_branch_id;
+  WHERE account_code = '2200';
 
   IF v_napsa_account_id IS NULL THEN
-    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type, branch_id)
-    VALUES ('2200', 'NAPSA Contributions Payable', 'LIABILITY', p_branch_id)
+    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type)
+    VALUES ('2200', 'NAPSA Contributions Payable', 'LIABILITY')
     RETURNING id INTO v_napsa_account_id;
   END IF;
 
   SELECT id INTO v_health_insurance_account_id FROM public.chart_of_accounts
-  WHERE account_code = '2300' AND branch_id = p_branch_id;
+  WHERE account_code = '2300';
 
   IF v_health_insurance_account_id IS NULL THEN
-    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type, branch_id)
-    VALUES ('2300', 'National Health Insurance Payable', 'LIABILITY', p_branch_id)
+    INSERT INTO public.chart_of_accounts (account_code, account_name, account_type)
+    VALUES ('2300', 'National Health Insurance Payable', 'LIABILITY')
     RETURNING id INTO v_health_insurance_account_id;
   END IF;
 
