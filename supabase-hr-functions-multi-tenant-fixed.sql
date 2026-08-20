@@ -161,12 +161,15 @@ BEGIN
   -- accounts across all branches/businesses) - actual per-branch separation
   -- happens via journal_entries.branch_id, not by duplicating account rows.
   -- So these lookups/inserts must NOT filter or set branch_id.
+  -- Salary expense posts to 5200 "Salaries & Wages Expense". It previously
+  -- used 5100, which in this chart of accounts is "Utilities Expense" -
+  -- payroll was being booked as utilities.
   SELECT id INTO v_salary_exp_account_id FROM public.chart_of_accounts
-  WHERE account_code = '5100';
+  WHERE account_code = '5200';
 
   IF v_salary_exp_account_id IS NULL THEN
     INSERT INTO public.chart_of_accounts (account_code, account_name, account_type)
-    VALUES ('5100', 'Salary & Wages Expense', 'EXPENSE')
+    VALUES ('5200', 'Salaries & Wages Expense', 'EXPENSE')
     RETURNING id INTO v_salary_exp_account_id;
   END IF;
 
@@ -267,7 +270,7 @@ BEGIN
             'Payroll for ' || p_month || '/' || p_year || ' (' || v_employee_count || ' employees)', p_branch_id)
     RETURNING id INTO v_journal_id;
 
-    -- Post Dr. Salary & Wages Expense (5100)
+    -- Post Dr. Salaries & Wages Expense (5200)
     INSERT INTO public.journal_lines (journal_id, account_id, debit, credit, branch_id)
     VALUES (v_journal_id, v_salary_exp_account_id, v_total_gross, 0, p_branch_id);
 
