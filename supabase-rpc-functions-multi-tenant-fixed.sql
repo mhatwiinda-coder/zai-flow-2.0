@@ -299,20 +299,23 @@ DECLARE
   v_cogs NUMERIC;
   v_expenses NUMERIC;
 BEGIN
-  -- Get revenue (account 4000) scoped to branch
-  SELECT COALESCE(SUM(total_credit), 0) INTO v_revenue
+  -- Use NET balances (credit-debit for revenue, debit-credit for expenses).
+  -- Summing only one side ignored refunds/reversals and overstated totals.
+  -- Classify by account_type rather than hardcoded codes, so revenue posted
+  -- to 4100 (AR invoices) counts the same as 4000 (POS sales).
+  SELECT COALESCE(SUM(total_credit - total_debit), 0) INTO v_revenue
   FROM (SELECT * FROM get_trial_balance(p_branch_id)) tb
-  WHERE account_code = '4000';
+  WHERE UPPER(account_type) = 'REVENUE';
 
-  -- Get COGS (account 5000) scoped to branch
-  SELECT COALESCE(SUM(total_debit), 0) INTO v_cogs
+  -- COGS is the one expense broken out separately on the P&L
+  SELECT COALESCE(SUM(total_debit - total_credit), 0) INTO v_cogs
   FROM (SELECT * FROM get_trial_balance(p_branch_id)) tb
   WHERE account_code = '5000';
 
-  -- Get expenses (accounts 5100+) scoped to branch
-  SELECT COALESCE(SUM(total_debit), 0) INTO v_expenses
+  -- All other operating expenses
+  SELECT COALESCE(SUM(total_debit - total_credit), 0) INTO v_expenses
   FROM (SELECT * FROM get_trial_balance(p_branch_id)) tb
-  WHERE account_code LIKE '51%' OR account_code LIKE '52%';
+  WHERE UPPER(account_type) = 'EXPENSE' AND account_code <> '5000';
 
   RETURN QUERY SELECT
     v_revenue,

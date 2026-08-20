@@ -227,19 +227,34 @@ function loadBalanceSheet() {
       let assets = { current: [], fixed: [] };
       let liabilities = { current: [], longterm: [] };
       let equity = [];
+      let netIncome = 0;
 
       accounts.forEach(acc => {
         const type = (acc.account_type || '').toUpperCase();
-        const balance = Number(acc.total_debit || 0) - Number(acc.total_credit || 0);
+        const debit = Number(acc.total_debit || 0);
+        const credit = Number(acc.total_credit || 0);
 
+        // Assets/expenses are debit-normal; liabilities/equity/revenue are
+        // credit-normal. Using debit-credit for everything made liability
+        // balances come out negative.
         if (type === 'ASSET') {
-          assets.current.push({ name: acc.account_name, balance });
+          assets.current.push({ name: acc.account_name, balance: debit - credit });
         } else if (type === 'LIABILITY') {
-          liabilities.current.push({ name: acc.account_name, balance });
+          liabilities.current.push({ name: acc.account_name, balance: credit - debit });
         } else if (type === 'EQUITY') {
-          equity.push({ name: acc.account_name, balance });
+          equity.push({ name: acc.account_name, balance: credit - debit });
+        } else if (type === 'REVENUE') {
+          netIncome += (credit - debit);
+        } else if (type === 'EXPENSE') {
+          netIncome -= (debit - credit);
         }
       });
+
+      // Current-period profit belongs to equity. Without it the sheet can
+      // never balance, since revenue/expense activity has nowhere to land.
+      if (Math.abs(netIncome) >= 0.005) {
+        equity.push({ name: 'Current Period Earnings', balance: netIncome });
+      }
 
       // Calculate totals
       const totalCurrentAssets = assets.current.reduce((sum, a) => sum + a.balance, 0);
