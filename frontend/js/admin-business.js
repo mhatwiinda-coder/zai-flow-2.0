@@ -407,36 +407,55 @@ async function createNewUser() {
       }
     }
 
-    // Auto-create employee record for the user
+    // Auto-create employee record for the user (employees table has no business_id
+    // column - it's branch-scoped only, so branch_id is required)
     try {
-      const nameParts = name.trim().split(' ');
-      const firstName = nameParts[0];
-      const lastName = nameParts.slice(1).join(' ') || firstName;
+      let resolvedBranchId = branchId ? parseInt(branchId) : null;
 
-      // Generate employee code (format: EMP-YYYYMMDD-XXXXX for uniqueness)
-      const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
-      const randomSuffix = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
-      const employeeCode = `EMP-${today}-${randomSuffix}`;
+      // employees.branch_id is NOT NULL - if no branch was picked in the form,
+      // fall back to the business's first/primary branch
+      if (!resolvedBranchId) {
+        const { data: firstBranch } = await window.supabase
+          .from('branches')
+          .select('id')
+          .eq('business_id', parseInt(businessId))
+          .order('id')
+          .limit(1)
+          .maybeSingle();
+        resolvedBranchId = firstBranch ? firstBranch.id : null;
+      }
 
-      const { error: empError } = await window.supabase
-        .from('employees')
-        .insert({
-          business_id: parseInt(businessId),
-          branch_id: branchId ? parseInt(branchId) : null,
-          employee_code: employeeCode,
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          position: 'employee',
-          hire_date: new Date().toISOString().split('T')[0],
-          status: 'ACTIVE'
-        });
-
-      if (empError) {
-        console.warn('Employee auto-creation warning:', empError.message);
-        successMsg += ' (⚠️ HR record pending manual setup)';
+      if (!resolvedBranchId) {
+        successMsg += ' (⚠️ HR record needs manual setup - no branch exists yet for this business)';
       } else {
-        successMsg += ' + HR record created';
+        const nameParts = name.trim().split(' ');
+        const firstName = nameParts[0];
+        const lastName = nameParts.slice(1).join(' ') || firstName;
+
+        // Generate employee code (format: EMP-YYYYMMDD-XXXXX for uniqueness)
+        const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+        const randomSuffix = Math.floor(Math.random() * 10000).toString().padStart(5, '0');
+        const employeeCode = `EMP-${today}-${randomSuffix}`;
+
+        const { error: empError } = await window.supabase
+          .from('employees')
+          .insert({
+            branch_id: resolvedBranchId,
+            employee_code: employeeCode,
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            position: 'Employee',
+            hire_date: new Date().toISOString().split('T')[0],
+            status: 'ACTIVE'
+          });
+
+        if (empError) {
+          console.warn('Employee auto-creation warning:', empError.message);
+          successMsg += ' (⚠️ HR record pending manual setup)';
+        } else {
+          successMsg += ' + HR record created (complete details in HR portal)';
+        }
       }
     } catch (err) {
       console.warn('Employee auto-creation error:', err.message);

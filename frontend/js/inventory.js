@@ -124,10 +124,12 @@ function handleBarcodeLookup(barcode) {
 
   (async () => {
     try {
-      const { data: product, error } = await supabase
-        .from('products')
-        .select('*')
-        .or(`barcode.eq.${barcode},sku.eq.${barcode},id.eq.${barcode}`)
+      const { data: product, error } = await withBranchFilter(
+        supabase
+          .from('products')
+          .select('*')
+          .or(`barcode.eq.${barcode},sku.eq.${barcode},id.eq.${barcode}`)
+      )
         .single();
 
       if (error || !product) {
@@ -270,6 +272,12 @@ function saveProduct() {
 
       if (!name || !price) return alert("Product name and price required");
 
+      const context = getBranchContext();
+      if (!context) {
+        alert("No branch context available - please log in again");
+        return;
+      }
+
       // Auto-generate SKU: Always generate as NAME-TIMESTAMP (not from barcode)
       // Format: AQU-1234 (first 3 letters of name + dash + 4 random digits)
       const namePrefix = name.substring(0, 3).toUpperCase();
@@ -284,7 +292,8 @@ function saveProduct() {
         barcode: barcode || null,
         sku: sku,
         price: price,
-        stock: quantity || 0
+        stock: quantity || 0,
+        branch_id: context.branch_id
       };
 
       // Add cost field - try cost_price first
@@ -341,33 +350,27 @@ function lookupProduct() {
       let error = null;
 
       // Try SKU first
-      const { data: skuResult, error: skuError } = await supabase
-        .from('products')
-        .select('*')
-        .eq('sku', key)
-        .single();
+      const { data: skuResult, error: skuError } = await withBranchFilter(
+        supabase.from('products').select('*').eq('sku', key)
+      ).single();
 
       if (skuResult) {
         product = skuResult;
         console.log("Found by SKU:", product);
       } else {
         // Try barcode
-        const { data: barcodeResult, error: barcodeError } = await supabase
-          .from('products')
-          .select('*')
-          .eq('barcode', key)
-          .single();
+        const { data: barcodeResult, error: barcodeError } = await withBranchFilter(
+          supabase.from('products').select('*').eq('barcode', key)
+        ).single();
 
         if (barcodeResult) {
           product = barcodeResult;
           console.log("Found by barcode:", product);
         } else {
           // Try ID (convert to number)
-          const { data: idResult, error: idError } = await supabase
-            .from('products')
-            .select('*')
-            .eq('id', Number(key))
-            .single();
+          const { data: idResult, error: idError } = await withBranchFilter(
+            supabase.from('products').select('*').eq('id', Number(key))
+          ).single();
 
           if (idResult) {
             product = idResult;

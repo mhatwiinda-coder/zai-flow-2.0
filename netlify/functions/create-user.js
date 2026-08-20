@@ -36,25 +36,14 @@ export default async (req, context) => {
 
     console.log(`✅ Supabase client initialized`);
 
-    // Parse request (handle different body formats)
+    // Parse request body (Netlify Functions v2 uses the Web Fetch API -
+    // req.body is a ReadableStream, NOT parsed JSON. Must await req.json()).
     let requestData;
     try {
-      console.log(`📥 Request body type:`, typeof req.body);
-      console.log(`📥 Request body:`, req.body);
-
-      // Handle different body formats
-      if (typeof req.body === 'string') {
-        requestData = JSON.parse(req.body);
-      } else if (typeof req.body === 'object') {
-        requestData = req.body;
-      } else {
-        return jsonResponse({ error: `Invalid request body type: ${typeof req.body}` }, 400);
-      }
-
+      requestData = await req.json();
       console.log(`📥 Request parsed: email=${requestData.email}`);
     } catch (e) {
       console.error(`❌ JSON parse error:`, e.message);
-      console.error(`❌ Body was:`, req.body);
       return jsonResponse({ error: `Invalid request: ${e.message}` }, 400);
     }
 
