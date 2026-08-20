@@ -35,29 +35,8 @@ app.get("/api/config", (req, res) => {
     supabase_anon_key: process.env.SUPABASE_ANON_KEY
   });
 });
-app.get("/api/test-db", async (req, res) => {
-  try {
-    const { Pool } = await import("pg");
-    const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
-    });
-
-    const result = await pool.query("SELECT id, email, password FROM public.users WHERE email = 'admin@lodiachi-enterprises-ltd.local'");
-    await pool.end();
-    
-    res.json({
-      success: true,
-      rowCount: result.rows.length,
-      data: result.rows
-    });
-  } catch (err) {
-    res.json({
-      success: false,
-      error: err.message
-    });
-  }
-});
+// SECURITY: Removed /api/test-db endpoint (was exposing password hashes for hardcoded admin)
+// Removed 2026-05-17 as part of security hotfix - see SECURITY_AUDIT_REPORT_2026.md
 /* =========================
    NO HARDCODED USERS - TRUE SAAS MULTI-TENANCY
    Users are auto-created when businesses are created
@@ -72,10 +51,24 @@ const mockUsers = [];
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
-  console.log(`\n📧 Login attempt: ${email}`);
+  // SECURITY: Don't log sensitive data in production
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`\n📧 Login attempt: ${email}`);
+  }
 
   if (!email || !password) {
     return res.status(400).json({ success: false, message: "Email and password required" });
+  }
+
+  // SECURITY: Validate email format to prevent injection attacks
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email) || email.length > 254) {
+    return res.status(400).json({ success: false, message: "Invalid email format" });
+  }
+
+  // SECURITY: Limit password length to prevent DoS via bcrypt/comparison
+  if (typeof password !== 'string' || password.length > 1024) {
+    return res.status(400).json({ success: false, message: "Invalid credentials" });
   }
 
   try {
@@ -89,20 +82,37 @@ app.post("/api/login", async (req, res) => {
       });
 
       // Get user - BUSINESS SCOPED (users now have business_id)
+      // ⚠️ SECURITY TODO: Migrate to bcrypt-hashed passwords. Currently using plaintext.
+      // Migration plan: Run bcrypt.hash() on existing passwords, then change comparison below
+      // to bcrypt.compare(password, user.password) and remove password from SELECT after migration.
       const userResult = await pool.query(
         "SELECT id, name, email, role, password, business_id FROM public.users WHERE email = $1 LIMIT 1",
         [email]
       );
 
       if (userResult.rows.length === 0) {
-        console.log(`❌ User not found: ${email}`);
+        if (process.env.NODE_ENV !== 'production') console.log(`❌ User not found`);
         await pool.end();
         return res.json({ success: false, message: "Invalid email or password" });
       }
 
       const user = userResult.rows[0];
-      if (user.password !== password) {
-        console.log(`❌ Password mismatch for ${email}`);
+
+      // ⚠️ SECURITY CRITICAL: Password comparison should use bcrypt.compare()
+      // This plaintext comparison is a known vulnerability - tracked in SECURITY_AUDIT_REPORT_2026.md
+      // Backward compatibility: support both bcrypt-hashed ($2b$) and plaintext passwords during migration
+      let passwordValid = false;
+      if (user.password && user.password.startsWith('$2')) {
+        // bcrypt-hashed password (future)
+        const bcrypt = require('bcryptjs');
+        passwordValid = await bcrypt.compare(password, user.password);
+      } else {
+        // Plaintext password (legacy - REMOVE AFTER MIGRATION)
+        passwordValid = (user.password === password);
+      }
+
+      if (!passwordValid) {
+        if (process.env.NODE_ENV !== 'production') console.log(`❌ Password mismatch`);
         await pool.end();
         return res.json({ success: false, message: "Invalid email or password" });
       }
@@ -165,12 +175,12 @@ app.post("/api/login", async (req, res) => {
       const user = mockUsers.find(u => u.email === email);
 
       if (!user) {
-        console.log(`❌ User not found: ${email}`);
+        if (process.env.NODE_ENV !== 'production') console.log(`❌ User not found`);
         return res.json({ success: false, message: "Invalid email or password" });
       }
 
       if (user.password !== password) {
-        console.log(`❌ Password mismatch for ${email}`);
+        if (process.env.NODE_ENV !== 'production') console.log(`❌ Password mismatch`);
         return res.json({ success: false, message: "Invalid email or password" });
       }
 

@@ -2,10 +2,27 @@
 node_modules/
 package-lock.json
 
-# Environment
+# Environment & Secrets (NEVER commit these)
 .env
 .env.local
 .env.*.local
+.env.production
+.env.development
+.env.test
+*.env
+
+# Credentials & Keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+credentials.json
+secrets.json
+service-account*.json
+*-credentials.*
+*-secret.*
 
 # IDE
 .claude/

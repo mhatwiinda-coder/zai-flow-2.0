@@ -10,10 +10,14 @@
 # ENVIRONMENT VARIABLES
 # ============================================================================
 # Set these in Netlify UI under Settings > Build & deploy > Environment
-# - SUPABASE_URL: https://jzhwlablyxaeupvtpdce.supabase.co
-# - SUPABASE_ANON_KEY: your_public_key_here
+# - SUPABASE_URL: Your Supabase project URL
+# - SUPABASE_ANON_KEY: Your Supabase public/anon key (rotate periodically)
+# - JWT_SECRET: Strong random secret (min 32 chars)
+# - DATABASE_URL: PostgreSQL connection string
+#
+# SECURITY: Never commit actual values to this file.
+# Secret scanning is ENABLED for this repository (no omits).
 [build.environment]
-  SECRETS_SCAN_OMIT_PATHS = "frontend/js/supabase-init.js"
   PUBLISH_DIR = "frontend"
 
 # ============================================================================
@@ -57,10 +61,21 @@
 [[headers]]
   for = "/*"
   [headers.values]
+    # Prevent MIME-type sniffing attacks
     X-Content-Type-Options = "nosniff"
+    # Prevent clickjacking attacks
     X-Frame-Options = "SAMEORIGIN"
+    # Enable XSS filter (legacy browsers)
     X-XSS-Protection = "1; mode=block"
+    # Control referrer information
     Referrer-Policy = "strict-origin-when-cross-origin"
+    # Force HTTPS for 1 year (HSTS) - critical for production
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    # Restrict browser features (defense in depth)
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    # Content Security Policy - allows Supabase + self-hosted resources
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-ancestors 'self';"
+    # Disable caching for HTML (forces fresh content)
     Cache-Control = "no-cache, no-store, must-revalidate"
     Pragma = "no-cache"
 

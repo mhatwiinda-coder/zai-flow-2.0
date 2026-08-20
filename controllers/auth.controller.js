@@ -2,6 +2,14 @@ const db = require("../data/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// SECURITY: Validate JWT_SECRET is configured properly on startup
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET environment variable is required");
+}
+if (process.env.JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET is too weak (minimum 32 characters required)");
+}
+
 exports.login = (req, res) => {
   const { email, password } = req.body;
 
@@ -18,6 +26,7 @@ exports.login = (req, res) => {
       }
 
       if (!user) {
+        // SECURITY: Generic error to prevent user enumeration
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
@@ -29,7 +38,7 @@ exports.login = (req, res) => {
 
       const token = jwt.sign(
         { id: user.id, role: user.role },
-        process.env.JWT_SECRET || "devsecret",
+        process.env.JWT_SECRET,
         { expiresIn: "8h" }
       );
 
