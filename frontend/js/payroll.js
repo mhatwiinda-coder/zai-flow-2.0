@@ -29,7 +29,23 @@ function runPayroll() {
 
       if (error) throw error;
 
-      alert(`✅ Payroll processed successfully!\n\nPayroll Run ID: ${data[0].payroll_run_id}\nTotal Net: K ${formatMoney(data[0].total_net)}`);
+      const result = Array.isArray(data) ? data[0] : null;
+
+      if (!result) {
+        throw new Error('Payroll returned no result');
+      }
+
+      // process_payroll() refuses to run and returns a NULL payroll_run_id with
+      // an explanatory message (e.g. "Payroll already exists for this period").
+      // Report that honestly instead of always claiming success.
+      if (!result.payroll_run_id) {
+        alert(`⚠️ Payroll not processed\n\n${result.message || 'Unknown reason'}\n\nTo re-run this period (for example after adding or updating employees), reverse the existing payroll run first.`);
+        loadPayrollSummary();
+        return;
+      }
+
+      // formatMoney() already prefixes "K ", so don't add another one
+      alert(`✅ Payroll processed successfully!\n\nPayroll Run ID: ${result.payroll_run_id}\nEmployees: ${result.employee_count}\nTotal Net: ${formatMoney(result.total_net)}`);
 
       // Load the summary
       setTimeout(() => {
