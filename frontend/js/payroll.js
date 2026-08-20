@@ -48,10 +48,16 @@ function loadPayrollSummary() {
       const month = parseInt(document.getElementById("payrollMonth").value);
       const year = parseInt(document.getElementById("payrollYear").value);
 
+      const context = getBranchContext();
+      if (!context) {
+        throw new Error('No branch context available - please log in again');
+      }
+
       // Get payroll run
       const { data: payrollRuns, error: runError } = await window.supabase
         .from('payroll_runs')
         .select('*')
+        .eq('branch_id', context.branch_id)
         .eq('month', month)
         .eq('year', year)
         .limit(1);
@@ -74,7 +80,7 @@ function loadPayrollSummary() {
       document.getElementById("totalNet").innerText = formatMoney(payrollRun.total_net);
 
       // Load payroll details
-      const { data: deductions, error: dedError } = await supabase
+      const { data: deductions, error: dedError } = await window.supabase
         .from('payroll_deductions')
         .select('*, employees(employee_code, first_name, last_name)')
         .eq('payroll_run_id', payrollRun.id)
@@ -288,10 +294,17 @@ function reversePayroll() {
       const month = parseInt(document.getElementById("payrollMonth").value);
       const year = parseInt(document.getElementById("payrollYear").value);
 
+      const context = getBranchContext();
+      if (!context) {
+        alert('No branch context available - please log in again');
+        return;
+      }
+
       // Get payroll run ID
-      const { data: payrollRuns } = await supabase
+      const { data: payrollRuns } = await window.supabase
         .from('payroll_runs')
         .select('id')
+        .eq('branch_id', context.branch_id)
         .eq('month', month)
         .eq('year', year)
         .limit(1);

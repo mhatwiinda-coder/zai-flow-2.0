@@ -486,7 +486,7 @@ $$;
 DROP FUNCTION IF EXISTS public.approve_leave(INTEGER, INTEGER, INTEGER);
 CREATE OR REPLACE FUNCTION public.approve_leave(
   p_leave_request_id INTEGER,
-  p_business_id INTEGER,
+  p_branch_id INTEGER,
   p_approved_by INTEGER
 )
 RETURNS TABLE (
@@ -499,12 +499,12 @@ DECLARE
   v_end_date DATE;
   v_current_date DATE;
 BEGIN
-  -- Get leave request details
+  -- Get leave request details (leave_requests is branch-scoped directly)
   SELECT lr.employee_id, lr.start_date, lr.end_date
   INTO v_employee_id, v_start_date, v_end_date
   FROM public.leave_requests lr
   WHERE lr.id = p_leave_request_id
-  AND EXISTS (SELECT 1 FROM public.employees e WHERE e.id = lr.employee_id AND e.business_id = p_business_id);
+  AND lr.branch_id = p_branch_id;
 
   IF v_employee_id IS NULL THEN
     RETURN QUERY SELECT FALSE, 'Leave request not found'::TEXT;
@@ -519,9 +519,9 @@ BEGIN
   -- Mark attendance as LEAVE for each day
   v_current_date := v_start_date;
   WHILE v_current_date <= v_end_date LOOP
-    INSERT INTO public.attendance (employee_id, attendance_date, status)
-    VALUES (v_employee_id, v_current_date, 'LEAVE')
-    ON CONFLICT (employee_id, attendance_date) DO UPDATE SET status = 'LEAVE';
+    INSERT INTO public.attendance (branch_id, employee_id, attendance_date, status)
+    VALUES (p_branch_id, v_employee_id, v_current_date, 'LEAVE')
+    ON CONFLICT (branch_id, employee_id, attendance_date) DO UPDATE SET status = 'LEAVE';
 
     v_current_date := v_current_date + INTERVAL '1 day';
   END LOOP;
@@ -536,7 +536,7 @@ $$;
 DROP FUNCTION IF EXISTS public.reject_leave(INTEGER, INTEGER, INTEGER);
 CREATE OR REPLACE FUNCTION public.reject_leave(
   p_leave_request_id INTEGER,
-  p_business_id INTEGER,
+  p_branch_id INTEGER,
   p_approved_by INTEGER
 )
 RETURNS TABLE (
@@ -546,12 +546,12 @@ RETURNS TABLE (
 DECLARE
   v_employee_id INTEGER;
 BEGIN
-  -- Validate leave request belongs to this business
+  -- Validate leave request belongs to this branch (leave_requests is branch-scoped directly)
   SELECT lr.employee_id
   INTO v_employee_id
   FROM public.leave_requests lr
   WHERE lr.id = p_leave_request_id
-  AND EXISTS (SELECT 1 FROM public.employees e WHERE e.id = lr.employee_id AND e.business_id = p_business_id);
+  AND lr.branch_id = p_branch_id;
 
   IF v_employee_id IS NULL THEN
     RETURN QUERY SELECT FALSE, 'Leave request not found'::TEXT;

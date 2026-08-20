@@ -285,12 +285,11 @@ function saveEmployee() {
           return;
         }
 
-        console.log(`📝 Creating employee for business_id: ${context.business_id}, branch_id: ${context.branch_id}`);
+        console.log(`📝 Creating employee for branch_id: ${context.branch_id}`);
 
         const { data: newEmp, error: empError } = await window.supabase
           .from('employees')
           .insert({
-            business_id: context.business_id,
             branch_id: context.branch_id,
             employee_code: code,
             first_name: firstName,
@@ -350,12 +349,12 @@ function loadAttendanceData() {
         return;
       }
 
-      console.log(`📡 Loading attendance for business_id: ${context.business_id}, dates: ${fromDate} to ${toDate}`);
+      console.log(`📡 Loading attendance for branch_id: ${context.branch_id}, dates: ${fromDate} to ${toDate}`);
 
       const { data: employees, error: empError } = await supabase
         .from('employees')
         .select('id, employee_code, first_name, last_name')
-        .eq('business_id', context.business_id)
+        .eq('branch_id', context.branch_id)
         .eq('status', 'ACTIVE')
         .order('employee_code', { ascending: true });
 
@@ -447,11 +446,11 @@ function saveAttendance(empId) {
           .from('attendance')
           .upsert({
             employee_id: empId,
-            business_id: context.business_id,
+            branch_id: context.branch_id,
             attendance_date: dateStr,
             status: status,
             hours_worked: hours
-          }, { onConflict: 'employee_id,attendance_date' });
+          }, { onConflict: 'branch_id,employee_id,attendance_date' });
 
         if (error) throw error;
         currentDate.setDate(currentDate.getDate() + 1);
@@ -486,11 +485,12 @@ function loadLeaveRequests() {
       const context = getBranchContext();
       if (!context) return;
 
-      console.log(`📡 Loading leave requests for business_id: ${context.business_id}`);
+      console.log(`📡 Loading leave requests for branch_id: ${context.branch_id}`);
 
       let query = supabase
         .from('leave_requests')
-        .select('*, employees(first_name, last_name, business_id), leave_types(name)')
+        .select('*, employees(first_name, last_name), leave_types(name)')
+        .eq('branch_id', context.branch_id)
         .order('created_at', { ascending: false });
 
       const statusFilter = document.getElementById("leaveStatusFilter")?.value;
@@ -559,7 +559,7 @@ function approveLeave(leaveRequestId) {
       }
       const { data, error } = await window.supabase.rpc('approve_leave', {
         p_leave_request_id: leaveRequestId,
-        p_business_id: context.business_id,
+        p_branch_id: context.branch_id,
         p_approved_by: user.id
       });
 
@@ -584,7 +584,7 @@ function rejectLeave(leaveRequestId) {
       }
       const { data, error } = await window.supabase.rpc('reject_leave', {
         p_leave_request_id: leaveRequestId,
-        p_business_id: context.business_id,
+        p_branch_id: context.branch_id,
         p_approved_by: user.id
       });
 
@@ -625,7 +625,7 @@ function loadHeadcountMetrics() {
       const { data: allEmp } = await supabase
         .from('employees')
         .select('id, status')
-        .eq('business_id', context.business_id);
+        .eq('branch_id', context.branch_id);
 
       const active = allEmp ? allEmp.filter(e => e.status === 'ACTIVE').length : 0;
       const total = allEmp ? allEmp.length : 0;
@@ -635,7 +635,7 @@ function loadHeadcountMetrics() {
       const { data: todayAttendance } = await supabase
         .from('attendance')
         .select('status')
-        .eq('business_id', context.business_id)
+        .eq('branch_id', context.branch_id)
         .eq('attendance_date', today);
 
       const onLeave = todayAttendance ? todayAttendance.filter(a => a.status === 'LEAVE').length : 0;
@@ -665,14 +665,14 @@ function loadTurnoverMetrics() {
       const { data: terminated } = await supabase
         .from('employees')
         .select('hire_date')
-        .eq('business_id', context.business_id)
+        .eq('branch_id', context.branch_id)
         .eq('status', 'TERMINATED')
         .gte('termination_date', `${currentYear}-01-01`);
 
       const { data: allActive } = await supabase
         .from('employees')
         .select('hire_date')
-        .eq('business_id', context.business_id)
+        .eq('branch_id', context.branch_id)
         .eq('status', 'ACTIVE');
 
       const terminationCount = terminated ? terminated.length : 0;
@@ -709,7 +709,7 @@ function loadDepartmentChart() {
       const { data: employees } = await supabase
         .from('employees')
         .select('departments(name)')
-        .eq('business_id', context.business_id)
+        .eq('branch_id', context.branch_id)
         .eq('status', 'ACTIVE');
 
       const deptCounts = {};
@@ -774,7 +774,7 @@ function loadAttendanceChart() {
         const { data: attendance } = await window.supabase
           .from('attendance')
           .select('status')
-          .eq('business_id', context.business_id)
+          .eq('branch_id', context.branch_id)
           .eq('attendance_date', dateStr);
 
         const present = attendance ? attendance.filter(a => a.status === 'PRESENT').length : 0;
