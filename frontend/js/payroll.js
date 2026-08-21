@@ -20,11 +20,21 @@ function runPayroll() {
         throw new Error('No branch context available - please log in again');
       }
 
-      // Call RPC function to process payroll
-      const { data, error } = await window.supabase.rpc('process_payroll', {
+      const authUUID = getAuthUUID();
+      if (!authUUID) {
+        throw new Error('Could not identify current user - please log in again');
+      }
+
+      // Payroll always requires manager approval before it actually runs -
+      // this files the request rather than processing payroll directly.
+      // The wrapper does the same "already exists for this period" check
+      // process_payroll() itself does, so nothing gets approved that can't
+      // succeed.
+      const { data, error } = await window.supabase.rpc('request_payroll_approval', {
         p_branch_id: context.branch_id,
         p_month: month,
-        p_year: year
+        p_year: year,
+        p_requested_by: authUUID
       });
 
       if (error) throw error;
@@ -32,25 +42,16 @@ function runPayroll() {
       const result = Array.isArray(data) ? data[0] : null;
 
       if (!result) {
-        throw new Error('Payroll returned no result');
+        throw new Error('Request returned no result');
       }
 
-      // process_payroll() refuses to run and returns a NULL payroll_run_id with
-      // an explanatory message (e.g. "Payroll already exists for this period").
-      // Report that honestly instead of always claiming success.
-      if (!result.payroll_run_id) {
-        alert(`⚠️ Payroll not processed\n\n${result.message || 'Unknown reason'}\n\nTo re-run this period (for example after adding or updating employees), reverse the existing payroll run first.`);
-        loadPayrollSummary();
+      if (!result.success) {
+        alert(`⚠️ Could not submit payroll for approval\n\n${result.message || 'Unknown reason'}`);
         return;
       }
 
-      // formatMoney() already prefixes "K ", so don't add another one
-      alert(`✅ Payroll processed successfully!\n\nPayroll Run ID: ${result.payroll_run_id}\nEmployees: ${result.employee_count}\nTotal Net: ${formatMoney(result.total_net)}`);
-
-      // Load the summary
-      setTimeout(() => {
-        loadPayrollSummary();
-      }, 1000);
+      alert(`📨 Payroll for ${new Date(year, month - 1).toLocaleDateString('en-ZM', { month: 'long', year: 'numeric' })} sent for manager approval.\n\n${result.message}\n\nIt will process automatically once approved - check back on this page.`);
+      loadPayrollSummary();
     } catch (err) {
       console.error("Payroll processing error:", err);
       alert("Failed to process payroll: " + err.message);

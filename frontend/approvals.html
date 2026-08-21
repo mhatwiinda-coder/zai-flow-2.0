@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ZAI Flow | Approvals</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .approval-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-left: 4px solid #f7c948;
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+    .approval-card .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .approval-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .approval-meta { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    .approval-desc { font-size: 13px; color: rgba(255,255,255,0.75); margin-bottom: 12px; }
+    .approval-amount { font-size: 18px; font-weight: 700; color: #f7c948; white-space: nowrap; }
+    .approval-actions { display: flex; gap: 8px; }
+    .approval-actions button {
+      padding: 8px 18px; border: none; border-radius: 6px; cursor: pointer;
+      font-size: 13px; font-weight: 600;
+    }
+    .btn-approve { background: rgba(40,199,111,0.2); color: #28c76f; }
+    .btn-approve:hover { background: rgba(40,199,111,0.35); }
+    .btn-reject { background: rgba(234,84,85,0.2); color: #ea5455; }
+    .btn-reject:hover { background: rgba(234,84,85,0.35); }
+    .no-data { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR (rebuilt dynamically by sidebar-manager.js) -->
+  <aside class="sidebar">
+    <img src="assets/logo.png" class="logo" />
+    <a href="#" onclick="logout()">Logout</a>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <div class="topbar">
+      <h2>✅ Approvals</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
+        <div>
+          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
+          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+        </div>
+        <div id="userInfo"></div>
+        <button onclick="loadApprovals()" class="refresh-btn" title="Refresh">🔄</button>
+      </div>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Pending Requests</h3>
+      <p style="color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 20px;">
+        Requests waiting on your sign-off, for departments you manage.
+      </p>
+
+      <div id="approvalsList"></div>
+      <div id="noApprovals" class="no-data" style="display: none;">
+        Nothing waiting on you right now.
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-init.js"></script>
+<script src="js/branch-context.js"></script>
+<script src="js/display-branch-context.js"></script>
+<script src="js/session-timeout.js"></script>
+<script src="js/sidebar-manager.js"></script>
+<script src="js/approvals.js"></script>
+</body>
+</html>

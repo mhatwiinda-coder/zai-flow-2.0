@@ -628,7 +628,7 @@ function viewPODetails(poId) {
 }
 
 function confirmPO(poId) {
-  if (!confirm('Confirm this PO? It will be sent to the supplier.')) return;
+  if (!confirm('Confirm this PO? It will be sent to the supplier (or sent for manager approval first, if it\'s above the threshold).')) return;
 
   (async () => {
     try {
@@ -638,7 +638,13 @@ function confirmPO(poId) {
         return;
       }
 
-      // SECURITY: Verify PO belongs to current branch before updating
+      const authUUID = getAuthUUID();
+      if (!authUUID) {
+        alert('❌ Could not identify current user - please login again');
+        return;
+      }
+
+      // SECURITY: Verify PO belongs to current branch before acting on it
       const { data: poCheck, error: checkError } = await withBranchFilter(
         supabase.from('purchase_orders').select('id, branch_id')
       ).eq('id', poId).limit(1);
@@ -648,16 +654,19 @@ function confirmPO(poId) {
         return;
       }
 
-      // Proceed with update only for verified branch
-      const { error } = await supabase
-        .from('purchase_orders')
-        .update({ status: 'CONFIRMED' })
-        .eq('id', poId)
-        .eq('branch_id', context.branch_id);
+      // Confirms immediately if under the branch's approval threshold;
+      // otherwise files it for the Purchasing manager to approve.
+      const { data, error } = await window.supabase.rpc('request_po_confirmation', {
+        p_po_id: poId,
+        p_requested_by: authUUID
+      });
 
       if (error) throw error;
 
-      alert('✅ PO confirmed successfully!');
+      const result = Array.isArray(data) ? data[0] : null;
+      if (!result) throw new Error('Request returned no result');
+
+      alert((result.confirmed ? '✅ ' : '📨 ') + result.message);
       loadPurchaseOrders();
     } catch (err) {
       console.error('Confirm PO error:', err);

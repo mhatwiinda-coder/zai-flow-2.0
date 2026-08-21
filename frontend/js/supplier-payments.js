@@ -123,16 +123,26 @@ function recordInvoice(event) {
         return;
       }
 
-      const { data, error } = await window.supabase.rpc('record_purchase_invoice', {
+      const authUUID = getAuthUUID();
+      if (!authUUID) {
+        alert('❌ Could not identify current user - please login again');
+        return;
+      }
+
+      // Records immediately if under the branch's approval threshold;
+      // otherwise files it for the Purchasing manager to approve.
+      const { data, error } = await window.supabase.rpc('request_supplier_invoice_approval', {
         p_po_id: currentInvoicePoId,
         p_supplier_invoice_no: invoiceNumber,
         p_invoice_date: invoiceDate,
-        p_amount: amount
+        p_amount: amount,
+        p_requested_by: authUUID
       });
 
       if (error) throw error;
 
-      alert('✅ ' + data[0].message);
+      const result = data[0];
+      alert((result.recorded ? '✅ ' : '📨 ') + result.message);
       closeRecordInvoiceModal();
       loadPurchaseInvoices();
       loadPurchaseOrders();
@@ -245,17 +255,27 @@ function processPayment(event) {
         return;
       }
 
-      const { data, error } = await window.supabase.rpc('process_purchase_payment', {
+      const authUUID = getAuthUUID();
+      if (!authUUID) {
+        alert('❌ Could not identify current user - please login again');
+        return;
+      }
+
+      // Pays immediately if under the branch's approval threshold;
+      // otherwise files it for the Purchasing manager to approve.
+      const { data, error } = await window.supabase.rpc('request_supplier_payment_approval', {
         p_invoice_id: currentPaymentInvoiceId,
         p_amount: amount,
         p_payment_date: paymentDate,
         p_method: method,
-        p_reference: reference || null
+        p_reference: reference || null,
+        p_requested_by: authUUID
       });
 
       if (error) throw error;
 
-      alert('✅ ' + data[0].message + '\n\nGL entries posted automatically');
+      const result = data[0];
+      alert((result.paid ? '✅ ' : '📨 ') + result.message + (result.paid ? '\n\nGL entries posted automatically' : ''));
       closePaymentModal();
       loadSupplierPayments();
       loadPurchaseInvoices();

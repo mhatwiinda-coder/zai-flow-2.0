@@ -92,7 +92,7 @@ function updateSidebar(moduleMap, context) {
   });
 
   // Module order for consistent display
-  const moduleOrder = ['dashboard', 'sales', 'inventory', 'accounting', 'purchasing', 'hr_payroll', 'bi'];
+  const moduleOrder = ['dashboard', 'sales', 'inventory', 'accounting', 'purchasing', 'hr_payroll', 'approvals', 'bi'];
 
   console.log("➕ Adding accessible modules...");
 
@@ -110,6 +110,7 @@ function updateSidebar(moduleMap, context) {
         accounting: { href: 'accounting.html', text: '📋 Accounting' },
         purchasing: { href: 'purchasing.html', text: '🏢 Purchasing' },
         hr_payroll: { href: 'hr.html', text: '👥 HR & Payroll' },
+        approvals: { href: 'approvals.html', text: '✅ Approvals' },
         bi: { href: 'bi.html', text: '📈 BI Dashboard' }
       };
 
