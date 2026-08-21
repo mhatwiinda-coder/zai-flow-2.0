@@ -10,6 +10,12 @@
 -- real salary and department, then activates.
 --
 -- Idempotent - re-running creates nothing new.
+--
+-- IMPORTANT: run LINK_ADMIN_TO_EXISTING_EMPLOYEE.sql FIRST. admin@zai.com
+-- turned out to be a real, actively-used login (not a demo account as first
+-- assumed) belonging to an employee who already has an HR record under a
+-- different email. Running this script before that link is fixed would have
+-- created a duplicate "SYS-<id> / Admin User" record for the same person.
 -- ============================================================================
 
 
