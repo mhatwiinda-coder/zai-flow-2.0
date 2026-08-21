@@ -136,3 +136,31 @@ function getCurrentUser() {
   const userJson = localStorage.getItem("user");
   return userJson ? JSON.parse(userJson) : null;
 }
+
+/* =====================================================
+   SESSION TIMEOUT NOTICE
+   Shown when session-timeout.js redirects here after
+   signing the user out for inactivity.
+===================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+  // sessionStorage is the reliable signal - some hosts rewrite /login.html to
+  // /login and drop the query string. The query param is a fallback only.
+  let timedOut = false;
+  try {
+    timedOut = sessionStorage.getItem("zaiflow_signout_reason") === "timeout";
+    if (timedOut) sessionStorage.removeItem("zaiflow_signout_reason");
+  } catch (_) { /* ignore */ }
+
+  if (!timedOut && new URLSearchParams(window.location.search).get("reason") !== "timeout") return;
+
+  const errorDiv = document.getElementById("error");
+  if (!errorDiv) return;
+
+  errorDiv.textContent = "You were signed out after 5 minutes of inactivity. Please sign in again.";
+  errorDiv.style.color = "#f59e0b";
+
+  // Drop the query string so a refresh doesn't keep showing the notice.
+  if (window.location.search) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+});
