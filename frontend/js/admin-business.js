@@ -343,6 +343,42 @@ function populateBusinessDropdownForUser() {
   });
 }
 
+/**
+ * Look for an existing HR employee record that might be the same person as
+ * the login about to be created, so we don't create a duplicate the way
+ * admin@zai.com almost did. Matches on exact email, or on first+last name
+ * together (name alone is too weak - "John Banda" is not rare).
+ *
+ * Searches across ALL businesses/branches deliberately: a person doesn't
+ * become a different person by moving branch, and this is exactly the class
+ * of mismatch (right person, wrong email on file) that caused that incident.
+ */
+async function findPossibleDuplicateEmployees(name, email) {
+  const nameParts = name.trim().split(/\s+/);
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || firstName;
+
+  const selectCols = 'id, employee_code, first_name, last_name, email, position, status, branch_id, branches(name, business_entities(name))';
+
+  const [byEmail, byName] = await Promise.all([
+    window.supabase.from('employees').select(selectCols).ilike('email', email),
+    window.supabase.from('employees').select(selectCols)
+      .ilike('first_name', firstName).ilike('last_name', lastName)
+  ]);
+
+  const merged = new Map();
+  for (const row of [...(byEmail.data || []), ...(byName.data || [])]) {
+    merged.set(row.id, row);
+  }
+  return Array.from(merged.values());
+}
+
+function describeDuplicateMatch(emp) {
+  const business = emp.branches?.business_entities?.name || 'unknown business';
+  const branch = emp.branches?.name || 'unknown branch';
+  return `• ${emp.first_name} ${emp.last_name} (${emp.employee_code}) - ${emp.position}, ${emp.status}\n  ${branch} / ${business}\n  Email on file: ${emp.email || '(none)'}`;
+}
+
 async function createNewUser() {
   const businessId = document.getElementById('newUserBusiness').value;
   const branchId = document.getElementById('newUserBranch').value;
@@ -358,6 +394,42 @@ async function createNewUser() {
   if (password.length < 8) {
     showMessage('Password must be at least 8 characters', 'error', 'userMessage');
     return;
+  }
+
+  // Check for an existing HR record before creating anything, so the admin
+  // finds out at the point of granting access - not after a duplicate exists.
+  let linkToExistingEmployeeId = null;
+  try {
+    const matches = await findPossibleDuplicateEmployees(name, email);
+
+    if (matches.length === 1) {
+      const emp = matches[0];
+      const alreadyLinked = emp.email && emp.email.toLowerCase() === email.toLowerCase();
+
+      if (!alreadyLinked) {
+        const proceed = confirm(
+          `A matching employee record already exists:\n\n${describeDuplicateMatch(emp)}\n\n` +
+          `Is this the SAME PERSON as the login you're creating?\n\n` +
+          `OK = Yes, link this new login to their existing HR record (recommended - avoids a duplicate).\n` +
+          `Cancel = No, this is a different person - create a separate new HR record.`
+        );
+        if (proceed) {
+          linkToExistingEmployeeId = emp.id;
+        }
+      }
+    } else if (matches.length > 1) {
+      const list = matches.map(describeDuplicateMatch).join('\n\n');
+      const proceed = confirm(
+        `${matches.length} existing employee records could match this person:\n\n${list}\n\n` +
+        `I can't safely guess which one (if any) is correct. Recommend cancelling and resolving ` +
+        `this in HR manually first.\n\nContinue anyway and create a brand-new HR record?`
+      );
+      if (!proceed) return;
+    }
+  } catch (err) {
+    // Don't let the duplicate check itself block user creation if it errors -
+    // just warn and fall through to the normal flow.
+    console.warn('Duplicate employee check failed:', err.message);
   }
 
   try {
@@ -405,6 +477,35 @@ async function createNewUser() {
         console.warn('Branch assignment error:', err.message);
         successMsg += ' (⚠️ branch assignment pending)';
       }
+    }
+
+    // If the admin confirmed this login belongs to an existing HR record,
+    // link the two instead of creating a duplicate - just bring the email
+    // on file in sync, since everything else about that employee is already
+    // correct and shouldn't be overwritten.
+    if (linkToExistingEmployeeId) {
+      try {
+        const { error: linkError } = await window.supabase
+          .from('employees')
+          .update({ email: email })
+          .eq('id', linkToExistingEmployeeId);
+
+        successMsg += linkError
+          ? ' (⚠️ could not link to existing HR record: ' + linkError.message + ')'
+          : ' + linked to existing HR record';
+      } catch (err) {
+        successMsg += ' (⚠️ could not link to existing HR record: ' + err.message + ')';
+      }
+
+      showMessage(successMsg + ' - User can now login!', 'success', 'userMessage');
+      document.getElementById('newUserBusiness').value = '';
+      document.getElementById('newUserBranch').value = '';
+      document.getElementById('newUserName').value = '';
+      document.getElementById('newUserEmail').value = '';
+      document.getElementById('newUserPassword').value = '';
+      document.getElementById('createUserModal').classList.remove('show');
+      await loadUsers();
+      return;
     }
 
     // Auto-create employee record for the user.
