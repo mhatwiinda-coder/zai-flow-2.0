@@ -6,9 +6,21 @@
 --  employee has not clocked in. HR can then either send the task to the
 --  employees in tray or amend if employee is sick or absent."
 --
--- Run FIX_CLOCK_IN_HR_INTEGRATION.sql first - this depends on the clock_in /
--- clock_out columns it adds.
 -- ============================================================================
+
+
+-- ============================================================================
+-- STEP 0: Prerequisites, restated so this file is self-sufficient
+-- ============================================================================
+-- These are also created by FIX_CLOCK_IN_HR_INTEGRATION.sql and
+-- APPROVAL_WORKFLOW_SCHEMA.sql. Repeating them here (idempotently) removes the
+-- ordering hazard: get_daily_attendance selects a.clock_in/a.clock_out, so if
+-- those columns are missing the CREATE FUNCTION fails and the app then reports
+-- "Could not find the function public.get_daily_attendance" - which looks like
+-- this file never ran, when in fact it ran and errored partway.
+ALTER TABLE public.attendance  ADD COLUMN IF NOT EXISTS clock_in  TIMESTAMPTZ;
+ALTER TABLE public.attendance  ADD COLUMN IF NOT EXISTS clock_out TIMESTAMPTZ;
+ALTER TABLE public.departments ADD COLUMN IF NOT EXISTS manager_user_id UUID;
 
 
 -- ============================================================================

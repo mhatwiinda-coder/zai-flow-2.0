@@ -1271,9 +1271,9 @@ function showBalanceModal() {
   (async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const { data, error } = await supabase
-        .from('cash_drawer')
-        .select('*')
+      const { data, error } = await withBranchFilter(
+        window.supabase.from('cash_drawer').select('*')
+      )
         .eq('user_id', String(user?.id))
         .order('opened_at', { ascending: false })
         .limit(1);
@@ -1292,9 +1292,9 @@ function showBalanceModal() {
       const drawer = data[0];
 
       // Calculate expected balance (opening + sales since drawer opened)
-      const { data: sales, error: salesError } = await supabase
-        .from('sales')
-        .select('total')
+      const { data: sales, error: salesError } = await withBranchFilter(
+        window.supabase.from('sales').select('total')
+      )
         .eq('payment_method', 'Cash')
         .eq('status', 'COMPLETED')
         .gte('created_at', drawer.opened_at);
@@ -1330,9 +1330,9 @@ function closeTill() {
 
       // Get current drawer ID
       const user = JSON.parse(localStorage.getItem("user"));
-      const { data: drawerData, error: drawerError } = await supabase
-        .from('cash_drawer')
-        .select('*')
+      const { data: drawerData, error: drawerError } = await withBranchFilter(
+        window.supabase.from('cash_drawer').select('*')
+      )
         .eq('user_id', String(user?.id))
         .order('opened_at', { ascending: false })
         .limit(1);
@@ -1346,9 +1346,9 @@ function closeTill() {
       const drawerId = drawer.id;
 
       // Calculate expected balance (opening + sales since drawer opened)
-      const { data: sales, error: salesError } = await supabase
-        .from('sales')
-        .select('total')
+      const { data: sales, error: salesError } = await withBranchFilter(
+        window.supabase.from('sales').select('total')
+      )
         .eq('payment_method', 'Cash')
         .eq('status', 'COMPLETED')
         .gte('created_at', drawer.opened_at);
@@ -1444,14 +1444,19 @@ function closeTill() {
       balanceAttempts = 0;
 
       // Close drawer - update status to CLOSED
-      const { error: closeError } = await supabase
+      // Filters must come AFTER .update() in the Supabase client, so this
+      // applies the branch guard explicitly rather than via withBranchFilter()
+      // (which prepends .eq() and is only valid on a select).
+      const closeCtx = getBranchContext();
+      const { error: closeError } = await window.supabase
         .from('cash_drawer')
         .update({
           status: 'CLOSED',
           declared_balance: declaredBalance,
           closed_at: new Date().toISOString()
         })
-        .eq('id', drawerId);
+        .eq('id', drawerId)
+        .eq('branch_id', closeCtx.branch_id);
 
       if (closeError) {
         alert(closeError.message || "Failed to close drawer");
@@ -1528,9 +1533,9 @@ function reprintSaleReceipt(saleId) {
   (async () => {
     try {
       // Get sale details
-      const { data: sale, error: saleError } = await supabase
-        .from('sales')
-        .select('*')
+      const { data: sale, error: saleError } = await withBranchFilter(
+        window.supabase.from('sales').select('*')
+      )
         .eq('id', saleId)
         .single();
 
@@ -1540,10 +1545,9 @@ function reprintSaleReceipt(saleId) {
       }
 
       // Get sale items
-      const { data: items, error: itemsError } = await supabase
-        .from('sale_items')
-        .select('product_id,quantity,price,products(name)')
-        .eq('sale_id', saleId);
+      const { data: items, error: itemsError } = await withBranchFilter(
+        window.supabase.from('sale_items').select('product_id,quantity,price,products(name)')
+      ).eq('sale_id', saleId);
 
       if (itemsError) {
         console.error('Error loading sale items:', itemsError);

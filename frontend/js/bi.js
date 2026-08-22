@@ -60,9 +60,9 @@ if (inventorySummary) {
 function loadTopProducts() {
   (async () => {
     try {
-      const { data: salesItems, error } = await supabase
-        .from('sales_items')
-        .select('product_id,quantity,products(name)');
+      const { data: salesItems, error } = await withBranchFilter(
+        window.supabase.from('sale_items').select('product_id,quantity,products(name)')
+      );
 
       if (error) throw error;
 
@@ -106,10 +106,9 @@ function loadTopProducts() {
 function loadSalesTrend() {
   (async () => {
     try {
-      const { data: sales, error } = await supabase
-        .from('sales')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data: sales, error } = await withBranchFilter(
+        window.supabase.from('sales').select('*')
+      ).order('created_at', { ascending: true });
 
       if (error) throw error;
 
@@ -148,9 +147,9 @@ function loadSalesTrend() {
 function loadFiltered(range) {
   (async () => {
     try {
-      const { data: sales, error } = await supabase
-        .from('sales')
-        .select('*');
+      const { data: sales, error } = await withBranchFilter(
+        window.supabase.from('sales').select('*')
+      );
 
       if (error) throw error;
 
@@ -190,9 +189,9 @@ function loadFiltered(range) {
 function loadPaymentChart() {
   (async () => {
     try {
-      const { data: sales, error } = await supabase
-        .from('sales')
-        .select('payment_method,total');
+      const { data: sales, error } = await withBranchFilter(
+        window.supabase.from('sales').select('payment_method,total')
+      );
 
       if (error) throw error;
 
@@ -234,11 +233,9 @@ function loadPaymentChart() {
 function loadLowStock() {
   (async () => {
     try {
-      const { data: products, error } = await supabase
-        .from('products')
-        .select('*')
-        .lt('stock', 5)
-        .order('stock', { ascending: true });
+      const { data: products, error } = await withBranchFilter(
+        window.supabase.from('products').select('*')
+      ).lt('stock', 5).order('stock', { ascending: true });
 
       if (error) throw error;
 

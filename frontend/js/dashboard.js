@@ -174,9 +174,9 @@ function loadCashMetrics() {
       const user = JSON.parse(localStorage.getItem("user"));
 
       // Get the most recent drawer for this user using PostgREST
-      const { data: drawers, error: drawerError } = await supabase
-        .from('cash_drawer')
-        .select('*')
+      const { data: drawers, error: drawerError } = await withBranchFilter(
+        window.supabase.from('cash_drawer').select('*')
+      )
         .eq('user_id', String(user?.id))
         .order('opened_at', { ascending: false })
         .limit(1);
@@ -198,9 +198,9 @@ function loadCashMetrics() {
       const drawer = drawers[0];
 
       // Calculate expected balance (opening + cash sales since drawer opened)
-      const { data: sales, error: salesError } = await supabase
-        .from('sales')
-        .select('total')
+      const { data: sales, error: salesError } = await withBranchFilter(
+        window.supabase.from('sales').select('total')
+      )
         .eq('payment_method', 'Cash')
         .eq('status', 'COMPLETED')
         .gte('created_at', drawer.opened_at);
@@ -241,10 +241,9 @@ function loadSalesTrendChart() {
       loadingEl.style.display = "flex";
       if (charts.salesTrend) charts.salesTrend.destroy();
 
-      const { data: allSales, error } = await supabase
-        .from('sales')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data: allSales, error } = await withBranchFilter(
+        window.supabase.from('sales').select('*')
+      ).order('created_at', { ascending: false });
 
       if (error) {
         throw error;
@@ -342,9 +341,9 @@ function loadPaymentDistributionChart() {
       loadingEl.style.display = "flex";
       if (charts.paymentDist) charts.paymentDist.destroy();
 
-      const { data: allSales, error } = await supabase
-        .from('sales')
-        .select('*');
+      const { data: allSales, error } = await withBranchFilter(
+        window.supabase.from('sales').select('*')
+      );
 
       if (error) {
         throw error;
@@ -421,9 +420,9 @@ function loadAlerts() {
 function loadLowStockAlerts() {
   (async () => {
     try {
-      const { data: products, error } = await supabase
-        .from('products')
-        .select('*');
+      const { data: products, error } = await withBranchFilter(
+        window.supabase.from('products').select('*')
+      );
 
       if (error) {
         throw error;

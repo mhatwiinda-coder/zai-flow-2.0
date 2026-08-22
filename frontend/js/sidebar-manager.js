@@ -9,7 +9,12 @@
  * highlight with the active state. Replaces the emoji labels that used to
  * prefix each nav item.
  */
-const ICONS = (() => {
+// `var` not `const`: a page that accidentally includes this file twice would
+// throw "Identifier 'ICONS' has already been declared" with const, and that
+// SyntaxError aborts the whole file - taking the sidebar down with it. var
+// redeclares harmlessly, so a duplicate include degrades to a no-op instead
+// of breaking navigation.
+var ICONS = ICONS || (() => {
   const w = (p) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
   return {
     dashboard:  w('<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>'),
