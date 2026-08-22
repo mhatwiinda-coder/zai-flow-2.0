@@ -211,8 +211,12 @@ function editEmployee(empId) {
   })();
 }
 
+/* "View" opens the full personnel file (performance, disciplinary, training,
+   history, documents). "Edit" still opens the edit form - previously View just
+   did the same thing as Edit, so there was nowhere to actually see an
+   employee's record. */
 function viewEmployee(empId) {
-  editEmployee(empId);
+  openEmployeeProfile(empId);
 }
 
 function saveEmployee() {

@@ -33,6 +33,18 @@
     }
 
     .chart-card h3 { margin: 0 0 16px; font-size: 14px; color: var(--zf-text); }
+  
+    .profile-avatar-img {
+      width: 68px; height: 68px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--zf-border);
+    }
+    .profile-avatar-initials {
+      width: 68px; height: 68px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--zf-purple), var(--zf-purple-dark));
+      color: #fff; font-size: 22px; font-weight: 700;
+    }
+    .profile-tab-content { padding-top: 4px; }
   </style>
 </head>
 
@@ -446,7 +458,35 @@
 <script src="js/display-branch-context.js"></script>
 <script src="js/sidebar-manager.js"></script>
 <script src="js/hr.js"></script>
+<script src="js/employee-profile-hr.js"></script>
 <script src="js/payroll.js"></script>
+
+
+<!-- ===== EMPLOYEE PROFILE (full personnel file) ===== -->
+<div id="employeeProfileModal" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width: 1000px; width: 95%; max-height: 90vh; overflow-y: auto;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:20px;">
+      <div id="profileHeader" style="display:flex; align-items:center; gap:16px; flex:1; flex-wrap:wrap;"></div>
+      <button class="btn-secondary" onclick="closeEmployeeProfile()">Close</button>
+    </div>
+
+    <div class="tabs-container">
+      <button class="tab-button profile-tab-btn active" data-tab="Overview"     onclick="switchProfileTab('Overview')">Overview</button>
+      <button class="tab-button profile-tab-btn" data-tab="Performance"         onclick="switchProfileTab('Performance')">Performance</button>
+      <button class="tab-button profile-tab-btn" data-tab="Disciplinary"        onclick="switchProfileTab('Disciplinary')">Disciplinary</button>
+      <button class="tab-button profile-tab-btn" data-tab="Training"            onclick="switchProfileTab('Training')">Training</button>
+      <button class="tab-button profile-tab-btn" data-tab="History"             onclick="switchProfileTab('History')">History</button>
+      <button class="tab-button profile-tab-btn" data-tab="Medical"             onclick="switchProfileTab('Medical')">Medical</button>
+    </div>
+
+    <div id="profileTabOverview"     class="profile-tab-content"></div>
+    <div id="profileTabPerformance"  class="profile-tab-content" style="display:none;"></div>
+    <div id="profileTabDisciplinary" class="profile-tab-content" style="display:none;"></div>
+    <div id="profileTabTraining"     class="profile-tab-content" style="display:none;"></div>
+    <div id="profileTabHistory"      class="profile-tab-content" style="display:none;"></div>
+    <div id="profileTabMedical"      class="profile-tab-content" style="display:none;"></div>
+  </div>
+</div>
 
 </body>
 </html>
