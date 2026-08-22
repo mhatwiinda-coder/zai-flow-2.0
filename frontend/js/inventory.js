@@ -437,6 +437,9 @@ function updateProduct() {
     try {
       if (!editId) return alert("Lookup a product first");
 
+      const context = getBranchContext();
+      if (!context) return alert("No branch context - please log in again");
+
       const newStock = Number(document.getElementById("editStock").value);
       const reason = document.getElementById("editReason").value;
 
@@ -461,10 +464,11 @@ function updateProduct() {
         updateData.cost_price = editCost;
       }
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await window.supabase
         .from('products')
         .update(updateData)
-        .eq('id', editId);
+        .eq('id', editId)
+        .eq('branch_id', context.branch_id);
 
       if (updateError) {
         console.error("Update error:", updateError);
@@ -479,13 +483,14 @@ function updateProduct() {
 
         console.log("Recording movement:", { type: movementType, quantity: movementQuantity, reason });
 
-        const { error: movementError } = await supabase
+        const { error: movementError } = await window.supabase
           .from('inventory_movements')
           .insert([{
             product_id: editId,
             type: movementType,
             quantity: movementQuantity,
-            reason: reason
+            reason: reason,
+            branch_id: context.branch_id
           }]);
 
         if (movementError) {
@@ -516,10 +521,12 @@ function quickDeleteProduct(productId) {
 
   (async () => {
     try {
-      const { error } = await supabase
+      const delCtx = getBranchContext();
+      const { error } = await window.supabase
         .from('products')
         .delete()
-        .eq('id', productId);
+        .eq('id', productId)
+        .eq('branch_id', delCtx.branch_id);
 
       if (error) {
         alert(error.message || "Failed to delete product");
