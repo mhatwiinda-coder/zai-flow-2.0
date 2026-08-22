@@ -452,7 +452,7 @@
     <!-- Admin Header -->
     <div class="admin-header">
       <div>
-        <h1>🔐 Role Management</h1>
+        <h1>Role Management</h1>
         <p>Manage user roles and permissions across all modules</p>
       </div>
     </div>
@@ -460,9 +460,9 @@
     <!-- Tabs -->
     <div style="background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;">
       <div class="tabs">
-        <button class="tab-button active" onclick="switchAdminTab('users')">👥 Users & Roles</button>
-        <button class="tab-button" onclick="switchAdminTab('roles')">🎯 Role Definitions</button>
-        <button class="tab-button" onclick="switchAdminTab('permissions')">🔑 Permissions Matrix</button>
+        <button class="tab-button active" onclick="switchAdminTab('users')">Users & Roles</button>
+        <button class="tab-button" onclick="switchAdminTab('roles')">Role Definitions</button>
+        <button class="tab-button" onclick="switchAdminTab('permissions')">Permissions Matrix</button>
       </div>
 
       <!-- Tab 1: Users & Roles -->
@@ -470,7 +470,7 @@
         <div style="padding: 20px;">
           <div class="search-box">
             <input type="text" id="search-users" placeholder="Search users by name or email...">
-            <button onclick="searchUsers()">🔍 Search</button>
+            <button onclick="searchUsers()">Search</button>
           </div>
 
           <div class="card">
@@ -510,7 +510,7 @@
               </div>
             </div>
             <button class="btn btn-primary" onclick="assignRoleToUser()" style="width: 100%; margin-top: 10px;">
-              ✓ Assign Role
+              Assign Role
             </button>
           </div>
         </div>
@@ -555,7 +555,7 @@
   <!-- Assign Role Modal -->
   <div id="assign-role-modal" class="modal">
     <div class="modal-content">
-      <h3>👥 Assign Role to User</h3>
+      <h3>Assign Role to User</h3>
       <div class="form-group">
         <label>User *</label>
         <select id="modal-user-select">
@@ -578,7 +578,7 @@
   <!-- Remove Role Modal -->
   <div id="remove-role-modal" class="modal">
     <div class="modal-content">
-      <h3>⚠️ Remove Role from User</h3>
+      <h3>Remove Role from User</h3>
       <p id="remove-role-message"></p>
       <p style="color: #999; font-size: 13px;">This action cannot be undone.</p>
       <div class="modal-buttons">

@@ -50,14 +50,14 @@
   <!-- MAIN CONTENT -->
   <main>
     <div class="topbar">
-      <h2>✅ Approvals</h2>
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
-        <div>
-          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
-          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
-        </div>
+      <h2>Approvals</h2>
+      <div class="topbar-right">
+        <div class="zf-context-pill">
+            <span class="zf-pill-label">Branch</span>
+            <select id="branchDropdown" class="zf-pill-select"></select>
+          </div>
         <div id="userInfo"></div>
-        <button onclick="loadApprovals()" class="refresh-btn" title="Refresh">🔄</button>
+        <button onclick="loadApprovals()" class="refresh-btn" title="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg></button>
       </div>
     </div>
 

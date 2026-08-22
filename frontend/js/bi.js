@@ -245,12 +245,12 @@ function loadLowStock() {
       let html = "<h4>Low Stock Alerts</h4>";
 
       if (!Array.isArray(products) || products.length === 0) {
-        html += "<p>No low stock items 🎉</p>";
+        html += "<p>No low stock items </p>";
       } else {
         products.forEach(p => {
           html += `
             <div style="color:red;">
-              ⚠ ${p.name} — ${p.stock} left
+              ${p.name} — ${p.stock} left
             </div>
           `;
         });

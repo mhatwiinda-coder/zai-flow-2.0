@@ -51,14 +51,14 @@ function closeClockOutModal() {
 async function performClockIn() {
   const notes = document.getElementById('clock-in-notes').value;
   if (!window.supabase || !context) {
-    alert('❌ System not initialized. Please refresh the page.');
+    alert('System not initialized. Please refresh the page.');
     return;
   }
 
   try {
     const authUUID = getAuthUUID();
     if (!authUUID) {
-      alert('❌ User authentication not found. Please refresh the page.');
+      alert('User authentication not found. Please refresh the page.');
       return;
     }
 
@@ -71,11 +71,11 @@ async function performClockIn() {
     if (error) throw error;
     const result = data[0];
     if (result.success) {
-      alert('✅ ' + result.message);
+      alert('' + result.message);
       closeClockInModal();
       loadAttendanceStatus();
     } else {
-      alert('❌ ' + result.message);
+      alert('' + result.message);
     }
   } catch (err) {
     console.error('Clock in error:', err);
@@ -86,14 +86,14 @@ async function performClockIn() {
 async function performClockOut() {
   const notes = document.getElementById('clock-out-notes').value;
   if (!window.supabase || !context) {
-    alert('❌ System not initialized. Please refresh the page.');
+    alert('System not initialized. Please refresh the page.');
     return;
   }
 
   try {
     const authUUID = getAuthUUID();
     if (!authUUID) {
-      alert('❌ User authentication not found. Please refresh the page.');
+      alert('User authentication not found. Please refresh the page.');
       return;
     }
 
@@ -106,11 +106,11 @@ async function performClockOut() {
     if (error) throw error;
     const result = data[0];
     if (result.success) {
-      alert(`✅ ${result.message}\nHours worked: ${result.hours_worked}`);
+      alert(`${result.message}\nHours worked: ${result.hours_worked}`);
       closeClockOutModal();
       loadAttendanceStatus();
     } else {
-      alert('❌ ' + result.message);
+      alert('' + result.message);
     }
   } catch (err) {
     console.error('Clock out error:', err);
@@ -137,19 +137,19 @@ async function performCreateTask() {
   const priority = document.getElementById('task-priority').value;
 
   if (!title) {
-    alert('⚠️ Please enter a task title');
+    alert('Please enter a task title');
     return;
   }
 
   if (!window.supabase || !context) {
-    alert('❌ System not initialized. Please refresh the page.');
+    alert('System not initialized. Please refresh the page.');
     return;
   }
 
   try {
     const authUUID = getAuthUUID();
     if (!authUUID) {
-      alert('❌ User authentication not found. Please refresh the page.');
+      alert('User authentication not found. Please refresh the page.');
       return;
     }
 
@@ -166,11 +166,11 @@ async function performCreateTask() {
     if (error) throw error;
     const result = data[0];
     if (result.success) {
-      alert('✅ ' + result.message);
+      alert('' + result.message);
       closeCreateTaskModal();
       loadUserTasks();
     } else {
-      alert('❌ Failed to create task');
+      alert('Failed to create task');
     }
   } catch (err) {
     console.error('Create task error:', err);
@@ -206,7 +206,7 @@ function switchTaskTab(tabName) {
 
 async function updateTaskStatus(taskId, newStatus) {
   if (!window.supabase) {
-    alert('❌ System not initialized. Please refresh the page.');
+    alert('System not initialized. Please refresh the page.');
     return;
   }
 
@@ -221,7 +221,7 @@ async function updateTaskStatus(taskId, newStatus) {
     if (result.success) {
       loadUserTasks();
     } else {
-      alert('❌ ' + result.message);
+      alert('' + result.message);
     }
   } catch (err) {
     console.error('Update task error:', err);
@@ -232,7 +232,7 @@ async function updateTaskStatus(taskId, newStatus) {
 async function deleteTask(taskId) {
   if (!confirm('Are you sure you want to delete this task?')) return;
   if (!window.supabase) {
-    alert('❌ System not initialized. Please refresh the page.');
+    alert('System not initialized. Please refresh the page.');
     return;
   }
 
@@ -252,7 +252,7 @@ async function deleteTask(taskId) {
 
 async function markNotificationRead(notificationId) {
   if (!window.supabase) {
-    alert('❌ System not initialized. Please refresh the page.');
+    alert('System not initialized. Please refresh the page.');
     return;
   }
 
@@ -270,14 +270,14 @@ async function markNotificationRead(notificationId) {
 
 async function markAllNotificationsRead() {
   if (!window.supabase || !context) {
-    alert('❌ System not initialized. Please refresh the page.');
+    alert('System not initialized. Please refresh the page.');
     return;
   }
 
   try {
     const authUUID = getAuthUUID();
     if (!authUUID) {
-      alert('❌ User authentication not found. Please refresh the page.');
+      alert('User authentication not found. Please refresh the page.');
       return;
     }
 
@@ -358,7 +358,7 @@ async function loadAttendanceStatus() {
       if (isClockedIn) {
         clockInBtn.style.display = 'none';
         clockOutBtn.style.display = 'inline-block';
-        statusBadge.textContent = '✅ Clocked In';
+        statusBadge.textContent = 'Clocked In';
         statusBadge.className = 'status-badge clocked-in';
         attendanceStatus.textContent = 'Online';
         const hours = Math.floor(elapsedMinutes / 60);
@@ -367,7 +367,7 @@ async function loadAttendanceStatus() {
       } else {
         clockInBtn.style.display = 'inline-block';
         clockOutBtn.style.display = 'none';
-        statusBadge.textContent = '❌ Offline';
+        statusBadge.textContent = 'Offline';
         statusBadge.className = 'status-badge clocked-out';
         attendanceStatus.textContent = 'Offline';
         elapsedDisplay.textContent = 'Not clocked in';
@@ -423,7 +423,7 @@ function displayEmptyTasks() {
   const todoContainer = document.getElementById('task-list-todo');
   const inProgressContainer = document.getElementById('task-list-in-progress');
   const completedContainer = document.getElementById('task-list-completed');
-  todoContainer.innerHTML = '<div class="empty-state"><p>No tasks yet! 🎉</p></div>';
+  todoContainer.innerHTML = '<div class="empty-state"><p>No tasks yet! </p></div>';
   inProgressContainer.innerHTML = '<div class="empty-state"><p>No tasks in progress</p></div>';
   completedContainer.innerHTML = '<div class="empty-state"><p>No completed tasks yet</p></div>';
 }
@@ -431,7 +431,7 @@ function displayEmptyTasks() {
 function renderTasksByStatus(tabSuffix, tasks) {
   const container = document.getElementById(`task-list-${tabSuffix}`);
   if (!tasks || tasks.length === 0) {
-    const emoji = tabSuffix === 'todo' ? '🎉' : (tabSuffix === 'in-progress' ? '⏳' : '✅');
+    const emoji = tabSuffix === 'todo' ? '' : (tabSuffix === 'in-progress' ? '⏳' : '');
     container.innerHTML = `<div class="empty-state"><p>No tasks ${emoji}</p></div>`;
     return;
   }
@@ -448,13 +448,13 @@ function renderTasksByStatus(tabSuffix, tasks) {
         </div>
         ${task.description ? `<div style="color: #666; font-size: 13px; margin: 8px 0;">${escapeHtml(task.description)}</div>` : ''}
         <div class="task-meta">
-          ${isOverdue ? '<span style="color: #dc3545; font-weight: bold;">⚠️ OVERDUE</span> • ' : ''}
+          ${isOverdue ? '<span style="color: #dc3545; font-weight: bold;">OVERDUE</span> • ' : ''}
           Due: ${dueDateStr} • Created: ${new Date(task.created_at).toLocaleDateString()}
         </div>
         <div style="margin-top: 10px; display: flex; gap: 8px;">
-          ${task.status !== 'COMPLETED' ? `<button class="btn btn-success" onclick="updateTaskStatus(${task.task_id}, 'COMPLETED')" style="font-size: 12px; padding: 6px 10px;">✓ Complete</button>` : ''}
+          ${task.status !== 'COMPLETED' ? `<button class="btn btn-success" onclick="updateTaskStatus(${task.task_id}, 'COMPLETED')" style="font-size: 12px; padding: 6px 10px;">Complete</button>` : ''}
           ${task.status === 'TODO' ? `<button class="btn btn-primary" onclick="updateTaskStatus(${task.task_id}, 'IN_PROGRESS')" style="font-size: 12px; padding: 6px 10px;">▶ Start</button>` : ''}
-          <button class="btn btn-secondary" onclick="deleteTask(${task.task_id})" style="font-size: 12px; padding: 6px 10px;">🗑 Delete</button>
+          <button class="btn btn-secondary" onclick="deleteTask(${task.task_id})" style="font-size: 12px; padding: 6px 10px;">Delete</button>
         </div>
       </div>
     `;
@@ -477,7 +477,7 @@ async function loadNotifications() {
     document.getElementById('notification-count').textContent = (data && data.length) || 0;
 
     if (!data || data.length === 0) {
-      document.getElementById('notification-list').innerHTML = `<div class="empty-state"><p>No notifications yet 🎉</p></div>`;
+      document.getElementById('notification-list').innerHTML = `<div class="empty-state"><p>No notifications yet </p></div>`;
       return;
     }
 
@@ -522,12 +522,12 @@ async function loadUserAccessibleModules() {
     document.getElementById('module-count').textContent = (data && data.length) || 0;
 
     const moduleInfo = {
-      'dashboard': { name: 'Dashboard', icon: '📊', url: 'dashboard.html' },
-      'sales': { name: 'Sales', icon: '🛒', url: 'sales.html' },
-      'inventory': { name: 'Inventory', icon: '📦', url: 'inventory.html' },
-      'accounting': { name: 'Accounting', icon: '📋', url: 'accounting.html' },
-      'hr_payroll': { name: 'HR & Payroll', icon: '👥', url: 'hr.html' },
-      'purchasing': { name: 'Purchasing', icon: '📄', url: 'purchasing.html' }
+      'dashboard': { name: 'Dashboard', icon: '', url: 'dashboard.html' },
+      'sales': { name: 'Sales', icon: '', url: 'sales.html' },
+      'inventory': { name: 'Inventory', icon: '', url: 'inventory.html' },
+      'accounting': { name: 'Accounting', icon: '', url: 'accounting.html' },
+      'hr_payroll': { name: 'HR & Payroll', icon: '', url: 'hr.html' },
+      'purchasing': { name: 'Purchasing', icon: '', url: 'purchasing.html' }
     };
 
     let html = '';
@@ -536,7 +536,7 @@ async function loadUserAccessibleModules() {
     if (currentContext && currentContext.user_role === 'admin') {
       html += `
         <a href="admin-business.html" class="quick-link" title="Admin Business">
-          <div class="quick-link-icon">⚙️</div>
+          <div class="quick-link-icon"></div>
           <div class="quick-link-name">Admin Business</div>
         </a>
       `;
@@ -551,7 +551,7 @@ async function loadUserAccessibleModules() {
         // Not admin and no modules
         document.getElementById('quick-links-container').innerHTML = `
           <div class="empty-state" style="grid-column: 1/-1;">
-            <div class="empty-state-icon">🚫</div>
+            <div class="empty-state-icon"></div>
             <p>No modules accessible yet. Contact your admin.</p>
           </div>
         `;
@@ -568,7 +568,7 @@ async function loadUserAccessibleModules() {
     });
 
     Object.keys(moduleMap).forEach(moduleName => {
-      const info = moduleInfo[moduleName] || { name: moduleName, icon: '📦', url: '#' };
+      const info = moduleInfo[moduleName] || { name: moduleName, icon: '', url: '#' };
       html += `
         <a href="${info.url}" class="quick-link" title="${info.name}">
           <div class="quick-link-icon">${info.icon}</div>

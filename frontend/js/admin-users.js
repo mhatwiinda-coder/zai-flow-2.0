@@ -175,7 +175,7 @@ async function createBusinessUser(event) {
     }
 
     if (data && data[0] && data[0].success) {
-      showMessage('✅ User created successfully!', 'success');
+      showMessage('User created successfully!', 'success');
 
       // Clear form and close modal
       document.getElementById('userName').value = '';
@@ -222,7 +222,7 @@ async function updateUserRole(userId, newRole) {
     if (error) throw error;
 
     if (data && data[0] && data[0].success) {
-      showMessage('✅ Role updated successfully!', 'success');
+      showMessage('Role updated successfully!', 'success');
       loadBusinessUsers();
     } else {
       showMessage('Error updating role', 'error');
@@ -252,7 +252,7 @@ async function deleteUser(userId) {
     if (error) throw error;
 
     if (data && data[0] && data[0].success) {
-      showMessage('✅ User deleted successfully!', 'success');
+      showMessage('User deleted successfully!', 'success');
       loadBusinessUsers();
     } else {
       showMessage('Error deleting user', 'error');

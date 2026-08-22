@@ -28,11 +28,11 @@
 <main>
   <div class="topbar">
     <h2>Inventory Management</h2>
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
-      <div>
-        <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
-        <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
-      </div>
+    <div class="topbar-right">
+      <div class="zf-context-pill">
+            <span class="zf-pill-label">Branch</span>
+            <select id="branchDropdown" class="zf-pill-select"></select>
+          </div>
       <div id="userInfo"></div>
     </div>
   </div>
@@ -41,7 +41,7 @@
   <div class="dashboard-section">
     <div class="scanner-card">
       <div class="scanner-header">
-        <h3>📱 Barcode Scanner</h3>
+        <h3>Barcode Scanner</h3>
         <button onclick="toggleCamera()" class="scanner-toggle" id="cameraBtn">Start Camera</button>
         <button onclick="toggleManualEntry()" class="manual-toggle">Manual Entry</button>
       </div>
@@ -58,9 +58,9 @@
       <div id="productPreview" class="product-preview" style="display: none;">
         <h4>Product Found</h4>
         <div class="preview-content">
-          <div><strong>📦 Product:</strong> <span id="previewName">-</span></div>
-          <div><strong>💰 Price:</strong> K <span id="previewPrice">0.00</span></div>
-          <div><strong>📊 Stock:</strong> <span id="previewStock">0</span> units</div>
+          <div><strong>Product:</strong> <span id="previewName">-</span></div>
+          <div><strong>Price:</strong> K <span id="previewPrice">0.00</span></div>
+          <div><strong>Stock:</strong> <span id="previewStock">0</span> units</div>
           <div><strong>SKU:</strong> <span id="previewSKU">-</span></div>
           <button onclick="addToLookup()" class="btn-primary">Add to Lookup</button>
         </div>
@@ -72,7 +72,7 @@
   <div class="dashboard-kpi-row">
     <div class="dashboard-kpi kpi-inventory">
       <div class="kpi-header">
-        <div class="kpi-icon">📦</div>
+        <div class="kpi-icon"></div>
         <div class="kpi-label">Total Products</div>
       </div>
       <div class="kpi-content">
@@ -83,7 +83,7 @@
 
     <div class="dashboard-kpi kpi-financial">
       <div class="kpi-header">
-        <div class="kpi-icon">💎</div>
+        <div class="kpi-icon"></div>
         <div class="kpi-label">Inventory Value</div>
       </div>
       <div class="kpi-content">
@@ -94,7 +94,7 @@
 
     <div class="dashboard-kpi kpi-sales">
       <div class="kpi-header">
-        <div class="kpi-icon">📥</div>
+        <div class="kpi-icon"></div>
         <div class="kpi-label">Stock In (Today)</div>
       </div>
       <div class="kpi-content">
@@ -105,7 +105,7 @@
 
     <div class="dashboard-kpi kpi-cash">
       <div class="kpi-header">
-        <div class="kpi-icon">📤</div>
+        <div class="kpi-icon"></div>
         <div class="kpi-label">Stock Out (Today)</div>
       </div>
       <div class="kpi-content">
@@ -119,13 +119,13 @@
   <div class="dashboard-section">
     <details class="collapsible-card">
       <summary class="collapsible-header">
-        <span>📚 Product Catalog</span>
+        <span>Product Catalog</span>
         <span class="product-count" id="productCount">(0 products)</span>
       </summary>
 
       <div class="collapsible-content">
         <div class="search-bar">
-          <input type="text" id="productSearch" placeholder="🔍 Search products by name, SKU, or barcode..." />
+          <input type="text" id="productSearch" placeholder="Search products by name, SKU, or barcode..." />
         </div>
 
         <div class="products-grid" id="productsGrid">
@@ -139,7 +139,7 @@
   <div class="dashboard-section">
     <details class="collapsible-card">
       <summary class="collapsible-header">
-        <span>➕ Add New Product</span>
+        <span>Add New Product</span>
       </summary>
 
       <div class="collapsible-content">
@@ -161,7 +161,7 @@
   <div class="dashboard-section">
     <details class="collapsible-card">
       <summary class="collapsible-header">
-        <span>✏️ Edit / Adjust Product</span>
+        <span>Edit / Adjust Product</span>
       </summary>
 
       <div class="collapsible-content">
@@ -195,7 +195,7 @@
   <div class="dashboard-section">
     <details class="collapsible-card" open>
       <summary class="collapsible-header">
-        <span>📋 Recent Stock Movements</span>
+        <span>Recent Stock Movements</span>
         <span class="movement-count">(Today)</span>
       </summary>
 

@@ -152,7 +152,7 @@ function displayProductPreview(product) {
   const stock = Number(product.stock || 0);
 
   preview.innerHTML = `
-    <h4>📦 Product Found</h4>
+    <h4>Product Found</h4>
     <div class="preview-content">
       <div><strong>Product:</strong> ${product.name || product.product_name || "-"}</div>
       <div><strong>Price:</strong> K ${Number(product.price || 0).toFixed(2)}</div>
@@ -628,9 +628,9 @@ function displayMovements(movements) {
     const time = new Date(m.created_at || m.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
     let color = "#00bcd4";
-    let icon = "📦";
-    if (type === 'IN') { color = "#28c76f"; icon = "📥"; }
-    else if (type === 'OUT') { color = "#ff5b5b"; icon = "📤"; }
+    let icon = "";
+    if (type === 'IN') { color = "#28c76f"; icon = ""; }
+    else if (type === 'OUT') { color = "#ff5b5b"; icon = ""; }
 
     html += `
       <div class="movement-item" style="border-left: 3px solid ${color};">

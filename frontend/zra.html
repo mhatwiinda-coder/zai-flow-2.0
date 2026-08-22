@@ -70,12 +70,12 @@
   <!-- MAIN -->
   <main>
     <div class="topbar">
-      <h2>🏛️ ZRA Smart Invoice</h2>
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
-        <div>
-          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
-          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
-        </div>
+      <h2>ZRA Smart Invoice</h2>
+      <div class="topbar-right">
+        <div class="zf-context-pill">
+            <span class="zf-pill-label">Branch</span>
+            <select id="branchDropdown" class="zf-pill-select"></select>
+          </div>
         <div id="userInfo"></div>
       </div>
     </div>
@@ -103,7 +103,7 @@
     <div class="zra-grid">
       <!-- CONFIGURATION PANEL -->
       <div class="zra-card">
-        <h3>⚙️ ZRA Configuration</h3>
+        <h3>ZRA Configuration</h3>
         <div id="configStatus" style="margin-bottom:16px;"></div>
 
         <div class="form-row">
@@ -154,36 +154,36 @@
           <input id="vsdc_url" placeholder="https://vsdc.zra.org.zm/api/v1" />
         </div>
 
-        <button class="btn-save" onclick="saveConfig()">💾 Save Configuration</button>
+        <button class="btn-save" onclick="saveConfig()">Save Configuration</button>
       </div>
 
       <!-- STATUS & CONTROLS -->
       <div class="zra-card">
-        <h3>📡 Status &amp; Controls</h3>
+        <h3>Status &amp; Controls</h3>
 
         <div id="statusPanel" style="margin-bottom:20px;">
           <p style="color: rgba(255,255,255,0.5);">Loading...</p>
         </div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
-          <button class="btn-sync" onclick="manualSync()">🔄 Sync Offline Queue</button>
-          <button class="btn-sync" onclick="loadStatus()" style="color:#64a4ff; border-color:#64a4ff; background:rgba(100,164,255,0.1);">↻ Refresh</button>
+          <button class="btn-sync" onclick="manualSync()">Sync Offline Queue</button>
+          <button class="btn-sync" onclick="loadStatus()" style="color:#64a4ff; border-color:#64a4ff; background:rgba(100,164,255,0.1);">Refresh</button>
         </div>
 
         <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:16px; font-size:13px; line-height:1.7;">
           <div style="color:rgba(255,255,255,0.7); font-weight:600; margin-bottom:8px;">How It Works</div>
-          <div>✅ Every sale is automatically submitted to ZRA in real-time</div>
-          <div>📶 If offline (load shedding / no internet), invoices are queued</div>
-          <div>🔄 Queue syncs automatically every 5 minutes when online</div>
-          <div>🧪 Use <strong>Sandbox</strong> mode for testing — no real ZRA submission</div>
-          <div>🔴 Switch to <strong>Production</strong> only after ZRA device registration</div>
+          <div>Every sale is automatically submitted to ZRA in real-time</div>
+          <div>If offline (load shedding / no internet), invoices are queued</div>
+          <div>Queue syncs automatically every 5 minutes when online</div>
+          <div>Use <strong>Sandbox</strong> mode for testing — no real ZRA submission</div>
+          <div>Switch to <strong>Production</strong> only after ZRA device registration</div>
         </div>
       </div>
     </div>
 
     <!-- RECENT FISCAL INVOICES -->
     <div class="zra-card" style="margin-bottom:24px;">
-      <h3>🧾 Recent Fiscal Invoices</h3>
+      <h3>Recent Fiscal Invoices</h3>
       <table>
         <thead>
           <tr>
@@ -222,10 +222,10 @@
 
   function statusBadge(s) {
     const map = {
-      'SUBMITTED': '<span class="status-badge badge-green">✅ Submitted</span>',
+      'SUBMITTED': '<span class="status-badge badge-green">Submitted</span>',
       'QUEUED':    '<span class="status-badge badge-orange">⏳ Queued</span>',
       'PENDING':   '<span class="status-badge badge-orange">⏳ Pending</span>',
-      'FAILED':    '<span class="status-badge badge-red">❌ Failed</span>',
+      'FAILED':    '<span class="status-badge badge-red">Failed</span>',
       'SKIPPED':   '<span class="status-badge badge-blue">— Skipped</span>',
     };
     return map[s] || `<span class="status-badge">${s}</span>`;
@@ -247,8 +247,8 @@
       : '';
 
     document.getElementById("configStatus").innerHTML = data.configured
-      ? `<span class="status-badge badge-green">✅ Configured</span> &nbsp; ${envTag}`
-      : `<span class="status-badge badge-red">⚠️ Not Configured — fill in your TPIN below</span>`;
+      ? `<span class="status-badge badge-green">Configured</span> &nbsp; ${envTag}`
+      : `<span class="status-badge badge-red">Not Configured — fill in your TPIN below</span>`;
 
     // Status panel
     if (data.config) {
@@ -341,7 +341,7 @@
       alert("Sync failed: " + e.message);
     } finally {
       btn.disabled = false;
-      btn.innerText = "🔄 Sync Offline Queue";
+      btn.innerText = "Sync Offline Queue";
     }
   }
 
@@ -349,7 +349,7 @@
     if (!confirm(`Resubmit fiscal invoice for Sale #${saleId} to ZRA?`)) return;
     const res  = await fetch(`${API}/zra/resubmit/${saleId}`, { method: "POST", headers: authHeaders() });
     const data = await res.json();
-    alert(data.status === 'SUBMITTED' ? "✅ Submitted successfully!" : `Status: ${data.status} — ${data.reason || ''}`);
+    alert(data.status === 'SUBMITTED' ? "Submitted successfully!" : `Status: ${data.status} — ${data.reason || ''}`);
     loadStatus();
   }
 

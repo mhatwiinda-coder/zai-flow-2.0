@@ -174,7 +174,7 @@ function loadProfitAndLoss() {
       document.getElementById("totalRevenueValue").innerText = money(totalRevenue);
 
       // Trend indicator
-      const trend = netIncome > 0 ? "↗ Profitable" : "↘ Loss";
+      const trend = netIncome > 0 ? "Profitable" : "Loss";
       const trendColor = netIncome > 0 ? "#28c76f" : "#ff5b5b";
       document.getElementById("plTrend").innerText = trend;
       document.getElementById("plTrend").style.color = trendColor;
@@ -287,14 +287,14 @@ function loadBalanceSheet() {
       const statusEl = document.getElementById("balanceStatusValue");
 
       if (isBalanced) {
-        verificationEl.innerText = "✓ BALANCED";
+        verificationEl.innerText = "BALANCED";
         verificationEl.style.color = "#28c76f";
-        statusEl.innerText = "✓ Balanced";
+        statusEl.innerText = "Balanced";
         statusEl.style.color = "#28c76f";
       } else {
-        verificationEl.innerText = "✗ UNBALANCED";
+        verificationEl.innerText = "UNBALANCED";
         verificationEl.style.color = "#ff5b5b";
-        statusEl.innerText = "✗ Unbalanced";
+        statusEl.innerText = "Unbalanced";
         statusEl.style.color = "#ff5b5b";
       }
 
@@ -377,7 +377,7 @@ function loadTrialBalance() {
 
       const isBalanced = Math.abs(totalDebits - totalCredits) < 0.01;
       const statusEl = document.getElementById("tbBalanceStatus");
-      statusEl.innerText = isBalanced ? "✓ Balanced" : "✗ Unbalanced";
+      statusEl.innerText = isBalanced ? "Balanced" : "Unbalanced";
       statusEl.style.color = isBalanced ? "#28c76f" : "#ff5b5b";
     } catch (err) {
       console.error("Trial Balance error:", err);

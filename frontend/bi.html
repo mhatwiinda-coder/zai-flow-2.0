@@ -31,15 +31,15 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
       <h1 style="margin: 0;">Business Intelligence Dashboard</h1>
-      <div>
-        <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
-        <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
-      </div>
+      <div class="zf-context-pill">
+            <span class="zf-pill-label">Branch</span>
+            <select id="branchDropdown" class="zf-pill-select"></select>
+          </div>
     </div>
 
     <!-- FILTERS SECTION -->
     <div class="bi-filters card">
-      <h3>📅 Period & Filters</h3>
+      <h3>Period & Filters</h3>
       <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
         <div>
           <label>Start Date:</label>
@@ -78,10 +78,10 @@
 
     <!-- TAB NAVIGATION -->
     <div class="bi-tabs">
-      <button class="bi-tab active" onclick="switchBITab('sales')">📊 Sales</button>
-      <button class="bi-tab" onclick="switchBITab('inventory')">📦 Inventory</button>
-      <button class="bi-tab" onclick="switchBITab('operations')">⚙️ Operations</button>
-      <button class="bi-tab" onclick="switchBITab('analysis')">📈 Analysis</button>
+      <button class="bi-tab active" onclick="switchBITab('sales')">Sales</button>
+      <button class="bi-tab" onclick="switchBITab('inventory')">Inventory</button>
+      <button class="bi-tab" onclick="switchBITab('operations')">Operations</button>
+      <button class="bi-tab" onclick="switchBITab('analysis')">Analysis</button>
     </div>
 
     <!-- SALES TAB -->
@@ -118,7 +118,7 @@
       </div>
 
       <div>
-        <h3>Low Stock Alerts ⚠️</h3>
+        <h3>Low Stock Alerts </h3>
         <div id="lowStockWidget" style="max-height: 400px; overflow-y: auto;"></div>
       </div>
     </div>
@@ -146,7 +146,7 @@
         <h3>Export Reports</h3>
         <p>Download your business data in various formats:</p>
         <button onclick="exportExcel()" class="btn-primary" style="padding: 12px 24px; font-size: 14px;">
-          📥 Export to Excel
+          Export to Excel
         </button>
       </div>
 

@@ -397,11 +397,11 @@
       <div class="purchasing-header">
         <h1>Purchasing & Supplier Management</h1>
         <div class="header-actions">
-          <div>
-            <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
-            <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
+          <div class="zf-context-pill">
+            <span class="zf-pill-label">Branch</span>
+            <select id="branchDropdown" class="zf-pill-select"></select>
           </div>
-          <button class="btn-primary" onclick="refreshAllData()">🔄 Refresh</button>
+          <button class="btn-primary" onclick="refreshAllData()">Refresh</button>
         </div>
       </div>
 
@@ -410,7 +410,7 @@
         <!-- KPI CARDS -->
         <div class="kpi-section">
           <div class="kpi-card success">
-            <div class="kpi-label">📊 Total Purchase Orders</div>
+            <div class="kpi-label">Total Purchase Orders</div>
             <div class="kpi-value" id="totalPOs">0</div>
             <div class="kpi-detail">All POs YTD</div>
           </div>
@@ -420,12 +420,12 @@
             <div class="kpi-detail">Confirmed POs awaiting goods</div>
           </div>
           <div class="kpi-card info">
-            <div class="kpi-label">💳 Pending Payment</div>
+            <div class="kpi-label">Pending Payment</div>
             <div class="kpi-value" id="pendingPayment">0</div>
             <div class="kpi-detail">Invoiced POs unpaid</div>
           </div>
           <div class="kpi-card success">
-            <div class="kpi-label">💰 Total Spend (YTD)</div>
+            <div class="kpi-label">Total Spend (YTD)</div>
             <div class="kpi-value" id="totalSpent" style="font-size: 24px;">K 0</div>
             <div class="kpi-detail">Total purchase value</div>
           </div>

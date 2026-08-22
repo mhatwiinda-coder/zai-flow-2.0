@@ -46,11 +46,11 @@ function runPayroll() {
       }
 
       if (!result.success) {
-        alert(`⚠️ Could not submit payroll for approval\n\n${result.message || 'Unknown reason'}`);
+        alert(`Could not submit payroll for approval\n\n${result.message || 'Unknown reason'}`);
         return;
       }
 
-      alert(`📨 Payroll for ${new Date(year, month - 1).toLocaleDateString('en-ZM', { month: 'long', year: 'numeric' })} sent for manager approval.\n\n${result.message}\n\nIt will process automatically once approved - check back on this page.`);
+      alert(`Payroll for ${new Date(year, month - 1).toLocaleDateString('en-ZM', { month: 'long', year: 'numeric' })} sent for manager approval.\n\n${result.message}\n\nIt will process automatically once approved - check back on this page.`);
       loadPayrollSummary();
     } catch (err) {
       console.error("Payroll processing error:", err);
@@ -214,8 +214,8 @@ function generatePayslip(deductionId, payrollRunId) {
         </head>
         <body>
           <div class="no-print">
-            <button onclick="window.print()">🖨️ Print Payslip</button>
-            <button onclick="window.close()">❌ Close</button>
+            <button onclick="window.print()">Print Payslip</button>
+            <button onclick="window.close()">Close</button>
           </div>
 
           <div class="payslip-container">
@@ -341,7 +341,7 @@ function reversePayroll() {
 
       if (error) throw error;
 
-      alert("✅ Payroll reversed successfully");
+      alert("Payroll reversed successfully");
       loadPayrollSummary();
     } catch (err) {
       console.error("Reverse payroll error:", err);

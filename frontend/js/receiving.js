@@ -138,7 +138,7 @@ function submitGoodsReceipt() {
 
       if (error) throw error;
 
-      alert('✅ ' + data[0].message + '\n\nInventory and GL entries updated');
+      alert('' + data[0].message + '\n\nInventory and GL entries updated');
       closeGoodsReceiptModal();
       loadGoodsReceiptList();
       loadPurchaseOrders();

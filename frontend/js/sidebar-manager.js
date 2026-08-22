@@ -104,14 +104,14 @@ function updateSidebar(moduleMap, context) {
       const moduleFunctions = moduleMap.get(moduleType);
 
       const moduleConfig = {
-        dashboard: { href: 'dashboard.html', text: '📊 Dashboard' },
-        sales: { href: 'sales.html', text: '🛒 Sales / POS' },
-        inventory: { href: 'inventory.html', text: '📦 Inventory' },
-        accounting: { href: 'accounting.html', text: '📋 Accounting' },
-        purchasing: { href: 'purchasing.html', text: '🏢 Purchasing' },
-        hr_payroll: { href: 'hr.html', text: '👥 HR & Payroll' },
-        approvals: { href: 'approvals.html', text: '✅ Approvals' },
-        bi: { href: 'bi.html', text: '📈 BI Dashboard' }
+        dashboard: { href: 'dashboard.html', text: 'Dashboard' },
+        sales: { href: 'sales.html', text: 'Sales / POS' },
+        inventory: { href: 'inventory.html', text: 'Inventory' },
+        accounting: { href: 'accounting.html', text: 'Accounting' },
+        purchasing: { href: 'purchasing.html', text: 'Purchasing' },
+        hr_payroll: { href: 'hr.html', text: 'HR & Payroll' },
+        approvals: { href: 'approvals.html', text: 'Approvals' },
+        bi: { href: 'bi.html', text: 'BI Dashboard' }
       };
 
       if (moduleConfig[moduleType]) {
@@ -137,7 +137,7 @@ function updateSidebar(moduleMap, context) {
 
     const adminDashLink = document.createElement('a');
     adminDashLink.href = 'admin-business.html';
-    adminDashLink.textContent = '⚙️ Admin Business';
+    adminDashLink.textContent = 'Admin Business';
     adminDashLink.className = 'sidebar-link';
     sidebar.appendChild(adminDashLink);
   }

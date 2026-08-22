@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Verify user is admin (case-insensitive check)
   const userRole = (context.user_role || '').toLowerCase();
   if (userRole !== 'admin' && userRole !== 'administrator') {
-    alert('❌ You do not have permission to access this page. Only administrators can manage roles.');
+    alert('You do not have permission to access this page. Only administrators can manage roles.');
     window.location.href = 'employee-landing.html';
     return;
   }
@@ -179,11 +179,11 @@ function renderUsersTable(users) {
         </td>
         <td>
           <button class="btn btn-sm btn-primary" onclick="openAssignRoleModal('${user.user_id}')">
-            ➕ Add Role
+            Add Role
           </button>
           ${user.roles && user.roles.length > 0 ? `
             <button class="btn btn-sm btn-danger" onclick="openRemoveRoleModal('${user.user_id}')">
-              ✕ Remove
+              Remove
             </button>
           ` : ''}
         </td>
@@ -237,9 +237,9 @@ function renderRolesList(roles) {
   const container = document.getElementById('roles-list');
 
   container.innerHTML = roles.map(role => {
-    const hierarchyLabel = role.hierarchy_level === 0 ? '👑 Admin' :
-                          role.hierarchy_level < 30 ? '💼 Manager' :
-                          role.hierarchy_level < 60 ? '📋 Supervisor' : '👤 Staff';
+    const hierarchyLabel = role.hierarchy_level === 0 ? 'Admin' :
+                          role.hierarchy_level < 30 ? 'Manager' :
+                          role.hierarchy_level < 60 ? 'Supervisor' : 'Staff';
 
     return `
       <div class="role-card" onclick="selectRoleForDetails(${role.id}, '${role.name}', '${role.description || ''}')">
@@ -249,7 +249,7 @@ function renderRolesList(roles) {
         </div>
         <div class="role-card-desc">${role.description || 'No description'}</div>
         <div class="role-card-stats">
-          Level: ${role.hierarchy_level} • ID: ${role.id} • ${role.is_active ? '✅ Active' : '❌ Inactive'}
+          Level: ${role.hierarchy_level} • ID: ${role.id} • ${role.is_active ? 'Active' : 'Inactive'}
         </div>
       </div>
     `;
@@ -305,7 +305,7 @@ function assignRoleToUser() {
   const roleId = document.getElementById('role-select').value;
 
   if (!userId || !roleId) {
-    alert('⚠️ Please select both a user and a role');
+    alert('Please select both a user and a role');
     return;
   }
 
@@ -317,7 +317,7 @@ async function confirmAssignRole() {
   const roleId = document.getElementById('modal-role-select').value;
 
   if (!userId || !roleId) {
-    alert('⚠️ Please select both a user and a role');
+    alert('Please select both a user and a role');
     return;
   }
 
@@ -333,12 +333,12 @@ async function confirmAssignRole() {
 
     const result = data[0];
     if (result.success) {
-      alert('✅ ' + result.message);
+      alert('' + result.message);
       closeAssignRoleModal();
       loadUsers();
       loadRoles();
     } else {
-      alert('❌ ' + result.message);
+      alert('' + result.message);
     }
   } catch (err) {
     console.error('Assign role error:', err);
@@ -378,14 +378,14 @@ function closeRemoveRoleModal() {
 
 async function confirmRemoveRole() {
   if (!selectedUserForRemoval) {
-    alert('⚠️ No user selected');
+    alert('No user selected');
     return;
   }
 
   try {
     const user = allUsers.find(u => u.user_id === selectedUserForRemoval);
     if (!user || !user.roles || user.roles.length === 0) {
-      alert('⚠️ User has no roles to remove');
+      alert('User has no roles to remove');
       return;
     }
 
@@ -400,7 +400,7 @@ async function confirmRemoveRole() {
       if (error) throw error;
     }
 
-    alert('✅ Roles removed successfully');
+    alert('Roles removed successfully');
     closeRemoveRoleModal();
     loadUsers();
     loadRoles();
@@ -438,7 +438,7 @@ async function loadPermissionsMatrix() {
     // Get role details
     const role = allRoles.find(r => r.id === parseInt(roleId));
     if (!role) {
-      alert('❌ Role not found');
+      alert('Role not found');
       return;
     }
 
@@ -511,13 +511,13 @@ function renderPermissionsMatrix(roleName, moduleMap) {
     Object.entries(moduleMap).forEach(([module, functions]) => {
       html += `
         <div class="permission-section">
-          <h4>📦 ${module}</h4>
+          <h4>${module}</h4>
           <div class="permission-grid">
       `;
 
       functions.forEach(func => {
         const actions = func.actions.length > 0
-          ? func.actions.map(a => `${a.action}${a.allowed ? '✅' : '❌'}`).join(', ')
+          ? func.actions.map(a => `${a.action}${a.allowed ? '' : ''}`).join(', ')
           : 'No specific actions';
 
         html += `

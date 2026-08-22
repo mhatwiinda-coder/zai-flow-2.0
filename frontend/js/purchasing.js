@@ -45,7 +45,7 @@ function refreshAllData() {
   loadPurchaseInvoices();
   loadSupplierPayments();
   loadPurchasingAnalytics();
-  alert('✅ All data refreshed');
+  alert('All data refreshed');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -160,7 +160,7 @@ function saveSupplier(event) {
     try {
       const context = getBranchContext();
       if (!context) {
-        alert('❌ No branch context - please login again');
+        alert('No branch context - please login again');
         return;
       }
 
@@ -196,7 +196,7 @@ function saveSupplier(event) {
 
       if (result.error) throw result.error;
 
-      alert('✅ Supplier saved successfully');
+      alert('Supplier saved successfully');
       closeSupplierModal();
       loadSupplierList();
       loadPOSupplierDropdown();
@@ -217,7 +217,7 @@ function editSupplier(supplierId) {
 
       if (error) throw error;
       if (!data || data.length === 0) {
-        alert('❌ Supplier not found or does not belong to your branch');
+        alert('Supplier not found or does not belong to your branch');
         return;
       }
 
@@ -249,7 +249,7 @@ function deactivateSupplier(supplierId) {
     try {
       const context = getBranchContext();
       if (!context) {
-        alert('❌ No branch context - please login again');
+        alert('No branch context - please login again');
         return;
       }
 
@@ -259,7 +259,7 @@ function deactivateSupplier(supplierId) {
       ).eq('id', supplierId).limit(1);
 
       if (checkError || !supplierCheck || supplierCheck.length === 0) {
-        alert('❌ Supplier not found or does not belong to your branch - access denied');
+        alert('Supplier not found or does not belong to your branch - access denied');
         return;
       }
 
@@ -272,7 +272,7 @@ function deactivateSupplier(supplierId) {
 
       if (error) throw error;
 
-      alert('✅ Supplier deactivated');
+      alert('Supplier deactivated');
       loadSupplierList();
     } catch (err) {
       console.error('Deactivate supplier error:', err);
@@ -583,7 +583,7 @@ function submitPO() {
 
       if (error) throw error;
 
-      alert(`✅ PO created successfully!\n\nPO Number: ${data[0].po_number}\nTotal: K ${formatMoney(data[0].total_amount)}`);
+      alert(`PO created successfully!\n\nPO Number: ${data[0].po_number}\nTotal: K ${formatMoney(data[0].total_amount)}`);
       closePOModal();
       loadPurchaseOrders();
     } catch (err) {
@@ -634,13 +634,13 @@ function confirmPO(poId) {
     try {
       const context = getBranchContext();
       if (!context) {
-        alert('❌ No branch context - please login again');
+        alert('No branch context - please login again');
         return;
       }
 
       const authUUID = getAuthUUID();
       if (!authUUID) {
-        alert('❌ Could not identify current user - please login again');
+        alert('Could not identify current user - please login again');
         return;
       }
 
@@ -650,7 +650,7 @@ function confirmPO(poId) {
       ).eq('id', poId).limit(1);
 
       if (checkError || !poCheck || poCheck.length === 0) {
-        alert('❌ PO not found or does not belong to your branch - access denied');
+        alert('PO not found or does not belong to your branch - access denied');
         return;
       }
 
@@ -666,7 +666,7 @@ function confirmPO(poId) {
       const result = Array.isArray(data) ? data[0] : null;
       if (!result) throw new Error('Request returned no result');
 
-      alert((result.confirmed ? '✅ ' : '📨 ') + result.message);
+      alert((result.confirmed ? '' : '') + result.message);
       loadPurchaseOrders();
     } catch (err) {
       console.error('Confirm PO error:', err);
@@ -686,7 +686,7 @@ function deletePO(poId) {
     try {
       const context = getBranchContext();
       if (!context) {
-        alert('❌ No branch context - please login again');
+        alert('No branch context - please login again');
         return;
       }
 
@@ -696,12 +696,12 @@ function deletePO(poId) {
       ).eq('id', poId).limit(1);
 
       if (checkError || !poCheck || poCheck.length === 0) {
-        alert('❌ PO not found or does not belong to your branch - access denied');
+        alert('PO not found or does not belong to your branch - access denied');
         return;
       }
 
       if (poCheck[0].status !== 'DRAFT') {
-        alert('❌ Only DRAFT POs can be deleted');
+        alert('Only DRAFT POs can be deleted');
         return;
       }
 
@@ -714,7 +714,7 @@ function deletePO(poId) {
 
       if (error) throw error;
 
-      alert('✅ PO deleted');
+      alert('PO deleted');
       loadPurchaseOrders();
     } catch (err) {
       console.error('Delete PO error:', err);

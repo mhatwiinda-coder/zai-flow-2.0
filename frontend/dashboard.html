@@ -33,13 +33,13 @@
   <main>
     <div class="topbar">
       <h2>Welcome to ZAI Flow</h2>
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
-        <div>
-          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
-          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
-        </div>
+      <div class="topbar-right">
+        <div class="zf-context-pill">
+            <span class="zf-pill-label">Branch</span>
+            <select id="branchDropdown" class="zf-pill-select"></select>
+          </div>
         <div id="userInfo"></div>
-        <button onclick="refreshDashboard()" class="refresh-btn" title="Refresh Dashboard">🔄</button>
+        <button onclick="refreshDashboard()" class="refresh-btn" title="Refresh Dashboard"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg></button>
       </div>
     </div>
 
@@ -48,7 +48,7 @@
       <!-- SALES KPI -->
       <div class="dashboard-kpi kpi-sales">
         <div class="kpi-header">
-          <div class="kpi-icon">📊</div>
+          <div class="kpi-icon"></div>
           <div class="kpi-label">Today's Sales</div>
         </div>
         <div class="kpi-content">
@@ -66,7 +66,7 @@
       <!-- INVENTORY KPI -->
       <div class="dashboard-kpi kpi-inventory">
         <div class="kpi-header">
-          <div class="kpi-icon">📦</div>
+          <div class="kpi-icon"></div>
           <div class="kpi-label">Inventory Value</div>
         </div>
         <div class="kpi-content">
@@ -84,7 +84,7 @@
       <!-- FINANCIAL KPI -->
       <div class="dashboard-kpi kpi-financial">
         <div class="kpi-header">
-          <div class="kpi-icon">💰</div>
+          <div class="kpi-icon"></div>
           <div class="kpi-label">Net Balance</div>
         </div>
         <div class="kpi-content">
@@ -102,7 +102,7 @@
       <!-- CASH MANAGEMENT KPI -->
       <div class="dashboard-kpi kpi-cash">
         <div class="kpi-header">
-          <div class="kpi-icon">✅</div>
+          <div class="kpi-icon"></div>
           <div class="kpi-label">Cash Drawer</div>
         </div>
         <div class="kpi-content">
@@ -143,7 +143,7 @@
       <div class="alerts-row">
         <!-- LOW STOCK ALERTS -->
         <div class="alerts-card">
-          <h3>⚠️ Low Stock Items</h3>
+          <h3>Low Stock Items</h3>
           <div class="alerts-list" id="lowStockList">
             <p class="no-data">No low stock alerts</p>
           </div>
@@ -151,7 +151,7 @@
 
         <!-- RECENT TRANSACTIONS -->
         <div class="alerts-card">
-          <h3>📝 Recent Sales</h3>
+          <h3>Recent Sales</h3>
           <div class="alerts-list" id="recentSalesList">
             <p class="no-data">No recent sales</p>
           </div>
@@ -164,10 +164,10 @@
       <details class="system-status">
         <summary>System Status</summary>
         <div class="glass">
-          <p>✅ Authentication: Active</p>
-          <p id="salesStatus">📊 Sales Module: Loading...</p>
-          <p id="inventoryStatus">📦 Inventory Module: Loading...</p>
-          <p id="accountingStatus">💼 Accounting Module: Loading...</p>
+          <p>Authentication: Active</p>
+          <p id="salesStatus">Sales Module: Loading...</p>
+          <p id="inventoryStatus">Inventory Module: Loading...</p>
+          <p id="accountingStatus">Accounting Module: Loading...</p>
         </div>
       </details>
     </div>

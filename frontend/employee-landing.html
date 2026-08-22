@@ -647,7 +647,7 @@
   <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-brand">
-      <h2>🚀 ZAI FLOW 2.0</h2>
+      <h2>ZAI FLOW 2.0</h2>
     </div>
     <div class="nav-menu">
       <a href="employee-landing.html" class="nav-link active">Dashboard</a>
@@ -663,7 +663,7 @@
     <div class="sidebar">
       <!-- Profile Card -->
       <div class="profile-card">
-        <div class="profile-avatar">👤</div>
+        <div class="profile-avatar"></div>
         <div class="profile-name" id="user-name">--</div>
         <div class="profile-title" id="user-role">--</div>
         <div class="profile-title" id="business-name" style="font-size: 12px; color: #94a3b8;">Loading business...</div>
@@ -700,7 +700,7 @@
       <!-- Time Tracker Card -->
       <div class="card" style="margin-bottom: 24px; grid-column: 1/-1;">
         <div class="card-title">
-          <span class="card-title-icon">⏱️</span>
+          <span class="card-title-icon">⏱</span>
           Time Tracker
         </div>
 
@@ -710,10 +710,10 @@
           <div class="time-label" id="elapsed-time-display">Not clocked in</div>
           <div class="clock-buttons">
             <button class="btn-clock btn-clock-in" id="clock-in-btn" onclick="showClockInModal()">
-              ✓ Clock In
+              Clock In
             </button>
             <button class="btn-clock btn-clock-out" id="clock-out-btn" onclick="showClockOutModal()" style="display:none;">
-              ✕ Clock Out
+              Clock Out
             </button>
           </div>
         </div>
@@ -723,12 +723,11 @@
       <!-- Modules Card -->
       <div class="card" style="margin-bottom: 24px;">
         <div class="card-title">
-          <span class="card-title-icon">🔗</span>
           Your Modules
         </div>
         <div class="modules-grid" id="quick-links-container">
           <div class="empty-state">
-            <div class="empty-state-icon">📦</div>
+            <div class="empty-state-icon"></div>
             <p>Loading your accessible modules...</p>
           </div>
         </div>
@@ -737,12 +736,11 @@
       <!-- Notifications Card -->
       <div class="card" style="margin-bottom: 24px;">
         <div class="card-title">
-          <span class="card-title-icon">🔔</span>
           Notifications
         </div>
         <div class="notifications-list" id="notification-list">
           <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-icon"></div>
             <p>No notifications yet</p>
           </div>
         </div>
@@ -751,7 +749,6 @@
       <!-- Tasks Card -->
       <div class="card" style="margin-bottom: 24px;">
         <div class="card-title">
-          <span class="card-title-icon">✅</span>
           My Tasks
         </div>
 
@@ -764,7 +761,7 @@
         <div id="task-tab-todo" class="tab-content" style="display:block;">
           <div id="task-list-todo">
             <div class="empty-state">
-              <div class="empty-state-icon">🎉</div>
+              <div class="empty-state-icon"></div>
               <p>No tasks yet!</p>
             </div>
           </div>
@@ -780,13 +777,13 @@
         <div id="task-tab-completed" class="tab-content" style="display:none;">
           <div id="task-list-completed">
             <div class="empty-state">
-              <div class="empty-state-icon">✨</div>
+              <div class="empty-state-icon"></div>
               <p>No completed tasks yet</p>
             </div>
           </div>
         </div>
 
-        <button class="new-task-btn" onclick="showCreateTaskModal()" style="margin-top: 16px; padding: 10px 16px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">➕ New Task</button>
+        <button class="new-task-btn" onclick="showCreateTaskModal()" style="margin-top: 16px; padding: 10px 16px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">New Task</button>
       </div>
     </div>
   </div>
@@ -794,7 +791,7 @@
   <!-- Clock In Modal -->
   <div id="clock-in-modal" class="modal">
     <div class="modal-content">
-      <h3>🚀 Clock In</h3>
+      <h3>Clock In</h3>
       <div class="form-group">
         <label>Time</label>
         <input type="text" id="clock-in-time" readonly>
@@ -813,7 +810,7 @@
   <!-- Clock Out Modal -->
   <div id="clock-out-modal" class="modal">
     <div class="modal-content">
-      <h3>🛑 Clock Out</h3>
+      <h3>Clock Out</h3>
       <div class="form-group">
         <label>Time</label>
         <input type="text" id="clock-out-time" readonly>
@@ -836,7 +833,7 @@
   <!-- Create Task Modal -->
   <div id="create-task-modal" class="modal">
     <div class="modal-content">
-      <h3>➕ Create New Task</h3>
+      <h3>Create New Task</h3>
       <div class="form-group">
         <label>Task Title *</label>
         <input type="text" id="task-title" placeholder="What needs to be done?">

@@ -40,7 +40,7 @@
     if (!document.body) return;
     const errorDiv = document.createElement('div');
     errorDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff4444;color:white;padding:15px;text-align:center;z-index:99999;font-family:Arial,sans-serif;font-size:14px';
-    errorDiv.textContent = '⚠️ Configuration error: Unable to connect to backend. Please refresh the page or contact support.';
+    errorDiv.textContent = 'Configuration error: Unable to connect to backend. Please refresh the page or contact support.';
     document.body.appendChild(errorDiv);
   }
 

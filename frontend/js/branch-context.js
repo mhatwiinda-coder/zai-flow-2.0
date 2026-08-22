@@ -99,14 +99,14 @@ function switchBranch(branchId) {
     const user = JSON.parse(localStorage.getItem('user'));
 
     if (!user?.branches) {
-      alert('❌ No branches found for user');
+      alert('No branches found for user');
       return false;
     }
 
     const branch = user.branches.find(b => b.branch_id === parseInt(branchId));
 
     if (!branch) {
-      alert('❌ You do not have access to this branch');
+      alert('You do not have access to this branch');
       return false;
     }
 
@@ -154,7 +154,7 @@ function initBranchSelector() {
     user.branches.forEach(branch => {
       const option = document.createElement('option');
       option.value = branch.branch_id;
-      option.textContent = `📍 ${branch.business_name} - ${branch.branch_name}`;
+      option.textContent = `${branch.business_name} - ${branch.branch_name}`;
       option.selected = branch.branch_id === user.current_branch_id;
       dropdown.appendChild(option);
     });
@@ -188,7 +188,7 @@ function displayBranchInfo() {
 
   if (infoEl && context) {
     infoEl.innerHTML = `
-      📍 <strong>${context.branch_name}</strong>
+      <strong>${context.branch_name}</strong>
       (${context.business_name})
     `;
   }

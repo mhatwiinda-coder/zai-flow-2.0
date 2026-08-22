@@ -57,24 +57,24 @@
   <!-- MAIN CONTENT -->
   <main>
     <div class="topbar">
-      <h2>👥 HR & Payroll Management</h2>
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
-        <div>
-          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
-          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
-        </div>
+      <h2>HR & Payroll Management</h2>
+      <div class="topbar-right">
+        <div class="zf-context-pill">
+            <span class="zf-pill-label">Branch</span>
+            <select id="branchDropdown" class="zf-pill-select"></select>
+          </div>
         <div id="userInfo"></div>
-        <button onclick="refreshHR()" class="refresh-btn" title="Refresh HR Module">🔄</button>
+        <button onclick="refreshHR()" class="refresh-btn" title="Refresh HR Module"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg></button>
       </div>
     </div>
 
     <!-- TABS NAVIGATION -->
     <div class="tabs-container">
-      <button class="tab-button active" onclick="switchTab('employee-dir')">📋 Employees</button>
-      <button class="tab-button" onclick="switchTab('payroll')">💰 Payroll</button>
-      <button class="tab-button" onclick="switchTab('attendance')">📅 Attendance</button>
-      <button class="tab-button" onclick="switchTab('leave')">🏖️ Leave Requests</button>
-      <button class="tab-button" onclick="switchTab('analytics')">📊 Analytics</button>
+      <button class="tab-button active" onclick="switchTab('employee-dir')">Employees</button>
+      <button class="tab-button" onclick="switchTab('payroll')">Payroll</button>
+      <button class="tab-button" onclick="switchTab('attendance')">Attendance</button>
+      <button class="tab-button" onclick="switchTab('leave')">Leave Requests</button>
+      <button class="tab-button" onclick="switchTab('analytics')">Analytics</button>
     </div>
 
     <!-- ========== TAB 1: EMPLOYEE DIRECTORY ========== -->
@@ -84,7 +84,7 @@
 
         <!-- Add Employee Button -->
         <div style="margin-bottom: 20px;">
-          <button class="btn-primary" onclick="openEmployeeModal()" style="width: auto;">➕ Add Employee</button>
+          <button class="btn-primary" onclick="openEmployeeModal()" style="width: auto;">Add Employee</button>
         </div>
 
         <!-- Search & Filter -->
@@ -156,9 +156,9 @@
         </div>
 
         <div style="margin-bottom: 20px;">
-          <button class="btn-primary" onclick="runPayroll()">🚀 Run Payroll</button>
-          <button class="btn-secondary" onclick="loadPayrollSummary()" style="margin-left: 10px;">↻ Load Current</button>
-          <button class="btn-danger" onclick="reversePayroll()" style="margin-left: 10px;">↩ Reverse Payroll</button>
+          <button class="btn-primary" onclick="runPayroll()">Run Payroll</button>
+          <button class="btn-secondary" onclick="loadPayrollSummary()" style="margin-left: 10px;">Load Current</button>
+          <button class="btn-danger" onclick="reversePayroll()" style="margin-left: 10px;">Reverse Payroll</button>
         </div>
 
         <!-- Payroll Summary -->
@@ -221,9 +221,9 @@
         </div>
 
         <div style="margin-bottom: 20px;">
-          <button class="btn-primary" onclick="loadAttendanceData()">📋 Load Attendance</button>
-          <button class="btn-secondary" onclick="markAllPresent()" style="margin-left: 10px;">✅ Mark All Present</button>
-          <button class="btn-secondary" onclick="markAllAbsent()" style="margin-left: 10px;">❌ Mark All Absent</button>
+          <button class="btn-primary" onclick="loadAttendanceData()">Load Attendance</button>
+          <button class="btn-secondary" onclick="markAllPresent()" style="margin-left: 10px;">Mark All Present</button>
+          <button class="btn-secondary" onclick="markAllAbsent()" style="margin-left: 10px;">Mark All Absent</button>
         </div>
 
         <!-- Attendance Table -->
@@ -341,7 +341,7 @@
 <!-- EMPLOYEE MODAL -->
 <div id="employeeModal" class="modal" style="display:none;">
   <div class="modal-box" style="max-height: 90vh; overflow-y: auto;">
-    <h3>👤 Add/Edit Employee</h3>
+    <h3>Add/Edit Employee</h3>
 
     <div class="form-grid full">
       <div class="form-group">
@@ -393,8 +393,8 @@
     </div>
 
     <div style="display: flex; gap: 10px; margin-top: 20px;">
-      <button onclick="saveEmployee()" class="btn-primary" style="flex: 1;">✅ Save</button>
-      <button onclick="document.getElementById('employeeModal').style.display='none';" class="btn-danger" style="flex: 1;">❌ Cancel</button>
+      <button onclick="saveEmployee()" class="btn-primary" style="flex: 1;">Save</button>
+      <button onclick="document.getElementById('employeeModal').style.display='none';" class="btn-danger" style="flex: 1;">Cancel</button>
     </div>
   </div>
 </div>

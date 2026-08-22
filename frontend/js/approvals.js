@@ -6,10 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const ACTION_LABELS = {
-  RUN_PAYROLL: '💰 Payroll',
-  CONFIRM_PURCHASE_ORDER: '📦 Purchase Order',
-  RECORD_PURCHASE_INVOICE: '🧾 Supplier Invoice',
-  PROCESS_SUPPLIER_PAYMENT: '💳 Supplier Payment'
+  RUN_PAYROLL: 'Payroll',
+  CONFIRM_PURCHASE_ORDER: 'Purchase Order',
+  RECORD_PURCHASE_INVOICE: 'Supplier Invoice',
+  PROCESS_SUPPLIER_PAYMENT: 'Supplier Payment'
 };
 
 function loadApprovals() {
@@ -62,8 +62,8 @@ function loadApprovals() {
               ${amountHtml}
             </div>
             <div class="approval-actions">
-              <button class="btn-approve" onclick="approveRequest(${req.id})">✓ Approve</button>
-              <button class="btn-reject" onclick="rejectRequest(${req.id})">✗ Reject</button>
+              <button class="btn-approve" onclick="approveRequest(${req.id})">Approve</button>
+              <button class="btn-reject" onclick="rejectRequest(${req.id})">Reject</button>
             </div>
           </div>
         `;
@@ -90,7 +90,7 @@ function approveRequest(requestId) {
       if (error) throw error;
 
       const result = data[0];
-      alert((result.success ? '✅ ' : '⚠️ ') + result.message);
+      alert((result.success ? '' : '') + result.message);
       loadApprovals();
     } catch (err) {
       console.error("Approve request error:", err);
@@ -119,7 +119,7 @@ function rejectRequest(requestId) {
       if (error) throw error;
 
       const result = data[0];
-      alert((result.success ? '✅ ' : '⚠️ ') + result.message);
+      alert((result.success ? '' : '') + result.message);
       loadApprovals();
     } catch (err) {
       console.error("Reject request error:", err);

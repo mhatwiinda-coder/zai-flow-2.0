@@ -60,7 +60,7 @@ function loadSalesMetrics() {
 
       document.getElementById("salesValue").innerText = money(totalRevenue);
       document.getElementById("salesCount").innerText = count;
-      document.getElementById("salesStatus").innerText = "📊 Sales Module: Active";
+      document.getElementById("salesStatus").innerText = "Sales Module: Active";
 
       // Calculate trend (compare with yesterday)
       const yesterday = new Date();
@@ -77,11 +77,11 @@ function loadSalesMetrics() {
         : 0;
 
       const trendEl = document.getElementById("salesTrend");
-      trendEl.innerText = trendPercent > 0 ? `↗ +${trendPercent}%` : `↘ ${trendPercent}%`;
+      trendEl.innerText = trendPercent > 0 ? `+${trendPercent}%` : `${trendPercent}%`;
       trendEl.style.color = trendPercent > 0 ? "#28c76f" : "#ff5b5b";
     } catch (err) {
       console.error("Sales metrics error:", err);
-      document.getElementById("salesStatus").innerText = "📊 Sales Module: Error";
+      document.getElementById("salesStatus").innerText = "Sales Module: Error";
     }
   })();
 }
@@ -110,7 +110,7 @@ function loadInventoryMetrics() {
 
       document.getElementById("inventoryValue").innerText = money(totalValue);
       document.getElementById("lowStockCount").innerText = lowStock;
-      document.getElementById("inventoryStatus").innerText = "📦 Inventory Module: Active";
+      document.getElementById("inventoryStatus").innerText = "Inventory Module: Active";
 
       // Update alert color
       const alertBadge = document.getElementById("inventoryAlert");
@@ -120,7 +120,7 @@ function loadInventoryMetrics() {
         : "rgba(40, 199, 111, 0.15)";
     } catch (err) {
       console.error("Inventory metrics error:", err);
-      document.getElementById("inventoryStatus").innerText = "📦 Inventory Module: Error";
+      document.getElementById("inventoryStatus").innerText = "Inventory Module: Error";
     }
   })();
 }
@@ -152,15 +152,15 @@ function loadFinancialMetrics() {
 
       document.getElementById("financialValue").innerText = money(netProfit);
       document.getElementById("revenueRatio").innerText = ratio + "%";
-      document.getElementById("accountingStatus").innerText = "💼 Accounting Module: Active";
+      document.getElementById("accountingStatus").innerText = "Accounting Module: Active";
 
       // Trend indicator
       const trendEl = document.getElementById("financialTrend");
-      trendEl.innerText = netProfit > 0 ? `↗ Profit` : `↘ Loss`;
+      trendEl.innerText = netProfit > 0 ? `Profit` : `Loss`;
       trendEl.style.color = netProfit > 0 ? "#28c76f" : "#ff5b5b";
     } catch (err) {
       console.error("Financial metrics error:", err);
-      document.getElementById("accountingStatus").innerText = "💼 Accounting Module: Error";
+      document.getElementById("accountingStatus").innerText = "Accounting Module: Error";
     }
   })();
 }
@@ -212,7 +212,7 @@ function loadCashMetrics() {
       statusEl.style.color = "#28c76f";
       balanceEl.innerText = money(expectedBalance);
 
-      varianceEl.innerText = expectedBalance > 0 ? "✓" : "!";
+      varianceEl.innerText = expectedBalance > 0 ? "" : "!";
       varianceEl.style.color = expectedBalance > 0 ? "#28c76f" : "#ff5b5b";
       diffEl.innerText = "0%";
     } catch (err) {
@@ -435,7 +435,7 @@ function loadLowStockAlerts() {
       const listEl = document.getElementById("lowStockList");
 
       if (lowStock.length === 0) {
-        listEl.innerHTML = '<p class="no-data">No low stock alerts ✅</p>';
+        listEl.innerHTML = '<p class="no-data">No low stock alerts </p>';
         return;
       }
 

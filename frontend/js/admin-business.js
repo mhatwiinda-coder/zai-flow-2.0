@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const context = getBranchContext();
 
   if (!context || context.user_role !== 'admin') {
-    showMessage('⛔ Admin access required', 'error', 'businessMessage');
+    showMessage('Admin access required', 'error', 'businessMessage');
     setTimeout(() => window.location.href = 'employee-landing.html', 2000);
     return;
   }
@@ -144,7 +144,7 @@ async function createBusiness() {
 
     if (error) throw error;
 
-    showMessage('✅ Business created successfully', 'success', 'businessMessage');
+    showMessage('Business created successfully', 'success', 'businessMessage');
     document.getElementById('businessName').value = '';
     document.getElementById('createBusinessModal').classList.remove('show');
     await loadBusinesses();
@@ -244,7 +244,7 @@ async function createBranch() {
 
     if (error) throw error;
 
-    showMessage('✅ Branch created successfully', 'success', 'branchMessage');
+    showMessage('Branch created successfully', 'success', 'branchMessage');
     document.getElementById('branchName').value = '';
     document.getElementById('branchLocation').value = '';
     document.getElementById('branchContact').value = '';
@@ -273,7 +273,7 @@ async function createBranchModal() {
 
     if (error) throw error;
 
-    showMessage('✅ Branch created successfully', 'success', 'branchMessage');
+    showMessage('Branch created successfully', 'success', 'branchMessage');
     document.getElementById('branchBusinessModal').value = '';
     document.getElementById('branchNameModal').value = '';
     document.getElementById('branchLocationModal').value = '';
@@ -455,7 +455,7 @@ async function createNewUser() {
     const createdUser = result.user;
 
     const business = allBusinesses.find(b => b.id === parseInt(businessId));
-    let successMsg = `✅ User "${name}" created successfully in "${business.name}"`;
+    let successMsg = `User "${name}" created successfully in "${business.name}"`;
 
     // If branch was selected, assign user to branch access
     if (branchId && createdUser) {
@@ -475,7 +475,7 @@ async function createNewUser() {
           }]);
       } catch (err) {
         console.warn('Branch assignment error:', err.message);
-        successMsg += ' (⚠️ branch assignment pending)';
+        successMsg += ' (branch assignment pending)';
       }
     }
 
@@ -491,10 +491,10 @@ async function createNewUser() {
           .eq('id', linkToExistingEmployeeId);
 
         successMsg += linkError
-          ? ' (⚠️ could not link to existing HR record: ' + linkError.message + ')'
+          ? ' (could not link to existing HR record: ' + linkError.message + ')'
           : ' + linked to existing HR record';
       } catch (err) {
-        successMsg += ' (⚠️ could not link to existing HR record: ' + err.message + ')';
+        successMsg += ' (could not link to existing HR record: ' + err.message + ')';
       }
 
       showMessage(successMsg + ' - User can now login!', 'success', 'userMessage');
@@ -528,7 +528,7 @@ async function createNewUser() {
       }
 
       if (!resolvedBranchId) {
-        successMsg += ' (⚠️ HR record needs manual setup - no branch exists yet for this business)';
+        successMsg += ' (HR record needs manual setup - no branch exists yet for this business)';
       } else {
         const nameParts = name.trim().split(' ');
         const firstName = nameParts[0];
@@ -555,14 +555,14 @@ async function createNewUser() {
 
         if (empError) {
           console.warn('Employee auto-creation warning:', empError.message);
-          successMsg += ' (⚠️ HR record pending manual setup)';
+          successMsg += ' (HR record pending manual setup)';
         } else {
           successMsg += ' + HR record created (complete details in HR portal)';
         }
       }
     } catch (err) {
       console.warn('Employee auto-creation error:', err.message);
-      successMsg += ' (⚠️ HR record needs manual setup)';
+      successMsg += ' (HR record needs manual setup)';
     }
 
     showMessage(successMsg + ' - User can now login!', 'success', 'userMessage');
@@ -710,7 +710,7 @@ async function assignRolesToUser() {
 
     if (error) throw error;
 
-    showMessage(`✅ Role "${role.name}" assigned to ${user.name}`, 'success', 'userMessage');
+    showMessage(`Role "${role.name}" assigned to ${user.name}`, 'success', 'userMessage');
     document.getElementById('userSelect').value = '';
     document.getElementById('roleSelect').value = '';
     selectedFunctionalRoles = [];
@@ -755,7 +755,7 @@ function editUserRole(id) {
 }
 
 function deleteUserConfirm(userId, userName, userEmail) {
-  const confirmed = confirm(`⚠️ Are you sure you want to delete user "${userName}" (${userEmail})?\n\nThis will:\n- Delete from Supabase Auth\n- Remove all database records\n- Remove branch access\n\nThis action CANNOT be undone.`);
+  const confirmed = confirm(`Are you sure you want to delete user "${userName}" (${userEmail})?\n\nThis will:\n- Delete from Supabase Auth\n- Remove all database records\n- Remove branch access\n\nThis action CANNOT be undone.`);
 
   if (confirmed) {
     deleteUser(userId);
@@ -797,7 +797,7 @@ async function deleteUser(userId) {
       throw new Error(errorData.error || 'Failed to delete user');
     }
 
-    showMessage(`✅ User "${userData.name}" deleted successfully`, 'success', 'userMessage');
+    showMessage(`User "${userData.name}" deleted successfully`, 'success', 'userMessage');
 
     // Reload users
     await loadUsers();
@@ -900,7 +900,7 @@ async function confirmDelete() {
 
       if (error) throw error;
 
-      showMessage('✅ Business deleted', 'success', 'businessMessage');
+      showMessage('Business deleted', 'success', 'businessMessage');
       await loadBusinesses();
     } else if (deleteTarget.type === 'branch') {
       const { error } = await window.supabase
@@ -910,7 +910,7 @@ async function confirmDelete() {
 
       if (error) throw error;
 
-      showMessage('✅ Branch deleted', 'success', 'branchMessage');
+      showMessage('Branch deleted', 'success', 'branchMessage');
       await loadBranches();
     }
 

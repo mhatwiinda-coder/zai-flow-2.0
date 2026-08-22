@@ -558,7 +558,7 @@ function approveLeave(leaveRequestId) {
       const user = JSON.parse(localStorage.getItem("user"));
       const context = getBranchContext();
       if (!context) {
-        alert('❌ Branch context not available');
+        alert('Branch context not available');
         return;
       }
       const { data, error } = await window.supabase.rpc('approve_leave', {
@@ -583,7 +583,7 @@ function rejectLeave(leaveRequestId) {
       const user = JSON.parse(localStorage.getItem("user"));
       const context = getBranchContext();
       if (!context) {
-        alert('❌ Branch context not available');
+        alert('Branch context not available');
         return;
       }
       const { data, error } = await window.supabase.rpc('reject_leave', {

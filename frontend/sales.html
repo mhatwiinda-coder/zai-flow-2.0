@@ -31,13 +31,13 @@
   <main>
     <div class="topbar">
       <h2>Point of Sale</h2>
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; width: 100%;">
-        <div>
-          <label for="branchDropdown" style="margin-right: 8px; color: #999; font-size: 12px;">📍 Branch:</label>
-          <select id="branchDropdown" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #667eea; background: #1e1e1e; color: #e0e0e0; cursor: pointer;"></select>
-        </div>
+      <div class="topbar-right">
+        <div class="zf-context-pill">
+            <span class="zf-pill-label">Branch</span>
+            <select id="branchDropdown" class="zf-pill-select"></select>
+          </div>
         <div id="userInfo"></div>
-        <button onclick="refreshPOS()" class="refresh-btn" title="Refresh POS">🔄</button>
+        <button onclick="refreshPOS()" class="refresh-btn" title="Refresh POS"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg></button>
       </div>
     </div>
 
@@ -45,7 +45,7 @@
     <div class="dashboard-section">
       <div id="openTillSection" style="display: none;">
         <div class="till-card">
-          <h3>📝 Open Cash Drawer</h3>
+          <h3>Open Cash Drawer</h3>
           <div class="form-grid">
             <input type="text" id="openingBalance" placeholder="Opening balance K" inputmode="decimal" />
             <button id="openDrawerBtn" class="btn-primary">Open Drawer</button>
@@ -56,7 +56,7 @@
       <div id="drawerStatus" class="till-status-card"></div>
 
       <div style="display: flex; gap: 12px;">
-        <button id="balanceTillBtn" class="btn-secondary" style="flex: 1;">⚖️ Balance Till</button>
+        <button id="balanceTillBtn" class="btn-secondary" style="flex: 1;">Balance Till</button>
         <div id="dailySummary" class="till-summary" style="flex: 1;"></div>
       </div>
     </div>
@@ -67,11 +67,11 @@
 
         <!-- LEFT: BARCODE SCANNER -->
         <div class="pos-scanner-card">
-          <h3>📱 Product Lookup</h3>
+          <h3>Product Lookup</h3>
 
           <div class="scanner-controls">
-            <button onclick="togglePOSManualEntry()" class="btn-primary" id="toggleInputBtn">✏️ Type SKU/Barcode</button>
-            <button onclick="togglePOSCamera()" class="btn-secondary" id="posCameraBtn">📷 Use Camera</button>
+            <button onclick="togglePOSManualEntry()" class="btn-primary" id="toggleInputBtn">Type SKU/Barcode</button>
+            <button onclick="togglePOSCamera()" class="btn-secondary" id="posCameraBtn">Use Camera</button>
           </div>
 
           <input id="posBarcodeInput" type="text" placeholder="Enter SKU, Barcode, or Product ID"
@@ -85,7 +85,7 @@
 
         <!-- RIGHT: CART & CHECKOUT -->
         <div class="pos-cart-card">
-          <h3>🛒 Cart</h3>
+          <h3>Cart</h3>
 
           <!-- Cart Items Table -->
           <div class="cart-wrapper">
@@ -113,9 +113,9 @@
           <div class="payment-section">
             <label>Payment Method</label>
             <select id="paymentMethod" style="width: 100%; margin-bottom: 12px;">
-              <option value="Cash">💵 Cash</option>
-              <option value="Card">💳 Card</option>
-              <option value="Mobile Money">📱 Mobile Money</option>
+              <option value="Cash">Cash</option>
+              <option value="Card">Card</option>
+              <option value="Mobile Money">Mobile Money</option>
             </select>
 
             <label id="cashLabel" style="display: none;">Cash Given</label>
@@ -131,21 +131,21 @@
 
           <!-- Action Buttons -->
           <div style="display: flex; gap: 10px;">
-            <button class="btn-primary" onclick="completeSale()" style="flex: 1;">✅ Complete Sale</button>
-            <button class="btn-danger" onclick="clearSale()" style="flex: 1;">❌ Discard</button>
+            <button class="btn-primary" onclick="completeSale()" style="flex: 1;">Complete Sale</button>
+            <button class="btn-danger" onclick="clearSale()" style="flex: 1;">Discard</button>
           </div>
 
           <!-- Receipt Actions -->
           <div id="receiptActions" style="display: none; margin-top: 12px; display: flex; gap: 10px;">
             <button onclick="printReceiptPreview()" class="btn-secondary" style="flex: 1; font-size: 12px;">Preview</button>
-            <button onclick="confirmPrint()" class="btn-primary" style="flex: 1; font-size: 12px;">🖨️ Print</button>
-            <button onclick="reprintReceipt()" class="btn-secondary" style="flex: 1; font-size: 12px;">↩️ Reprint</button>
+            <button onclick="confirmPrint()" class="btn-primary" style="flex: 1; font-size: 12px;">Print</button>
+            <button onclick="reprintReceipt()" class="btn-secondary" style="flex: 1; font-size: 12px;">Reprint</button>
           </div>
 
           <!-- Sales History Dropdown -->
           <details class="collapsible-card" style="margin-top: 20px;">
             <summary class="collapsible-header">
-              <span>📋 Sales History</span>
+              <span>Sales History</span>
               <span class="sales-count" id="salesCount">(0 sales)</span>
             </summary>
 
@@ -194,7 +194,7 @@
 <!-- BALANCE MODAL -->
 <div id="balanceModal" class="modal" style="display:none;">
   <div class="modal-box">
-    <h3>⚖️ Balance Till</h3>
+    <h3>Balance Till</h3>
     <div id="balanceInfo"></div>
     <input id="declaredCash" type="number" placeholder="Enter counted cash" style="width: 100%; padding: 10px; margin: 12px 0; border-radius: 6px; border: none;" />
     <button onclick="closeTill()" style="width: 100%; padding: 10px; background: #28c76f; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Close Till</button>

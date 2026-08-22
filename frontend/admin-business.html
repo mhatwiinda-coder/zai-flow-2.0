@@ -345,7 +345,7 @@
     <!-- Header -->
     <header>
       <div>
-        <h1>🏢 Business Management Console</h1>
+        <h1>Business Management Console</h1>
         <p style="margin: 5px 0 0 0; opacity: 0.9;">Manage businesses, branches, and user access</p>
       </div>
       <div class="user-info">
@@ -359,17 +359,17 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab-btn active" data-tab="dashboard" onclick="showTab('dashboard')">📊 Dashboard</button>
-      <button class="tab-btn" data-tab="businesses" onclick="showTab('businesses')">🏢 Businesses</button>
-      <button class="tab-btn" data-tab="branches" onclick="showTab('branches')">🏪 Branches</button>
-      <button class="tab-btn" data-tab="users" onclick="showTab('users')">👥 Users & Roles</button>
-      <button class="tab-btn" data-tab="roles" onclick="showTab('roles')">🔐 Role Configuration</button>
+      <button class="tab-btn active" data-tab="dashboard" onclick="showTab('dashboard')">Dashboard</button>
+      <button class="tab-btn" data-tab="businesses" onclick="showTab('businesses')">Businesses</button>
+      <button class="tab-btn" data-tab="branches" onclick="showTab('branches')">Branches</button>
+      <button class="tab-btn" data-tab="users" onclick="showTab('users')">Users & Roles</button>
+      <button class="tab-btn" data-tab="roles" onclick="showTab('roles')">Role Configuration</button>
     </div>
 
     <!-- TAB: DASHBOARD -->
     <div class="tab-content active" id="dashboard">
       <div class="card">
-        <h3>📊 Quick Stats</h3>
+        <h3>Quick Stats</h3>
         <div class="grid">
           <div style="padding: 15px; background: #0f1419; border-radius: 6px; border-left: 4px solid #667eea;">
             <strong style="color: #999;">Total Businesses</strong>
@@ -392,11 +392,11 @@
       </div>
 
       <div class="card">
-        <h3>⚡ Quick Actions</h3>
+        <h3>Quick Actions</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-          <button onclick="showTab('businesses'); document.querySelector('[data-tab=businesses]').click();" style="padding: 15px; background: #667eea; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold;">➕ Add Business</button>
-          <button onclick="showTab('branches'); document.querySelector('[data-tab=branches]').click();" style="padding: 15px; background: #667eea; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold;">➕ Add Branch</button>
-          <button onclick="showTab('users'); document.querySelector('[data-tab=users]').click();" style="padding: 15px; background: #764ba2; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold;">➕ Assign Role</button>
+          <button onclick="showTab('businesses'); document.querySelector('[data-tab=businesses]').click();" style="padding: 15px; background: #667eea; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold;">Add Business</button>
+          <button onclick="showTab('branches'); document.querySelector('[data-tab=branches]').click();" style="padding: 15px; background: #667eea; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold;">Add Branch</button>
+          <button onclick="showTab('users'); document.querySelector('[data-tab=users]').click();" style="padding: 15px; background: #764ba2; border: none; border-radius: 6px; color: white; cursor: pointer; font-weight: bold;">Assign Role</button>
         </div>
       </div>
     </div>
@@ -405,7 +405,7 @@
     <div class="tab-content" id="businesses">
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="margin: 0;">🏢 Manage Businesses</h3>
+          <h3 style="margin: 0;">Manage Businesses</h3>
           <button onclick="document.getElementById('createBusinessModal').classList.add('show');" style="background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">+ Create Business</button>
         </div>
       </div>
@@ -435,7 +435,7 @@
     <div class="tab-content" id="branches">
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3 style="margin: 0;">🏪 Manage Branches</h3>
+          <h3 style="margin: 0;">Manage Branches</h3>
           <button onclick="document.getElementById('createBranchModal').classList.add('show');" style="background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">+ Create Branch</button>
         </div>
 
@@ -492,7 +492,7 @@
     <div class="tab-content" id="users">
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h3 style="margin: 0;">👥 Assign Roles to Users</h3>
+          <h3 style="margin: 0;">Assign Roles to Users</h3>
           <button onclick="document.getElementById('createUserModal').classList.add('show');" style="background: #667eea; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">+ Create User</button>
         </div>
 
@@ -500,7 +500,7 @@
 
         <!-- Role Assignment Section -->
         <div style="background: #0f1419; padding: 20px; border-radius: 6px; border-left: 4px solid #667eea; margin-bottom: 30px;">
-          <h4 style="margin-top: 0; color: #667eea;">🎯 Assign Role with Auto-Suggestions</h4>
+          <h4 style="margin-top: 0; color: #667eea;">Assign Role with Auto-Suggestions</h4>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
             <div>
@@ -519,7 +519,7 @@
 
           <!-- Auto-Suggested Functional Roles -->
           <div id="suggestionBox" style="display: none; background: #1e1e2e; padding: 15px; border-radius: 6px; border: 1px solid #333; margin-bottom: 20px;">
-            <div style="color: #667eea; font-weight: bold; margin-bottom: 12px;">🎯 Suggested Functional Roles:</div>
+            <div style="color: #667eea; font-weight: bold; margin-bottom: 12px;">Suggested Functional Roles:</div>
             <div id="suggestedRoles" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
           </div>
 
@@ -531,7 +531,7 @@
             </div>
           </div>
 
-          <button onclick="assignRolesToUser()" style="background: #667eea; color: white; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px;">✓ Assign Roles</button>
+          <button onclick="assignRolesToUser()" style="background: #667eea; color: white; padding: 12px 30px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px;">Assign Roles</button>
         </div>
 
         <!-- All Users Table -->
@@ -558,7 +558,7 @@
     <!-- TAB: ROLE CONFIGURATION -->
     <div class="tab-content" id="roles">
       <div class="card">
-        <h3 style="margin-top: 0;">🔐 Role Configuration (Read-Only)</h3>
+        <h3 style="margin-top: 0;">Role Configuration (Read-Only)</h3>
         <p style="color: #999; font-size: 14px; margin-bottom: 20px;">View role hierarchy and their assigned modules</p>
 
         <table class="table" id="rolesTable">

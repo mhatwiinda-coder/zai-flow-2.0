@@ -149,7 +149,7 @@
       card.appendChild(btn);
     }
 
-    btn.textContent = profile ? '✎ Edit profile' : '⚠ Profile not linked';
+    btn.textContent = profile ? 'Edit profile' : 'Profile not linked';
     btn.style.cssText =
       'margin-top:12px;width:100%;padding:10px 14px;border:0;border-radius:10px;' +
       'cursor:pointer;font-size:13px;font-weight:600;' +

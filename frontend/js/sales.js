@@ -60,11 +60,11 @@ function togglePOSCamera() {
     scanner.style.display = "block";
     input.style.display = "none";
     if (captureBtn) captureBtn.style.display = "block";
-    btn.innerText = "🛑 Stop Camera";
+    btn.innerText = "Stop Camera";
     startPOSCamera();
   } else {
     scanner.style.display = "none";
-    btn.innerText = "📷 Start Camera";
+    btn.innerText = "Start Camera";
     stopPOSCamera();
     input.style.display = "block";
     if (captureBtn) captureBtn.style.display = "none";
@@ -254,9 +254,9 @@ function displaySalesHistory(sales) {
         <td>${s.payment_method}</td>
         <td>${time}</td>
         <td style="display: flex; gap: 4px;">
-          <button onclick="viewSale(${s.id})" style="padding: 4px 6px; font-size: 11px; background: #64a4ff; color: white; border: none; border-radius: 4px; cursor: pointer;">📋 View</button>
-          <button onclick="reprintSaleReceipt(${s.id})" style="padding: 4px 6px; font-size: 11px; background: #7367f0; color: white; border: none; border-radius: 4px; cursor: pointer;">🖨️ Reprint</button>
-          ${!isReversed ? `<button onclick="reverseSaleTransaction(${s.id})" style="padding: 4px 6px; font-size: 11px; background: #ff5b5b; color: white; border: none; border-radius: 4px; cursor: pointer;">↩️ Reverse</button>` : ''}
+          <button onclick="viewSale(${s.id})" style="padding: 4px 6px; font-size: 11px; background: #64a4ff; color: white; border: none; border-radius: 4px; cursor: pointer;">View</button>
+          <button onclick="reprintSaleReceipt(${s.id})" style="padding: 4px 6px; font-size: 11px; background: #7367f0; color: white; border: none; border-radius: 4px; cursor: pointer;">Reprint</button>
+          ${!isReversed ? `<button onclick="reverseSaleTransaction(${s.id})" style="padding: 4px 6px; font-size: 11px; background: #ff5b5b; color: white; border: none; border-radius: 4px; cursor: pointer;">Reverse</button>` : ''}
         </td>
       </tr>
     `;
@@ -299,7 +299,7 @@ function checkDrawerStatus() {
         const bar = document.getElementById("drawerStatus");
         const openSection = document.getElementById("openTillSection");
 
-        if (bar) bar.innerHTML = `🔴 Cash Drawer CLOSED`;
+        if (bar) bar.innerHTML = `Cash Drawer CLOSED`;
         if (openSection) openSection.style.display = "block";
 
         lockPOS(true);
@@ -317,7 +317,7 @@ function checkDrawerStatus() {
         const bar = document.getElementById("drawerStatus");
         const openSection = document.getElementById("openTillSection");
 
-        if (bar) bar.innerHTML = `🔴 Cash Drawer CLOSED`;
+        if (bar) bar.innerHTML = `Cash Drawer CLOSED`;
         if (openSection) openSection.style.display = "block";
 
         lockPOS(true);
@@ -343,7 +343,7 @@ function checkDrawerStatus() {
       const openSection = document.getElementById("openTillSection");
 
       if (bar)
-        bar.innerHTML = `🟢 Cash Drawer OPEN | Expected: ${money(expectedBalance)}`;
+        bar.innerHTML = `Cash Drawer OPEN | Expected: ${money(expectedBalance)}`;
 
       if (openSection)
         openSection.style.display = "none";
@@ -412,7 +412,7 @@ function openDrawer() {
 
       console.log('🔄 Checking drawer status after commit');
       checkDrawerStatus();
-      alert("✅ Drawer opened successfully!");
+      alert("Drawer opened successfully!");
     } catch (err) {
       console.error('❌ Error opening drawer:', err);
       alert(`Error: ${err.message}`);
@@ -427,7 +427,7 @@ function openDrawer() {
 let currentPreviewedProduct = null;
 
 function manualCapture() {
-  // 🔒 HARD LOCK
+  // HARD LOCK
   if (!drawerIsOpen) {
     alert("Till is closed. Open drawer before adding items.");
     return;
@@ -488,7 +488,7 @@ function manualCapture() {
         return;
       }
 
-      // 🔒 DOUBLE CHECK LOCK
+      // DOUBLE CHECK LOCK
       if (!drawerIsOpen) return;
 
       // Store for later use and display preview
@@ -511,7 +511,7 @@ function displayProductPreview(product) {
   preview.innerHTML = `
     <div style="background: rgba(40, 199, 111, 0.15); border: 1px solid rgba(40, 199, 111, 0.3); border-radius: 8px; padding: 12px;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-        <h4 style="margin: 0; color: #28c76f;">📦 ${product.name}</h4>
+        <h4 style="margin: 0; color: #28c76f;">${product.name}</h4>
         <button onclick="clearProductPreview()" style="background: #ff5b5b; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 12px;">Close</button>
       </div>
 
@@ -533,7 +533,7 @@ function displayProductPreview(product) {
       <div style="display: flex; gap: 8px;">
         <button onclick="addToCartFromPreview()"
                 style="flex: 1; background: #28c76f; color: white; border: none; border-radius: 4px; padding: 10px; cursor: pointer; font-weight: 600; font-size: 12px;">
-          ✓ Add to Cart
+          Add to Cart
         </button>
         <button onclick="clearProductPreview()"
                 style="flex: 1; background: #7367f0; color: white; border: none; border-radius: 4px; padding: 10px; cursor: pointer; font-weight: 600; font-size: 12px;">
@@ -586,7 +586,7 @@ function clearProductPreview() {
 ===================================================== */
 function renderCart() {
 
-  // 🔒 Prevent rendering cart if drawer closed
+  // Prevent rendering cart if drawer closed
   if (!drawerIsOpen) {
     cart = [];
     document.getElementById("cartItems").innerHTML = "";
@@ -676,7 +676,7 @@ function calculateChange() {
 ===================================================== */
 function completeSale() {
 
-  // 🔒 HARD DRAWER LOCK
+  // HARD DRAWER LOCK
   if (!drawerIsOpen) {
     alert("Till is closed. Open drawer before transacting.");
     return;
@@ -689,7 +689,7 @@ function completeSale() {
 
   const paymentMethod = document.getElementById("paymentMethod").value;
 
-  // 🔢 Calculate total properly (never trust UI text)
+  // Calculate total properly (never trust UI text)
   const total = cart.reduce((sum, item) => {
     return sum + (item.price * item.quantity);
   }, 0);
@@ -700,7 +700,7 @@ function completeSale() {
 
   let change = 0;
 
-  // 💵 CASH VALIDATION
+  // CASH VALIDATION
   if (paymentMethod === "Cash") {
 
     if (cashGiven <= 0) {
@@ -733,7 +733,7 @@ function completeSale() {
     */
   }
 
-  // 🚀 Call Supabase create_sale() function
+  // Call Supabase create_sale() function
   (async () => {
     try {
       // Prepare items in JSONB format for the function
@@ -745,7 +745,7 @@ function completeSale() {
 
       const context = getBranchContext();
       if (!context) {
-        alert('❌ No branch context found. Please log in again.');
+        alert('No branch context found. Please log in again.');
         return;
       }
 
@@ -767,7 +767,7 @@ function completeSale() {
         return;
       }
 
-      // ✅ Clean receipt data
+      // Clean receipt data
       lastSaleData = {
         sale_id: data[0].sale_id,
         total: Number(total),
@@ -782,7 +782,7 @@ function completeSale() {
         openPhysicalDrawer();
       }
 
-      // 🔄 Reset cart AFTER backend success
+      // Reset cart AFTER backend success
       cart = [];
       renderCart();
 
@@ -1364,7 +1364,7 @@ function closeTill() {
       if (variance !== 0) {
         if (balanceAttempts < 3) {
           // Option A: Prevent closing (attempts 1-2)
-          alert(`❌ TILL DOES NOT BALANCE\n\n` +
+          alert(`TILL DOES NOT BALANCE\n\n` +
             `Expected: K ${formatMoney(expectedBalance)}\n` +
             `Declared: K ${formatMoney(declaredBalance)}\n` +
             `Variance: K ${formatMoney(Math.abs(variance))}\n\n` +
@@ -1373,7 +1373,7 @@ function closeTill() {
           return;
         } else {
           // Option B: Allow closing on attempt 3 + post GL entry
-          const allow = confirm(`⚠️ TILL VARIANCE - ATTEMPT 3\n\n` +
+          const allow = confirm(`TILL VARIANCE - ATTEMPT 3\n\n` +
             `Expected: K ${formatMoney(expectedBalance)}\n` +
             `Declared: K ${formatMoney(declaredBalance)}\n` +
             `Variance: K ${formatMoney(Math.abs(variance))}\n\n` +
@@ -1605,7 +1605,7 @@ function reverseSaleTransaction(saleId) {
       }
 
       console.log('✅ Reversal successful:', data[0]);
-      alert(`✅ Sale #${saleId} has been reversed successfully.\n\nInventory and accounting entries have been reversed.`);
+      alert(`Sale #${saleId} has been reversed successfully.\n\nInventory and accounting entries have been reversed.`);
 
       // Refresh the UI
       loadSales();

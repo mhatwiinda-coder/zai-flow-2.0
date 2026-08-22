@@ -10,7 +10,7 @@ let userRoleMap = new Map(); // Map of user_id -> [role_ids]
 async function loadAllUsers() {
   const context = getBranchContext();
   if (!context || context.user_role !== 'admin') {
-    showError('⛔ You must be an admin to access this page');
+    showError('You must be an admin to access this page');
     return;
   }
 
@@ -139,8 +139,8 @@ function renderUserCard(user) {
       </div>
 
       <div class="role-actions">
-        <button class="btn-assign" id="assign-role-${user.id}">✓ Assign Role</button>
-        <button class="btn-remove" id="remove-role-${user.id}">✕ Remove All</button>
+        <button class="btn-assign" id="assign-role-${user.id}">Assign Role</button>
+        <button class="btn-remove" id="remove-role-${user.id}">Remove All</button>
       </div>
     </div>
   `;
@@ -170,7 +170,7 @@ async function assignRoleToUser(user) {
     if (error) throw error;
 
     if (data && data[0].success) {
-      showSuccess(`✅ Role assigned to ${user.name}`);
+      showSuccess(`Role assigned to ${user.name}`);
       await loadUserRoleAssignments(context.business_id);
       renderUsers(allUsers);
     } else {
@@ -205,7 +205,7 @@ async function removeRoleFromUser(userId, roleId) {
     if (error) throw error;
 
     if (data && data[0].success) {
-      showSuccess(`✅ Role removed from ${user.name}`);
+      showSuccess(`Role removed from ${user.name}`);
       await loadUserRoleAssignments(context.business_id);
       renderUsers(allUsers);
     }
@@ -235,7 +235,7 @@ async function showRemoveRoleDialog(user) {
         });
       }
 
-      showSuccess(`✅ All roles removed from ${user.name}`);
+      showSuccess(`All roles removed from ${user.name}`);
       await loadUserRoleAssignments(context.business_id);
       renderUsers(allUsers);
     } catch (err) {
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check if user is admin
   const context = getBranchContext();
   if (!context || context.user_role !== 'admin') {
-    showError('⛔ Admin access required');
+    showError('Admin access required');
     setTimeout(() => {
       window.location.href = 'employee-landing.html';
     }, 2000);

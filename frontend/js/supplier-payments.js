@@ -95,7 +95,7 @@ function openRecordInvoiceModal(poId) {
         const variance = Math.abs(amount - po.total_amount);
         const variancePct = (variance / po.total_amount * 100).toFixed(2);
         const varianceElem = document.getElementById('invoiceVariance');
-        varianceElem.textContent = `PO Total: K ${formatMoney(po.total_amount)} | Variance: ${variancePct}% ${variance > 0 ? '⚠️' : ''}`;
+        varianceElem.textContent = `PO Total: K ${formatMoney(po.total_amount)} | Variance: ${variancePct}% ${variance > 0 ? '' : ''}`;
       });
     } catch (err) {
       console.error('Open record invoice error:', err);
@@ -125,7 +125,7 @@ function recordInvoice(event) {
 
       const authUUID = getAuthUUID();
       if (!authUUID) {
-        alert('❌ Could not identify current user - please login again');
+        alert('Could not identify current user - please login again');
         return;
       }
 
@@ -142,7 +142,7 @@ function recordInvoice(event) {
       if (error) throw error;
 
       const result = data[0];
-      alert((result.recorded ? '✅ ' : '📨 ') + result.message);
+      alert((result.recorded ? '' : '') + result.message);
       closeRecordInvoiceModal();
       loadPurchaseInvoices();
       loadPurchaseOrders();
@@ -257,7 +257,7 @@ function processPayment(event) {
 
       const authUUID = getAuthUUID();
       if (!authUUID) {
-        alert('❌ Could not identify current user - please login again');
+        alert('Could not identify current user - please login again');
         return;
       }
 
@@ -275,7 +275,7 @@ function processPayment(event) {
       if (error) throw error;
 
       const result = data[0];
-      alert((result.paid ? '✅ ' : '📨 ') + result.message + (result.paid ? '\n\nGL entries posted automatically' : ''));
+      alert((result.paid ? '' : '') + result.message + (result.paid ? '\n\nGL entries posted automatically' : ''));
       closePaymentModal();
       loadSupplierPayments();
       loadPurchaseInvoices();
