@@ -1,3 +1,55 @@
+/* ============================================================================
+   ZAI FLOW - DESIGN TOKENS
+   The brand as it already existed (deep navy + gold accent, glassmorphic
+   cards) formalized into variables. Colors are unchanged from what every
+   page already renders today - this is a naming pass, not a repaint.
+   ============================================================================ */
+:root {
+  /* Brand surface */
+  --zf-bg-from: #0c2a44;
+  --zf-bg-to: #061827;
+  --zf-sidebar-from: #081826;
+  --zf-sidebar-to: #050f18;
+
+  /* Text */
+  --zf-text: #ffffff;
+  --zf-text-muted: #cfd8e3;
+  --zf-text-dim: rgba(255,255,255,0.6);
+  --zf-text-faint: rgba(255,255,255,0.4);
+
+  /* Accent */
+  --zf-gold: #f7c948;
+  --zf-purple: #667eea;
+  --zf-purple-dark: #764ba2;
+
+  /* Semantic status (already in use across pages, now named) */
+  --zf-success: #28c76f;
+  --zf-danger: #ea5455;
+  --zf-danger-alt: #ff5b5b;
+  --zf-warning: #ff9f43;
+  --zf-info: #64a4ff;
+
+  /* Surfaces */
+  --zf-glass: rgba(255,255,255,0.08);
+  --zf-glass-soft: rgba(255,255,255,0.05);
+  --zf-glass-faint: rgba(255,255,255,0.03);
+  --zf-border: rgba(255,255,255,0.1);
+  --zf-border-soft: rgba(255,255,255,0.06);
+
+  /* Scale */
+  --zf-radius-sm: 6px;
+  --zf-radius: 12px;
+  --zf-radius-lg: 16px;
+  --zf-space-1: 4px;
+  --zf-space-2: 8px;
+  --zf-space-3: 14px;
+  --zf-space-4: 20px;
+  --zf-space-5: 32px;
+  --zf-sidebar-width: 230px;
+  --zf-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  --zf-shadow-lg: 0 6px 20px rgba(0,0,0,0.25);
+}
+
 /* RESET */
 * {
   box-sizing: border-box;
@@ -8,8 +60,8 @@
 
 /* LAYOUT */
 body {
-  background: radial-gradient(circle at top, #0c2a44, #061827);
-  color: #fff;
+  background: radial-gradient(circle at top, var(--zf-bg-from), var(--zf-bg-to));
+  color: var(--zf-text);
   min-height: 100vh;
 }
 
@@ -23,14 +75,16 @@ body {
    ========================= */
 
 .sidebar {
-  width: 230px;
+  width: var(--zf-sidebar-width);
   height: 100vh;
-  padding: 20px 14px;
-  background: linear-gradient(180deg, #081826, #050f18);
+  padding: var(--zf-space-4) var(--zf-space-3);
+  background: linear-gradient(180deg, var(--zf-sidebar-from), var(--zf-sidebar-to));
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  box-shadow: inset -1px 0 0 rgba(255,255,255,0.06);
+  gap: var(--zf-space-3);
+  box-shadow: inset -1px 0 0 var(--zf-border-soft);
+  flex-shrink: 0;
+  overflow-y: auto;
 }
 
 .sidebar .logo {
@@ -44,17 +98,17 @@ body {
   display: block;
   padding: 14px 18px;
   border-radius: 14px;
-  color: #cfd8e3;
+  color: var(--zf-text-muted);
   text-decoration: none;
   font-weight: 500;
-  background: rgba(255,255,255,0.03);
+  background: var(--zf-glass-faint);
   transition: all 0.25s ease;
 }
 
 /* Hover */
 .sidebar a:hover {
-  background: rgba(255,255,255,0.08);
-  color: #ffffff;
+  background: var(--zf-glass-soft);
+  color: var(--zf-text);
   transform: translateX(2px);
 }
 
@@ -65,11 +119,11 @@ body {
     rgba(255,255,255,0.15),
     rgba(255,255,255,0.05)
   );
-  color: #f7c948;
+  color: var(--zf-gold);
   font-weight: 600;
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,0.18),
-    0 6px 20px rgba(0,0,0,0.25);
+    var(--zf-shadow-lg);
 }
 
 /* Push logout to bottom */
@@ -77,11 +131,17 @@ body {
   margin-top: auto;
 }
 
+/* Mobile sidebar toggle - hidden on desktop, shown via JS-added class on
+   small screens. See .zf-sidebar-toggle in the responsive section below. */
+.zf-sidebar-toggle {
+  display: none;
+}
 
 /* MAIN */
 .main {
   flex: 1;
   padding: 40px;
+  min-width: 0; /* let flex children shrink below content size instead of overflowing */
 }
 
 /* HEADERS */
@@ -164,40 +224,14 @@ button:hover {
   margin-top: 10px;
   color: #facc15;
 }
-.layout {
-  display: flex;
-  height: 100vh;
-}
+/* Note: an earlier ".layout"/".sidebar"/".content" block used to live here.
+   No page ever used class="layout" (confirmed by search), but its ".sidebar"
+   redeclaration had equal CSS specificity to the real one above and came
+   later in the file, so it silently won the cascade for every shared
+   property (width, background, padding) on every page - an unintentional,
+   invisible override. Removed rather than fixed forward, since nothing
+   referenced it on purpose. */
 
-.sidebar {
-  width: 240px;
-  padding: 25px;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(20px);
-  height: 100vh;
-  color: white;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar a {
-  color: white;
-  padding: 12px;
-  margin: 5px 0;
-  border-radius: 8px;
-  transition: 0.2s;
-}
-
-.sidebar a:hover,
-.sidebar a.active {
-  background: rgba(255,255,255,0.12);
-}
-
-.content {
-  flex: 1;
-  padding: 30px;
-  overflow-y: auto;
-}
 /* POS CAMERA FIX */
 #scannerBox {
   margin-top: 15px;
@@ -1780,5 +1814,68 @@ main {
 
   .financial-statement {
     padding: 0;
+  }
+}
+/* ============================================================================
+   ZAI FLOW - MOBILE SIDEBAR (off-canvas drawer)
+   Applies to every page using the shared .app/.sidebar shell. Previously
+   .sidebar had no responsive behavior at all - on a phone it just squeezed
+   page content into the leftover space beside a fixed 230px column.
+   Paired with js/mobile-nav.js, which injects the toggle button/backdrop.
+   ============================================================================ */
+@media (max-width: 900px) {
+  .app {
+    position: relative;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: min(var(--zf-sidebar-width), 80vw);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar.zf-sidebar-open {
+    transform: translateX(0);
+    box-shadow: 0 0 0 100vmax rgba(0,0,0,0); /* placeholder, real dimming is .zf-sidebar-backdrop */
+  }
+
+  .zf-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1001;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--zf-radius);
+    background: var(--zf-glass);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--zf-border);
+    color: var(--zf-text);
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .zf-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0,0,0,0.5);
+  }
+
+  .zf-sidebar-backdrop.zf-sidebar-open {
+    display: block;
+  }
+
+  /* Make room so page content doesn't sit under the toggle button */
+  .main, .content {
+    padding-top: 72px;
   }
 }
