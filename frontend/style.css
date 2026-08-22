@@ -2385,6 +2385,26 @@ input::placeholder, textarea::placeholder { color: var(--zf-text-faint); }
   filter: none;
 }
 
+
+/* ---- Generic in-page nav links -------------------------------------------
+   Some pages carry a .nav-link row without defining its color, so links fell
+   back to the browser default blue (#0000EE) - unreadable on the navy
+   background. */
+.nav-link {
+  color: var(--zf-text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover { color: var(--zf-text); }
+
+.nav-link.active {
+  color: var(--zf-gold);
+  font-weight: 600;
+}
+
 /* ============================================================================
    ZAI FLOW - MOBILE SIDEBAR (off-canvas drawer)
    Applies to every page using the shared .app/.sidebar shell. Previously

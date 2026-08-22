@@ -33,11 +33,11 @@
     }
 
     .user-card {
-      background: white;
+      background: var(--zf-glass-soft);
       border-radius: 8px;
       padding: 20px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      border: 2px solid #e9ecef;
+      border: 2px solid rgba(255,255,255,0.1);
     }
 
     .user-card:hover {
@@ -54,12 +54,12 @@
 
     .user-info h3 {
       margin: 0 0 5px 0;
-      color: #333;
+      color: var(--zf-text);
       font-size: 16px;
     }
 
     .user-email {
-      color: #666;
+      color: var(--zf-text-dim);
       font-size: 13px;
       margin-bottom: 8px;
     }
@@ -83,14 +83,14 @@
       display: block;
       margin-bottom: 8px;
       font-weight: bold;
-      color: #333;
+      color: var(--zf-text);
       font-size: 13px;
     }
 
     .role-selector select {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ddd;
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 4px;
       font-size: 13px;
       box-sizing: border-box;
@@ -135,7 +135,7 @@
     }
 
     .current-roles {
-      background: #f8f9fa;
+      background: var(--zf-glass-faint);
       padding: 10px;
       border-radius: 4px;
       margin-top: 12px;
@@ -145,7 +145,7 @@
     .current-roles strong {
       display: block;
       margin-bottom: 6px;
-      color: #333;
+      color: var(--zf-text);
     }
 
     .roles-list {
@@ -180,20 +180,20 @@
     .loading {
       text-align: center;
       padding: 40px;
-      color: #666;
+      color: var(--zf-text-dim);
     }
 
     .success-message {
-      background: #d4edda;
-      color: #155724;
+      background: rgba(40,199,111,0.18);
+      color: var(--zf-success);
       padding: 12px;
       border-radius: 4px;
       margin-bottom: 20px;
     }
 
     .error-message {
-      background: #f8d7da;
-      color: #721c24;
+      background: rgba(234,84,85,0.18);
+      color: var(--zf-danger);
       padding: 12px;
       border-radius: 4px;
       margin-bottom: 20px;
@@ -210,7 +210,7 @@
       flex: 1;
       min-width: 200px;
       padding: 10px;
-      border: 1px solid #ddd;
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 4px;
       font-size: 13px;
     }
