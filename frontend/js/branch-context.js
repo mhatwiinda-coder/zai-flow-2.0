@@ -305,3 +305,34 @@ document.addEventListener('DOMContentLoaded', () => {
 // - isUserAuthenticated()
 // - getAllUserBranches()
 // - getAllUserBusinesses()
+
+// ============================================================================
+// MISSING-RPC DETECTION
+// ============================================================================
+// Frontend changes deploy to Netlify the moment they're pushed, but the SQL
+// they depend on has to be run by hand in Supabase. That leaves a window where
+// a page calls an RPC that doesn't exist yet, and PostgREST returns PGRST202
+// ("Could not find the function ... in the schema cache"). Surfacing that raw
+// to the user reads like a crash; this turns it into a clear instruction.
+
+/**
+ * @param {object} error - the error object returned by supabase.rpc()
+ * @returns {boolean} true when the RPC simply hasn't been deployed yet
+ */
+function isMissingFunctionError(error) {
+  if (!error) return false;
+  return error.code === 'PGRST202' ||
+         /Could not find the function/i.test(error.message || '');
+}
+
+/**
+ * Human-readable explanation for a missing RPC.
+ * @param {object} error
+ * @param {string} sqlFile - the file that defines the function
+ */
+function missingFunctionMessage(error, sqlFile) {
+  const fn = (error.message || '').match(/public\.([a-z_]+)/i);
+  return 'This feature isn\'t available yet.\n\n' +
+         (fn ? 'Missing database function: ' + fn[1] + '\n' : '') +
+         (sqlFile ? 'Run ' + sqlFile + ' in the Supabase SQL Editor to enable it.' : '');
+}

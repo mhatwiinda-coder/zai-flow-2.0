@@ -33,6 +33,9 @@ function openEmployeeProfile(employeeId) {
       document.getElementById('employeeProfileModal').style.display = 'flex';
     } catch (err) {
       console.error('Load employee profile error:', err);
+      if (isMissingFunctionError(err)) {
+        return alert(missingFunctionMessage(err, 'ADD_HR_EMPLOYEE_PROFILE.sql'));
+      }
       alert('Failed to load profile: ' + err.message);
     }
   })();

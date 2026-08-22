@@ -396,6 +396,13 @@ function loadAttendanceData() {
       }).join('');
     } catch (err) {
       console.error('Attendance load error:', err);
+      if (isMissingFunctionError(err)) {
+        document.getElementById('attendanceTable').innerHTML = '';
+        document.getElementById('noAttendanceData').textContent =
+          'Attendance board not enabled yet - run ADD_MISSED_CLOCKIN_ALERTS.sql in Supabase.';
+        document.getElementById('noAttendanceData').style.display = 'block';
+        return;
+      }
       alert('Failed to load attendance: ' + err.message);
     }
   })();
