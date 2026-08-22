@@ -231,6 +231,11 @@
   </style>
 </head>
 <body>
+<div class="app">
+  <aside class="sidebar">
+    <img src="assets/logo.png" class="logo" alt="ZAI Flow" />
+  </aside>
+  <main>
   <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-container">
@@ -279,12 +284,15 @@
   </div>
 
   <!-- Scripts -->
+  </main>
+</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-init.js"></script>
   <script src="js/branch-context.js"></script>
   <script src="js/session-timeout.js"></script>
   <script src="js/mobile-nav.js"></script>
   <script src="js/display-branch-context.js"></script>
+  <script src="js/sidebar-manager.js"></script>
   <script src="js/admin-user-management.js"></script>
 </body>
 </html>

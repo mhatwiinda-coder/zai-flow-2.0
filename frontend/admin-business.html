@@ -341,6 +341,11 @@
   </style>
 </head>
 <body>
+<div class="app">
+  <aside class="sidebar">
+    <img src="assets/logo.png" class="logo" alt="ZAI Flow" />
+  </aside>
+  <main>
   <div class="container">
     <!-- Header -->
     <header>
@@ -690,6 +695,8 @@
 
   <!-- Scripts -->
   <!-- Supabase library (must load first) -->
+  </main>
+</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Supabase client initialization -->
@@ -702,6 +709,7 @@
 
   <!-- Display branch context -->
   <script src="js/display-branch-context.js"></script>
+  <script src="js/sidebar-manager.js"></script>
 
   <!-- Admin business logic -->
   <script src="js/admin-business.js"></script>
