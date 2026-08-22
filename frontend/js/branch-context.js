@@ -41,7 +41,27 @@ function getBranchContext() {
 function getAuthUUID() {
   try {
     const user = JSON.parse(localStorage.getItem('user'));
-    return user?.auth_id || null;
+    if (!user) return null;
+
+    // Real Supabase Auth id, when the account was created through the
+    // Netlify create-user function.
+    if (user.auth_id) return user.auth_id;
+
+    // Everyone signing in through server.js gets `id` already synthesized as
+    // 00000000-0000-0000-0000-<zero-padded users.id>. That login response
+    // never included auth_id, so relying on it alone made this return null
+    // for effectively every user - which silently broke clock-in, tasks,
+    // notifications and approval requests.
+    if (typeof user.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user.id)) {
+      return user.id;
+    }
+
+    // Numeric id - synthesize using the same convention as server.js.
+    if (user.id !== undefined && user.id !== null && !isNaN(Number(user.id))) {
+      return `00000000-0000-0000-0000-${String(user.id).padStart(12, '0')}`;
+    }
+
+    return null;
   } catch (err) {
     console.error('❌ Error getting auth UUID:', err);
     return null;

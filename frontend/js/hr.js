@@ -21,9 +21,11 @@ function initHR() {
 
 function setDefaultDates() {
   const today = new Date();
-  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-  document.getElementById("attendanceFromDate").valueAsDate = firstDay;
-  document.getElementById("attendanceToDate").valueAsDate = today;
+  // The attendance tab is now a single-day board rather than a range, so it
+  // has one #attendanceDate input. Guarded because this also runs on pages
+  // where the element may not exist.
+  const dateEl = document.getElementById("attendanceDate");
+  if (dateEl) dateEl.valueAsDate = today;
 }
 
 /* =====================================================
@@ -344,141 +346,153 @@ function loadAttendanceData() {
       const context = getBranchContext();
       if (!context) return;
 
-      const fromDate = document.getElementById("attendanceFromDate").value;
-      const toDate = document.getElementById("attendanceToDate").value;
+      const dateEl = document.getElementById('attendanceDate');
+      const theDate = dateEl && dateEl.value ? dateEl.value : new Date().toISOString().split('T')[0];
+      if (dateEl && !dateEl.value) dateEl.value = theDate;
 
-      if (!fromDate || !toDate) {
-        document.getElementById("attendanceTable").innerHTML = '';
-        document.getElementById("noAttendanceData").style.display = 'block';
-        return;
-      }
-
-      console.log(`📡 Loading attendance for branch_id: ${context.branch_id}, dates: ${fromDate} to ${toDate}`);
-
-      const { data: employees, error: empError } = await supabase
-        .from('employees')
-        .select('id, employee_code, first_name, last_name')
-        .eq('branch_id', context.branch_id)
-        .eq('status', 'ACTIVE')
-        .order('employee_code', { ascending: true });
-
-      if (empError) throw empError;
-
-      if (!Array.isArray(employees) || employees.length === 0) {
-        document.getElementById("noAttendanceData").style.display = 'block';
-        return;
-      }
-
-      // Get attendance records for the date range
-      const { data: attendanceRecords } = await window.supabase
-        .from('attendance')
-        .select('employee_id, status, hours_worked')
-        .gte('attendance_date', fromDate)
-        .lte('attendance_date', toDate);
-
-      const attendanceMap = {};
-      if (Array.isArray(attendanceRecords)) {
-        attendanceRecords.forEach(record => {
-          if (!attendanceMap[record.employee_id]) {
-            attendanceMap[record.employee_id] = [];
-          }
-          attendanceMap[record.employee_id].push(record);
-        });
-      }
-
-      document.getElementById("noAttendanceData").style.display = 'none';
-      let html = '';
-      employees.forEach(emp => {
-        const records = attendanceMap[emp.id] || [];
-        const statuses = records.map(r => r.status);
-        const mostCommon = statuses.length > 0
-          ? statuses.reduce((a, b, i, arr) => arr.filter(v => v === a).length > arr.filter(v => v === b).length ? a : b)
-          : 'PRESENT';
-        const hours = records.reduce((sum, r) => sum + (r.hours_worked || 8), 0) / Math.max(records.length, 1);
-
-        html += `
-          <tr>
-            <td><strong>${emp.employee_code}</strong></td>
-            <td>${emp.first_name} ${emp.last_name}</td>
-            <td>
-              <select class="attendance-status" data-emp-id="${emp.id}" value="${mostCommon}">
-                <option value="PRESENT">Present</option>
-                <option value="ABSENT">Absent</option>
-                <option value="LEAVE">Leave</option>
-                <option value="SICK">Sick</option>
-              </select>
-            </td>
-            <td><input type="number" class="attendance-hours" data-emp-id="${emp.id}" value="${hours.toFixed(1)}" min="0" max="24"></td>
-            <td><input type="text" class="attendance-notes" data-emp-id="${emp.id}" placeholder="Notes..."></td>
-            <td><button onclick="saveAttendance(${emp.id})" class="btn-edit">Save</button></td>
-          </tr>
-        `;
+      // get_daily_attendance returns EVERY active employee for the branch, not
+      // just those with a row - so people who never clocked in show up as
+      // NOT_CLOCKED_IN rather than being silently absent from the list. It's
+      // also branch-scoped server-side; the previous query read the attendance
+      // table with no branch filter at all, which leaked across tenants.
+      const { data, error } = await window.supabase.rpc('get_daily_attendance', {
+        p_branch_id: context.branch_id,
+        p_date: theDate
       });
 
-      document.getElementById("attendanceTable").innerHTML = html;
+      if (error) throw error;
+
+      const tbody = document.getElementById('attendanceTable');
+      const empty = document.getElementById('noAttendanceData');
+
+      if (!Array.isArray(data) || data.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      tbody.innerHTML = data.map(r => {
+        const statusClass = 'status-' + String(r.status || '').toLowerCase().replace(/_/g, '-');
+        return [
+          '<tr>',
+          '<td><strong>' + esc(r.employee_code) + '</strong></td>',
+          '<td>' + esc(r.full_name) + '</td>',
+          '<td>' + esc(r.department) + '</td>',
+          '<td><span class="status-badge ' + statusClass + '">' + esc(formatAttendanceStatus(r.status)) + '</span></td>',
+          '<td>' + formatClockTime(r.clock_in) + '</td>',
+          '<td>' + formatClockTime(r.clock_out) + '</td>',
+          '<td>' + (r.hours_worked != null ? Number(r.hours_worked).toFixed(2) : '-') + '</td>',
+          '<td class="action-buttons">',
+          '<button class="btn-edit" onclick="amendAttendance(' + r.employee_id + ', \'' + theDate + '\')">Amend</button>',
+          '<button class="btn-view" onclick="sendTaskToEmployee(' + r.employee_id + ')">Send task</button>',
+          '</td>',
+          '</tr>'
+        ].join('');
+      }).join('');
     } catch (err) {
-      console.error("Attendance data error:", err);
-      alert("Failed to load attendance: " + err.message);
+      console.error('Attendance load error:', err);
+      alert('Failed to load attendance: ' + err.message);
     }
   })();
 }
 
-function saveAttendance(empId) {
+function esc(v) {
+  const d = document.createElement('div');
+  d.textContent = v == null ? '' : String(v);
+  return d.innerHTML;
+}
+
+function formatClockTime(ts) {
+  if (!ts) return '-';
+  return new Date(ts).toLocaleTimeString('en-ZM', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatAttendanceStatus(s) {
+  if (!s) return '-';
+  return String(s).replace(/_/g, ' ');
+}
+
+/* HR amends someone's day - the "or amend if employee is sick or absent"
+   half of your workflow. */
+function amendAttendance(employeeId, theDate) {
+  const status = prompt('Set status (PRESENT, ABSENT, LEAVE, SICK, LATE, HALF_DAY):');
+  if (!status) return;
+  const notes = prompt('Note (optional):') || null;
+
   (async () => {
     try {
       const context = getBranchContext();
-      if (!context) {
-        alert("No branch context available");
-        return;
-      }
-
-      const fromDate = document.getElementById("attendanceFromDate").value;
-      const toDate = document.getElementById("attendanceToDate").value;
-      const statusEl = document.querySelector(`.attendance-status[data-emp-id="${empId}"]`);
-      const hoursEl = document.querySelector(`.attendance-hours[data-emp-id="${empId}"]`);
-      const status = statusEl.value;
-      const hours = parseFloat(hoursEl.value) || 8;
-
-      // Save attendance for each day in the range
-      const currentDate = new Date(fromDate);
-      const endDate = new Date(toDate);
-
-      while (currentDate <= endDate) {
-        const dateStr = currentDate.toISOString().split('T')[0];
-
-        const { error } = await supabase
-          .from('attendance')
-          .upsert({
-            employee_id: empId,
-            branch_id: context.branch_id,
-            attendance_date: dateStr,
-            status: status,
-            hours_worked: hours
-          }, { onConflict: 'branch_id,employee_id,attendance_date' });
-
-        if (error) throw error;
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
-      alert("Attendance saved successfully");
+      const { data, error } = await window.supabase.rpc('set_attendance_status', {
+        p_branch_id: context.branch_id,
+        p_employee_id: employeeId,
+        p_date: theDate,
+        p_status: status.trim().toUpperCase(),
+        p_notes: notes
+      });
+      if (error) throw error;
+      const res = data[0];
+      alert((res.success ? '' : 'Could not amend: ') + res.message);
+      if (res.success) loadAttendanceData();
     } catch (err) {
-      console.error("Save attendance error:", err);
-      alert("Failed to save attendance: " + err.message);
+      console.error('Amend attendance error:', err);
+      alert('Failed to amend: ' + err.message);
     }
   })();
 }
 
-function markAllPresent() {
-  document.querySelectorAll('.attendance-status').forEach(el => {
-    el.value = 'PRESENT';
-  });
+/* Sends a task into the employee's in-tray on their landing page - the
+   "send the task to the employee's in tray" half of the workflow. */
+function sendTaskToEmployee(employeeId) {
+  const title = prompt('Task title:');
+  if (!title) return;
+  const description = prompt('Details (optional):') || null;
+  const dueDate = prompt('Due date (YYYY-MM-DD, optional):') || null;
+
+  (async () => {
+    try {
+      const context = getBranchContext();
+      const { data, error } = await window.supabase.rpc('send_task_to_employee', {
+        p_branch_id: context.branch_id,
+        p_employee_id: employeeId,
+        p_title: title,
+        p_description: description,
+        p_due_date: dueDate || null,
+        p_priority: 'NORMAL',
+        p_assigned_by: getAuthUUID()
+      });
+      if (error) throw error;
+      const res = data[0];
+      alert((res.success ? '' : 'Not sent: ') + res.message);
+    } catch (err) {
+      console.error('Send task error:', err);
+      alert('Failed to send task: ' + err.message);
+    }
+  })();
 }
 
-function markAllAbsent() {
-  document.querySelectorAll('.attendance-status').forEach(el => {
-    el.value = 'ABSENT';
-  });
+/* Notifies HR and the employee's department manager about anyone who hasn't
+   clocked in and hasn't already been excused. Idempotent per employee/day. */
+function checkMissedClockIns() {
+  (async () => {
+    try {
+      const context = getBranchContext();
+      const dateEl = document.getElementById('attendanceDate');
+      const theDate = dateEl && dateEl.value ? dateEl.value : new Date().toISOString().split('T')[0];
+
+      const { data, error } = await window.supabase.rpc('raise_missed_clockin_alerts', {
+        p_branch_id: context.branch_id,
+        p_date: theDate
+      });
+      if (error) throw error;
+      alert(data[0].message);
+    } catch (err) {
+      console.error('Missed clock-in check error:', err);
+      alert('Failed to run check: ' + err.message);
+    }
+  })();
 }
+
 
 /* =====================================================
    LEAVE MANAGEMENT

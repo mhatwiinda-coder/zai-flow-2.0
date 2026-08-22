@@ -206,36 +206,35 @@
     <!-- ========== TAB 3: ATTENDANCE ========== -->
     <div id="attendance" class="tab-content">
       <div class="dashboard-section">
-        <h3>Attendance Tracking</h3>
+        <h3>Daily Attendance</h3>
+        <p style="color: var(--zf-text-dim); font-size: 13px; margin-bottom: 18px;">
+          Live clock-in board for the selected day. Everyone active is listed, so people who
+          have not clocked in are visible rather than simply missing.
+        </p>
 
-        <!-- Date Range Selector -->
         <div class="form-grid">
           <div class="form-group">
-            <label>From Date</label>
-            <input type="date" id="attendanceFromDate">
-          </div>
-          <div class="form-group">
-            <label>To Date</label>
-            <input type="date" id="attendanceToDate">
+            <label>Date</label>
+            <input type="date" id="attendanceDate">
           </div>
         </div>
 
-        <div style="margin-bottom: 20px;">
-          <button class="btn-primary" onclick="loadAttendanceData()">Load Attendance</button>
-          <button class="btn-secondary" onclick="markAllPresent()" style="margin-left: 10px;">Mark All Present</button>
-          <button class="btn-secondary" onclick="markAllAbsent()" style="margin-left: 10px;">Mark All Absent</button>
+        <div class="btn-row" style="margin-bottom: 20px; flex-wrap: wrap;">
+          <button class="btn-primary" onclick="loadAttendanceData()">Load</button>
+          <button class="btn-secondary" onclick="checkMissedClockIns()">Alert missed clock-ins</button>
         </div>
 
-        <!-- Attendance Table -->
         <div class="table-wrapper">
           <table>
             <thead>
               <tr>
-                <th>Employee Code</th>
+                <th>Code</th>
                 <th>Name</th>
+                <th>Department</th>
                 <th>Status</th>
-                <th>Hours Worked</th>
-                <th>Notes</th>
+                <th>Clock In</th>
+                <th>Clock Out</th>
+                <th>Hours</th>
                 <th>Actions</th>
               </tr>
             </thead>
