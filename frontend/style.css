@@ -1816,6 +1816,319 @@ main {
     padding: 0;
   }
 }
+
+/* ============================================================================
+   ZAI FLOW - SHARED COMPONENT SYSTEM
+   ============================================================================
+   Reference-3 (dark ERP dashboard) layout patterns rendered in the existing
+   ZAI navy/gold brand. These intentionally redefine the shared primitives
+   already used across the app (.card, table, .topbar, .dashboard-section,
+   status pills, buttons, forms) so every page picks up a consistent look
+   without needing bespoke per-page markup.
+
+   Placed AFTER the original definitions so it wins on equal specificity, and
+   BEFORE the mobile sidebar block so responsive rules still override it.
+   ============================================================================ */
+
+/* ---- Surfaces ------------------------------------------------------------ */
+.card,
+.dashboard-section,
+.glass {
+  background: var(--zf-glass-soft);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--zf-border);
+  border-radius: var(--zf-radius-lg);
+  padding: var(--zf-space-4);
+  margin-bottom: var(--zf-space-4);
+  box-shadow: var(--zf-shadow);
+}
+
+.dashboard-section h3,
+.card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: var(--zf-space-4);
+  color: var(--zf-text);
+}
+
+/* ---- Topbar -------------------------------------------------------------- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--zf-space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--zf-space-5);
+  padding-bottom: var(--zf-space-4);
+  border-bottom: 1px solid var(--zf-border);
+}
+
+.topbar h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Stat / KPI cards ---------------------------------------------------- */
+/* Ref-3 pattern: small muted label, large value, trend line underneath. */
+.metric-card,
+.kpi-card,
+.dashboard-kpi {
+  background: var(--zf-glass-soft);
+  border: 1px solid var(--zf-border);
+  border-radius: var(--zf-radius-lg);
+  padding: var(--zf-space-4);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.metric-card:hover,
+.kpi-card:hover,
+.dashboard-kpi:hover {
+  border-color: rgba(247, 201, 72, 0.35);
+  transform: translateY(-2px);
+}
+
+.metric-label,
+.kpi-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--zf-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--zf-space-2);
+}
+
+.metric-value,
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--zf-text);
+  line-height: 1.15;
+}
+
+/* ---- Tables -------------------------------------------------------------- */
+/* Wrap wide tables so they scroll internally instead of breaking the page. */
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead {
+  background: transparent;
+}
+
+th {
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--zf-text-dim);
+  border-bottom: 1px solid var(--zf-border);
+  white-space: nowrap;
+}
+
+td {
+  padding: 14px;
+  border-bottom: 1px solid var(--zf-border-soft);
+  color: var(--zf-text-muted);
+}
+
+tbody tr {
+  transition: background 0.15s ease;
+}
+
+tbody tr:hover {
+  background: var(--zf-glass-faint);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---- Status pills -------------------------------------------------------- */
+.status-badge,
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.status-active,
+.status-approved,
+.status-paid,
+.badge-success { background: rgba(40,199,111,0.15);  color: var(--zf-success); }
+
+.status-inactive,
+.status-pending,
+.badge-warning { background: rgba(255,159,67,0.15);  color: var(--zf-warning); }
+
+.status-terminated,
+.status-rejected,
+.badge-danger  { background: rgba(234,84,85,0.15);   color: var(--zf-danger); }
+
+.status-draft,
+.badge-info    { background: rgba(100,164,255,0.15); color: var(--zf-info); }
+
+/* ---- Buttons ------------------------------------------------------------- */
+button {
+  background: var(--zf-gold);
+  color: #0c2a44;
+  border: none;
+  border-radius: var(--zf-radius-sm);
+  padding: 10px 18px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+button:active { transform: translateY(0); }
+
+.btn-primary {
+  background: var(--zf-gold);
+  color: #0c2a44;
+}
+
+.btn-secondary,
+.btn-ghost {
+  background: var(--zf-glass);
+  color: var(--zf-text);
+  border: 1px solid var(--zf-border);
+}
+
+.btn-view,
+.btn-edit  { background: rgba(100,164,255,0.15); color: var(--zf-info);    padding: 6px 14px; font-size: 12px; }
+.btn-approve { background: rgba(40,199,111,0.15); color: var(--zf-success); padding: 6px 14px; font-size: 12px; }
+.btn-reject,
+.btn-danger  { background: rgba(234,84,85,0.15);  color: var(--zf-danger);  padding: 6px 14px; font-size: 12px; }
+
+/* ---- Forms --------------------------------------------------------------- */
+input, select, textarea {
+  padding: 10px 12px;
+  border-radius: var(--zf-radius-sm);
+  border: 1px solid var(--zf-border);
+  background: rgba(0,0,0,0.25);
+  color: var(--zf-text);
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--zf-gold);
+}
+
+input::placeholder, textarea::placeholder { color: var(--zf-text-faint); }
+
+.form-group { display: flex; flex-direction: column; }
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--zf-text-dim);
+  margin-bottom: 6px;
+}
+
+/* Auto-fit grids: collapse to one column on narrow screens with no extra
+   media queries, which is what most of these layouts actually need. */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--zf-space-3);
+  margin-bottom: var(--zf-space-3);
+}
+
+.form-grid.full { grid-template-columns: 1fr; }
+
+.dashboard-grid,
+.kpi-cards,
+.dashboard-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--zf-space-4);
+  margin-bottom: var(--zf-space-4);
+}
+
+/* ---- Tabs ---------------------------------------------------------------- */
+.tabs-container {
+  display: flex;
+  gap: var(--zf-space-1);
+  border-bottom: 1px solid var(--zf-border);
+  margin-bottom: var(--zf-space-4);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-button {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--zf-text-dim);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.tab-button:hover {
+  background: transparent;
+  color: var(--zf-text);
+  transform: none;
+  filter: none;
+}
+
+.tab-button.active {
+  background: transparent;
+  color: var(--zf-gold);
+  border-bottom-color: var(--zf-gold);
+  font-weight: 600;
+}
+
+/* ---- Empty states -------------------------------------------------------- */
+.no-data, .empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--zf-text-faint);
+  font-size: 13px;
+}
+
+/* ---- Responsive tightening ---------------------------------------------- */
+@media (max-width: 768px) {
+  main, .main, .content { padding: 20px 16px; }
+
+  .topbar { align-items: flex-start; }
+  .topbar h2 { font-size: 20px; }
+
+  .metric-value, .kpi-value { font-size: 22px; }
+
+  th, td { padding: 10px; font-size: 12px; }
+
+  /* Full-width tap targets on small screens */
+  .form-grid button, .btn-row button { width: 100%; }
+}
+
 /* ============================================================================
    ZAI FLOW - MOBILE SIDEBAR (off-canvas drawer)
    Applies to every page using the shared .app/.sidebar shell. Previously
