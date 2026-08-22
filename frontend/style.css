@@ -2405,6 +2405,49 @@ input::placeholder, textarea::placeholder { color: var(--zf-text-faint); }
   font-weight: 600;
 }
 
+
+/* ---- KPI icon chip -------------------------------------------------------
+   Reference pattern: each stat card carries its icon in a soft rounded
+   square rather than as an inline glyph. */
+.kpi-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--zf-space-3);
+}
+
+.kpi-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: rgba(247, 201, 72, 0.12);
+  color: var(--zf-gold);
+}
+
+.kpi-header .kpi-label { margin-bottom: 0; }
+
+/* Trend chip under the value (green up / red down) */
+.trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(40,199,111,0.15);
+  color: var(--zf-success);
+}
+
+.trend-badge.down {
+  background: rgba(234,84,85,0.15);
+  color: var(--zf-danger);
+}
+
 /* ============================================================================
    ZAI FLOW - MOBILE SIDEBAR (off-canvas drawer)
    Applies to every page using the shared .app/.sidebar shell. Previously

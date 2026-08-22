@@ -16,12 +16,19 @@
     const sidebar = document.querySelector('.sidebar');
     if (!sidebar) return;
 
+    // SVG rather than the ☰ / ✕ glyphs, so the icon renders identically
+    // across platforms and matches the rest of the icon set.
+    const svg = (paths) =>
+      `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+    const ICON_MENU  = svg('<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>');
+    const ICON_CLOSE = svg('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>');
+
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.className = 'zf-sidebar-toggle';
     toggle.setAttribute('aria-label', 'Toggle navigation menu');
     toggle.setAttribute('aria-expanded', 'false');
-    toggle.textContent = '☰';
+    toggle.innerHTML = ICON_MENU;
 
     const backdrop = document.createElement('div');
     backdrop.className = 'zf-sidebar-backdrop';
@@ -33,14 +40,14 @@
       sidebar.classList.add('zf-sidebar-open');
       backdrop.classList.add('zf-sidebar-open');
       toggle.setAttribute('aria-expanded', 'true');
-      toggle.textContent = '✕';
+      toggle.innerHTML = ICON_CLOSE;
     }
 
     function close() {
       sidebar.classList.remove('zf-sidebar-open');
       backdrop.classList.remove('zf-sidebar-open');
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.textContent = '☰';
+      toggle.innerHTML = ICON_MENU;
     }
 
     toggle.addEventListener('click', () => {
