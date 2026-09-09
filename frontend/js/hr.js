@@ -598,6 +598,135 @@ function loadLeaveRequests() {
   })();
 }
 
+/* =====================================================
+   ABSENCE REPORTING
+===================================================== */
+function loadAbsenceReport() {
+  (async () => {
+    try {
+      const context = getBranchContext();
+      if (!context) return;
+
+      const fromEl = document.getElementById('absenceFrom');
+      const toEl = document.getElementById('absenceTo');
+
+      // Default to month-to-date rather than making HR pick dates before they
+      // can see anything.
+      if (!fromEl.value) {
+        const d = new Date();
+        fromEl.value = new Date(d.getFullYear(), d.getMonth(), 1).toISOString().split('T')[0];
+      }
+      if (!toEl.value) toEl.value = new Date().toISOString().split('T')[0];
+
+      const args = { p_branch_id: context.branch_id, p_from: fromEl.value, p_to: toEl.value };
+
+      const [byEmp, byDept, patterns] = await Promise.all([
+        window.supabase.rpc('get_absence_by_employee', args),
+        window.supabase.rpc('get_absence_by_department', args),
+        window.supabase.rpc('get_absence_patterns', args)
+      ]);
+
+      if (byEmp.error) throw byEmp.error;
+      if (byDept.error) throw byDept.error;
+      if (patterns.error) throw patterns.error;
+
+      renderAbsenceSummary(byEmp.data || []);
+      renderAbsenceDept(byDept.data || []);
+      renderAbsenceEmployees(byEmp.data || []);
+      renderAbsencePatterns(patterns.data || []);
+    } catch (err) {
+      console.error('Absence report error:', err);
+      if (isMissingFunctionError(err)) {
+        document.getElementById('absenceSummary').innerHTML =
+          '<p class="no-data">Absence reporting not enabled yet - run ADD_ABSENCE_REPORTING.sql.</p>';
+        return;
+      }
+      alert('Failed to load absence report: ' + err.message);
+    }
+  })();
+}
+
+function renderAbsenceSummary(rows) {
+  const sum = (k) => rows.reduce((t, r) => t + Number(r[k] || 0), 0);
+  const annual = sum('annual_days'), sick = sum('sick_days'), unexcused = sum('unexcused_days');
+  const total = sum('total_days');
+  const working = rows.length ? Number(rows[0].working_days) : 0;
+  const rate = (working && rows.length)
+    ? (total * 100 / (working * rows.length)).toFixed(1)
+    : '0.0';
+
+  document.getElementById('absenceSummary').innerHTML = `
+    <div class="dashboard-grid">
+      ${absenceStat(total, 'Total Days Lost')}
+      ${absenceStat(annual, 'Annual Leave')}
+      ${absenceStat(sick, 'Sick', '#ff9f43')}
+      ${absenceStat(unexcused, 'Unexcused', unexcused > 0 ? '#ea5455' : null)}
+      ${absenceStat(rate + '%', 'Absence Rate')}
+    </div>
+    <p style="font-size:11px; color:rgba(255,255,255,0.5); margin-top:8px;">
+      ${working} working days in range (Mon-Fri). Public holidays are not accounted for.
+    </p>`;
+}
+
+function absenceStat(value, label, colour) {
+  return `
+    <div class="metric-card">
+      <div class="metric-value"${colour ? ` style="color:${colour};"` : ''}>${esc(value)}</div>
+      <div class="metric-label">${esc(label)}</div>
+    </div>`;
+}
+
+function renderAbsenceDept(rows) {
+  document.getElementById('absenceDeptTable').innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.department)}</td>
+      <td>${r.headcount}</td>
+      <td>${Number(r.annual_days)}</td>
+      <td>${Number(r.sick_days)}</td>
+      <td${Number(r.unexcused_days) > 0 ? ' style="color:#ea5455;font-weight:600;"' : ''}>${Number(r.unexcused_days)}</td>
+      <td><strong>${Number(r.total_days)}</strong></td>
+      <td>${Number(r.absence_rate)}%</td>
+    </tr>`).join('');
+}
+
+function renderAbsenceEmployees(rows) {
+  const withAbsence = rows.filter(r => Number(r.total_days) > 0);
+  const empty = document.getElementById('noAbsenceData');
+  empty.style.display = withAbsence.length ? 'none' : 'block';
+
+  document.getElementById('absenceEmpTable').innerHTML = withAbsence.map(r => `
+    <tr>
+      <td><strong>${esc(r.employee_code)}</strong></td>
+      <td>${esc(r.full_name)}</td>
+      <td>${esc(r.department)}</td>
+      <td>${Number(r.annual_days)}</td>
+      <td>${Number(r.sick_days)}</td>
+      <td${Number(r.unexcused_days) > 0 ? ' style="color:#ea5455;font-weight:600;"' : ''}>${Number(r.unexcused_days)}</td>
+      <td><strong>${Number(r.total_days)}</strong></td>
+      <td>${Number(r.absence_rate)}%</td>
+    </tr>`).join('');
+}
+
+function renderAbsencePatterns(rows) {
+  // A share is only meaningful once there are enough absences for it to mean
+  // anything - at two absences it is 0, 50 or 100% and says nothing.
+  document.getElementById('absencePatternTable').innerHTML = rows.map(r => {
+    const share = Number(r.mon_fri_share);
+    const enough = Number(r.total_absences) >= 3;
+    const flag = enough && share >= 60;
+    return `
+      <tr>
+        <td><strong>${esc(r.employee_code)}</strong></td>
+        <td>${esc(r.full_name)}</td>
+        <td>${r.total_absences}</td>
+        <td>${r.separate_occasions}</td>
+        <td>${r.mon_fri_absences}</td>
+        <td${flag ? ' style="color:#ff9f43;font-weight:600;"' : ''}>${share}%${flag ? ' ⚑' : ''}</td>
+        <td>${r.weekend_adjacent_sick}</td>
+      </tr>`;
+  }).join('');
+}
+
 /* Both of these used to announce success unconditionally, ignoring the
    success/message the function returns - so a refusal still showed "Leave
    request approved" and the row simply stayed PENDING. */

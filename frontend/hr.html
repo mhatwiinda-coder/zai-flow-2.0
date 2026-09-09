@@ -343,6 +343,86 @@
             </div>
           </div>
         </div>
+
+        <!-- Absence Reporting -->
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-top: 24px;">
+          <h4>Absence Report</h4>
+
+          <div style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin: 16px 0;">
+            <div class="form-group" style="margin: 0;">
+              <label>From</label>
+              <input type="date" id="absenceFrom">
+            </div>
+            <div class="form-group" style="margin: 0;">
+              <label>To</label>
+              <input type="date" id="absenceTo">
+            </div>
+            <button class="btn-primary" onclick="loadAbsenceReport()">Run Report</button>
+          </div>
+
+          <div id="absenceSummary" style="margin-bottom: 20px;"></div>
+
+          <h4 style="margin-top: 20px;">By Department</h4>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Staff</th>
+                  <th>Annual</th>
+                  <th>Sick</th>
+                  <th>Unexcused</th>
+                  <th>Total Days</th>
+                  <th>Rate</th>
+                </tr>
+              </thead>
+              <tbody id="absenceDeptTable"></tbody>
+            </table>
+          </div>
+
+          <h4 style="margin-top: 24px;">By Employee</h4>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Annual</th>
+                  <th>Sick</th>
+                  <th>Unexcused</th>
+                  <th>Total Days</th>
+                  <th>Rate</th>
+                </tr>
+              </thead>
+              <tbody id="absenceEmpTable"></tbody>
+            </table>
+          </div>
+
+          <h4 style="margin-top: 24px;">Patterns</h4>
+          <p style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 12px;">
+            Absences clustering on Mondays and Fridays, and sick days landing next to a weekend.
+            These are counts to look into, not conclusions - open the underlying days before
+            raising it with anyone.
+          </p>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Absence Days</th>
+                  <th>Occasions</th>
+                  <th>Mon/Fri</th>
+                  <th>Mon/Fri Share</th>
+                  <th>Sick by Weekend</th>
+                </tr>
+              </thead>
+              <tbody id="absencePatternTable"></tbody>
+            </table>
+          </div>
+          <p id="noAbsenceData" class="no-data" style="display:none;">No absence recorded for this period</p>
+        </div>
       </div>
     </div>
 
