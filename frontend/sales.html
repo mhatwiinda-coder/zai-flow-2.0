@@ -208,10 +208,12 @@
     window.location.href = "login.html";
   }
   // Initialize branch context display BEFORE module loads
-  setTimeout(() => {
+  // DOMContentLoaded, not a timer: display-branch-context.js loads further
+  // down the page, so a fixed delay was a race.
+  document.addEventListener('DOMContentLoaded', () => {
     initializeBranchDisplay();
     updatePageTitle('Point of Sale');
-  }, 500);
+  });
 
   function logout() {
     localStorage.clear();

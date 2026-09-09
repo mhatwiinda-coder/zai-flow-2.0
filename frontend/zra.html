@@ -211,10 +211,12 @@
   const token = localStorage.getItem("token");
 
   // Initialize branch context display
-  setTimeout(() => {
+  // DOMContentLoaded, not a timer: display-branch-context.js loads further
+  // down the page, so a fixed delay was a race.
+  document.addEventListener('DOMContentLoaded', () => {
     initializeBranchDisplay();
     updatePageTitle('ZRA Smart Invoice');
-  }, 500);
+  });
 
   function authHeaders() {
     return { "Content-Type": "application/json", "Authorization": "Bearer " + token };

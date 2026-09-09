@@ -182,10 +182,12 @@
   }
 
   // Initialize branch context display
-  setTimeout(() => {
+  // DOMContentLoaded, not a timer: display-branch-context.js loads further
+  // down the page, so a fixed delay was a race.
+  document.addEventListener('DOMContentLoaded', () => {
     initializeBranchDisplay();
     updatePageTitle('Dashboard');
-  }, 500);
+  });
 
   function logout() {
     localStorage.clear();
