@@ -740,6 +740,35 @@
         </div>
       </div>
 
+      <!-- Leave Card -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-title">
+          Leave
+        </div>
+
+        <div id="leave-balance-list">
+          <div class="empty-state">
+            <p>Loading your leave balance...</p>
+          </div>
+        </div>
+
+        <button onclick="showLeaveModal()"
+                style="margin-top: 16px; padding: 10px 16px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+          Request Leave
+        </button>
+
+        <div style="margin-top: 24px;">
+          <div style="font-size: 13px; font-weight: 600; color: var(--zf-text-muted); margin-bottom: 10px;">
+            My Requests
+          </div>
+          <div id="my-leave-list">
+            <div class="empty-state">
+              <p>No leave requests yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Notifications Card -->
       <div class="card" style="margin-bottom: 24px;">
         <div class="card-title">
@@ -858,6 +887,39 @@
       <div class="modal-buttons">
         <button class="modal-btn secondary" onclick="closeClockOutModal()">Cancel</button>
         <button class="modal-btn primary" onclick="performClockOut()">Clock Out</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Request Leave Modal -->
+  <div id="leave-modal" class="modal">
+    <div class="modal-content">
+      <h3>Request Leave</h3>
+      <div class="form-group">
+        <label>Leave Type *</label>
+        <select id="leave-type" onchange="updateLeaveDaysNote()">
+          <option value="">Select...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Start Date *</label>
+        <input type="date" id="leave-start" onchange="updateLeaveDaysNote()">
+      </div>
+      <div class="form-group">
+        <label>End Date *</label>
+        <input type="date" id="leave-end" onchange="updateLeaveDaysNote()">
+      </div>
+      <!-- Shows the day count and what it leaves, so the balance isn't a
+           surprise only discovered on submit. -->
+      <div id="leave-days-note"
+           style="display:none; font-size:12px; margin-bottom:14px; padding:10px; border-radius:6px;"></div>
+      <div class="form-group">
+        <label>Reason / Notes</label>
+        <textarea id="leave-notes" placeholder="Anything HR should know?"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn secondary" onclick="closeLeaveModal()">Cancel</button>
+        <button class="modal-btn primary" onclick="submitLeaveRequest()">Submit Request</button>
       </div>
     </div>
   </div>

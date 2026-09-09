@@ -686,6 +686,199 @@ function escapeHtml(text) {
 }
 
 // ============================================================================
+// LEAVE
+// ============================================================================
+
+// Balances keyed by leave_type_id, so the modal can show what a request would
+// leave without another round trip.
+let leaveBalances = [];
+
+async function loadLeaveData() {
+  if (!window.supabase || !context) return;
+  const authUUID = getAuthUUID();
+  if (!authUUID) return;
+
+  try {
+    const [balanceRes, requestRes] = await Promise.all([
+      window.supabase.rpc('get_my_leave_balance', {
+        p_user_id: authUUID,
+        p_business_id: context.business_id
+      }),
+      window.supabase.rpc('get_my_leave_requests', {
+        p_user_id: authUUID,
+        p_business_id: context.business_id
+      })
+    ]);
+
+    if (balanceRes.error) throw balanceRes.error;
+    if (requestRes.error) throw requestRes.error;
+
+    leaveBalances = balanceRes.data || [];
+    renderLeaveBalances(leaveBalances);
+    renderMyLeaveRequests(requestRes.data || []);
+  } catch (err) {
+    console.error('Load leave error:', err);
+    if (isMissingFunctionError(err)) {
+      document.getElementById('leave-balance-list').innerHTML =
+        '<div class="empty-state"><p>Leave is not enabled yet - run ADD_LEAVE_TYPES_AND_BALANCES.sql.</p></div>';
+    }
+  }
+}
+
+function renderLeaveBalances(rows) {
+  const el = document.getElementById('leave-balance-list');
+
+  // Unpaid leave has no entitlement to report a balance against, so showing it
+  // here as "0 of 0 left" would read as an error rather than as uncapped.
+  const withEntitlement = rows.filter(r => Number(r.days_entitled) > 0);
+
+  if (!withEntitlement.length) {
+    el.innerHTML = '<div class="empty-state"><p>No leave entitlement on record</p></div>';
+    return;
+  }
+
+  el.innerHTML = withEntitlement.map(r => {
+    const remaining = Number(r.days_remaining);
+    const colour = remaining <= 0 ? '#ea5455' : remaining <= 3 ? '#ff9f43' : 'var(--zf-text)';
+    const pending = Number(r.days_pending) > 0
+      ? ` <span style="color:#ff9f43;">(${Number(r.days_pending)} pending)</span>`
+      : '';
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:baseline; padding:8px 0; border-bottom:1px solid var(--zf-border-soft);">
+        <span style="font-size:13px; color:var(--zf-text-muted);">${escapeHtml(r.leave_type)}</span>
+        <span style="font-size:13px; font-weight:600; color:${colour};">
+          ${remaining} of ${Number(r.days_entitled)} left${pending}
+        </span>
+      </div>`;
+  }).join('');
+}
+
+function renderMyLeaveRequests(rows) {
+  const el = document.getElementById('my-leave-list');
+  if (!rows.length) {
+    el.innerHTML = '<div class="empty-state"><p>No leave requests yet</p></div>';
+    return;
+  }
+
+  const colours = { APPROVED: '#28c76f', REJECTED: '#ea5455', CANCELLED: 'rgba(255,255,255,0.4)' };
+
+  el.innerHTML = rows.map(r => {
+    const colour = colours[r.status] || '#ff9f43';
+    // A rejection without its reason just leaves the employee guessing.
+    const reason = r.rejection_reason
+      ? `<div style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:4px;">Reason: ${escapeHtml(r.rejection_reason)}</div>`
+      : '';
+    return `
+      <div style="padding:10px 0; border-bottom:1px solid var(--zf-border-soft);">
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <span style="font-size:13px;">${escapeHtml(r.leave_type)} - ${r.days_requested} day(s)</span>
+          <span style="font-size:11px; font-weight:600; color:${colour};">${escapeHtml(r.status)}</span>
+        </div>
+        <div style="font-size:11px; color:var(--zf-text-muted); margin-top:2px;">
+          ${new Date(r.start_date).toLocaleDateString('en-ZM')} to ${new Date(r.end_date).toLocaleDateString('en-ZM')}
+        </div>
+        ${reason}
+      </div>`;
+  }).join('');
+}
+
+function showLeaveModal() {
+  const select = document.getElementById('leave-type');
+  select.innerHTML = '<option value="">Select...</option>' +
+    leaveBalances.map(r => {
+      // Unpaid leave is uncapped, so a remaining count would be meaningless.
+      const suffix = Number(r.days_entitled) > 0 ? ` (${Number(r.days_remaining)} left)` : '';
+      return `<option value="${r.leave_type_id}">${escapeHtml(r.leave_type)}${suffix}</option>`;
+    }).join('');
+
+  document.getElementById('leave-start').value = '';
+  document.getElementById('leave-end').value = '';
+  document.getElementById('leave-notes').value = '';
+  document.getElementById('leave-days-note').style.display = 'none';
+  document.getElementById('leave-modal').classList.add('active');
+}
+
+function closeLeaveModal() {
+  document.getElementById('leave-modal').classList.remove('active');
+}
+
+function updateLeaveDaysNote() {
+  const note = document.getElementById('leave-days-note');
+  const typeId = document.getElementById('leave-type').value;
+  const start = document.getElementById('leave-start').value;
+  const end = document.getElementById('leave-end').value;
+
+  if (!typeId || !start || !end) {
+    note.style.display = 'none';
+    return;
+  }
+
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  if (endDate < startDate) {
+    note.style.display = 'block';
+    note.style.background = 'rgba(234,84,85,0.15)';
+    note.style.color = '#ea5455';
+    note.textContent = 'The end date cannot be before the start date.';
+    return;
+  }
+
+  // Calendar days inclusive - matches how request_leave_for_user counts them.
+  const days = Math.round((endDate - startDate) / 86400000) + 1;
+  const balance = leaveBalances.find(r => String(r.leave_type_id) === String(typeId));
+  const entitled = balance ? Number(balance.days_entitled) : 0;
+  const remaining = balance ? Number(balance.days_remaining) : 0;
+
+  note.style.display = 'block';
+  if (entitled > 0 && days > remaining) {
+    note.style.background = 'rgba(234,84,85,0.15)';
+    note.style.color = '#ea5455';
+    note.textContent = `${days} day(s) requested, but only ${remaining} day(s) remaining.`;
+  } else {
+    note.style.background = 'rgba(255,255,255,0.05)';
+    note.style.color = 'var(--zf-text-muted)';
+    note.textContent = entitled > 0
+      ? `${days} day(s) requested. ${remaining - days} day(s) would remain.`
+      : `${days} day(s) requested (uncapped).`;
+  }
+}
+
+async function submitLeaveRequest() {
+  const typeId = document.getElementById('leave-type').value;
+  const start = document.getElementById('leave-start').value;
+  const end = document.getElementById('leave-end').value;
+  const notes = document.getElementById('leave-notes').value.trim();
+
+  if (!typeId) return alert('Please choose a leave type.');
+  if (!start || !end) return alert('Please choose both a start and an end date.');
+
+  try {
+    const authUUID = getAuthUUID();
+    if (!authUUID) return alert('User authentication not found. Please refresh the page.');
+
+    const { data, error } = await window.supabase.rpc('request_leave_for_user', {
+      p_user_id: authUUID,
+      p_business_id: context.business_id,
+      p_leave_type_id: parseInt(typeId, 10),
+      p_start_date: start,
+      p_end_date: end,
+      p_notes: notes || null
+    });
+
+    if (error) throw error;
+    const result = data[0];
+    alert(result.message);
+    if (result.success) {
+      closeLeaveModal();
+      loadLeaveData();
+    }
+  } catch (err) {
+    console.error('Request leave error:', err);
+    alert('Failed to request leave: ' + err.message);
+  }
+}
+
+// ============================================================================
 // INITIALIZATION - Runs once on page load
 // ============================================================================
 
@@ -711,6 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAttendanceStatus();
   loadUserTasks();
   loadNotifications();
+  loadLeaveData();
 
   startClockDisplay();
   startDataRefresh();
