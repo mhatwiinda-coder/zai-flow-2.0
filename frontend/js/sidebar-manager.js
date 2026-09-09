@@ -27,6 +27,7 @@ var ICONS = ICONS || (() => {
     bi:         w('<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'),
     admin:      w('<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>'),
     roles:      w('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+    workspace:  w('<path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>'),
     logout:     w('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>')
   };
 })();
@@ -161,6 +162,19 @@ function updateSidebar(moduleMap, context) {
   }
 
   let addedCount = 0;
+
+  // Every user has a personal page regardless of which modules they were
+  // granted, so this one is never gated by moduleMap. It is the way back to
+  // your own workspace from an ERP page - previously the only route was to log
+  // out and land there again.
+  const personal = document.createElement('div');
+  personal.className = 'sidebar-group';
+  personal.appendChild(makeLink({
+    href: 'employee-landing.html',
+    text: 'My Workspace',
+    icon: ICONS.workspace
+  }));
+  sidebar.appendChild(personal);
 
   SECTIONS.forEach(section => {
     const available = section.modules.filter(m => moduleMap.has(m) && MODULES[m]);
