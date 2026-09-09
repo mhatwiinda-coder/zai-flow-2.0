@@ -31,6 +31,13 @@ function closeClockInModal() {
   document.getElementById('clock-in-modal').classList.remove('active');
 }
 
+// Last values seen from get_attendance_status. The clock-out modal needs to
+// know how long the shift has run, and what counts as a full day, to decide
+// whether to ask for an early-out reason. min_hours comes from the server
+// (zf_min_shift_hours) so the prompt and the enforcement can't drift apart.
+let currentElapsedMinutes = 0;
+let minShiftHours = 8;
+
 function showClockOutModal() {
   const now = new Date();
   const timeString = now.toLocaleTimeString('en-US', {
@@ -41,7 +48,29 @@ function showClockOutModal() {
   });
   document.getElementById('clock-out-time').value = timeString;
   document.getElementById('clock-out-notes').value = '';
+
+  document.getElementById('lunch-taken').value = '';
+  document.getElementById('lunch-minutes').value = '';
+  document.getElementById('no-lunch-reason').value = '';
+  document.getElementById('early-out-reason').value = '';
+  document.getElementById('lunch-minutes-group').style.display = 'none';
+  document.getElementById('no-lunch-reason-group').style.display = 'none';
+
+  const hoursSoFar = currentElapsedMinutes / 60;
+  const isEarly = hoursSoFar < minShiftHours;
+  document.getElementById('early-out-group').style.display = isEarly ? 'block' : 'none';
+  if (isEarly) {
+    document.getElementById('early-out-label').textContent =
+      `You have worked ${hoursSoFar.toFixed(2)}h of a ${minShiftHours}h day. Why are you clocking out early? *`;
+  }
+
   document.getElementById('clock-out-modal').classList.add('active');
+}
+
+function onLunchTakenChange() {
+  const value = document.getElementById('lunch-taken').value;
+  document.getElementById('lunch-minutes-group').style.display = value === 'yes' ? 'block' : 'none';
+  document.getElementById('no-lunch-reason-group').style.display = value === 'no' ? 'block' : 'none';
 }
 
 function closeClockOutModal() {
@@ -90,6 +119,34 @@ async function performClockOut() {
     return;
   }
 
+  // Checked here for a quick, field-specific message; clock_out() enforces the
+  // same rules server-side so calling the RPC directly can't skip them.
+  const lunchChoice = document.getElementById('lunch-taken').value;
+  if (!lunchChoice) {
+    alert('Please say whether you took a lunch break.');
+    return;
+  }
+
+  const lunchTaken = lunchChoice === 'yes';
+  const lunchMinutes = parseInt(document.getElementById('lunch-minutes').value, 10);
+  const noLunchReason = document.getElementById('no-lunch-reason').value.trim();
+  const earlyReason = document.getElementById('early-out-reason').value.trim();
+
+  if (lunchTaken && !(lunchMinutes > 0)) {
+    alert('Please enter how many minutes your lunch break lasted.');
+    return;
+  }
+  if (!lunchTaken && !noLunchReason) {
+    alert('Please give a reason for not taking a lunch break.');
+    return;
+  }
+
+  const isEarly = (currentElapsedMinutes / 60) < minShiftHours;
+  if (isEarly && !earlyReason) {
+    alert('Please give a reason for clocking out early.');
+    return;
+  }
+
   try {
     const authUUID = getAuthUUID();
     if (!authUUID) {
@@ -100,7 +157,11 @@ async function performClockOut() {
     const { data, error } = await window.supabase.rpc('clock_out', {
       p_user_id: authUUID,
       p_business_id: context.business_id,
-      p_notes: notes || null
+      p_notes: notes || null,
+      p_lunch_taken: lunchTaken,
+      p_lunch_minutes: lunchTaken ? lunchMinutes : null,
+      p_no_lunch_reason: lunchTaken ? null : noLunchReason,
+      p_early_reason: isEarly ? earlyReason : null
     });
 
     if (error) throw error;
@@ -348,6 +409,9 @@ async function loadAttendanceStatus() {
       const attendance = data[0];
       const isClockedIn = attendance.is_clocked_in;
       const elapsedMinutes = attendance.elapsed_minutes;
+
+      currentElapsedMinutes = elapsedMinutes || 0;
+      if (attendance.min_hours != null) minShiftHours = Number(attendance.min_hours);
 
       const clockInBtn = document.getElementById('clock-in-btn');
       const clockOutBtn = document.getElementById('clock-out-btn');

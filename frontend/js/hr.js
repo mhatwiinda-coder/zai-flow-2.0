@@ -378,15 +378,36 @@ function loadAttendanceData() {
       empty.style.display = 'none';
       tbody.innerHTML = data.map(r => {
         const statusClass = 'status-' + String(r.status || '').toLowerCase().replace(/_/g, '-');
+
+        // Lunch is recorded, never deducted from hours_worked - so it reads as
+        // its own column rather than being folded into the hours figure.
+        let lunchCell = '-';
+        if (r.lunch_taken === true) {
+          lunchCell = r.lunch_minutes != null ? esc(r.lunch_minutes + ' min') : 'Yes';
+        } else if (r.lunch_taken === false) {
+          lunchCell = '<span style="color:#ff9f43;">None</span>';
+        }
+
+        // The reasons are the whole point of asking, so they sit in the row
+        // rather than behind a hover or a drill-down.
+        const reasons = [];
+        if (r.no_lunch_reason) reasons.push('No lunch: ' + esc(r.no_lunch_reason));
+        if (r.early_out_reason) reasons.push('Left early: ' + esc(r.early_out_reason));
+        const reasonHtml = reasons.length
+          ? '<div style="margin-top:4px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.4;">' +
+            reasons.join('<br>') + '</div>'
+          : '';
+
         return [
           '<tr>',
           '<td><strong>' + esc(r.employee_code) + '</strong></td>',
           '<td>' + esc(r.full_name) + '</td>',
           '<td>' + esc(r.department) + '</td>',
-          '<td><span class="status-badge ' + statusClass + '">' + esc(formatAttendanceStatus(r.status)) + '</span></td>',
+          '<td><span class="status-badge ' + statusClass + '">' + esc(formatAttendanceStatus(r.status)) + '</span>' + reasonHtml + '</td>',
           '<td>' + formatClockTime(r.clock_in) + '</td>',
           '<td>' + formatClockTime(r.clock_out) + '</td>',
           '<td>' + (r.hours_worked != null ? Number(r.hours_worked).toFixed(2) : '-') + '</td>',
+          '<td>' + lunchCell + '</td>',
           '<td class="action-buttons">',
           '<button class="btn-edit" onclick="amendAttendance(' + r.employee_id + ', \'' + theDate + '\')">Amend</button>',
           '<button class="btn-view" onclick="sendTaskToEmployee(' + r.employee_id + ')">Send task</button>',

@@ -827,6 +827,31 @@
         <input type="text" id="hours-worked" readonly>
       </div>
       <div class="form-group">
+        <label>Did you take a lunch break? *</label>
+        <select id="lunch-taken" onchange="onLunchTakenChange()">
+          <option value="">Select...</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="lunch-minutes-group" style="display:none;">
+        <label>How long was it? (minutes) *</label>
+        <input type="number" id="lunch-minutes" min="1" max="480" placeholder="e.g. 45">
+      </div>
+
+      <div class="form-group" id="no-lunch-reason-group" style="display:none;">
+        <label>Why was no lunch break taken? *</label>
+        <textarea id="no-lunch-reason" placeholder="e.g. covered the counter over the lunch rush"></textarea>
+      </div>
+
+      <!-- Shown only when the shift is under the full-day threshold. -->
+      <div class="form-group" id="early-out-group" style="display:none;">
+        <label id="early-out-label">Why are you clocking out early? *</label>
+        <textarea id="early-out-reason" placeholder="e.g. approved half day, medical appointment"></textarea>
+      </div>
+
+      <div class="form-group">
         <label>Notes (Optional)</label>
         <textarea id="clock-out-notes" placeholder="Anything to note about this shift?"></textarea>
       </div>
