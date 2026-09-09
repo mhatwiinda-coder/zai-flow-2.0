@@ -90,6 +90,14 @@ CREATE OR REPLACE FUNCTION public.clock_in(
 )
 RETURNS TABLE (success BOOLEAN, message TEXT, employee_id INTEGER, clock_in_time TIMESTAMPTZ)
 LANGUAGE plpgsql SECURITY DEFINER AS $$
+-- RETURNS TABLE makes `employee_id` an OUT variable, and the ON CONFLICT
+-- inference clause below names that same column unqualified - which PL/pgSQL
+-- rejects as ambiguous (42702) at CALL time, not at CREATE time, so it only
+-- surfaced when someone actually clocked in. A conflict target cannot be
+-- table-qualified, so resolve the clash in favour of the column. Every genuine
+-- variable reference in this body is already qualified (v.employee_id,
+-- v.branch_id, p_notes), so nothing else changes meaning.
+#variable_conflict use_column
 DECLARE
   v RECORD;
 BEGIN

@@ -223,6 +223,15 @@ $$;
 
 
 -- ============================================================================
+-- 5. Refresh the API schema cache
+-- ============================================================================
+-- PostgREST answers from a cached schema. Without this the app can keep
+-- returning PGRST202 "Could not find the function" for minutes after the
+-- functions above are created successfully. Harmless if the cache is current.
+NOTIFY pgrst, 'reload schema';
+
+
+-- ============================================================================
 -- VERIFICATION
 -- ============================================================================
 SELECT routine_name FROM information_schema.routines
