@@ -33,6 +33,12 @@
   --zf-glass: rgba(255,255,255,0.08);
   --zf-glass-soft: rgba(255,255,255,0.05);
   --zf-glass-faint: rgba(255,255,255,0.03);
+
+  /* OPAQUE surface for dialogs. The glass tokens above are translucent by
+     design, which works for cards sitting on the page but not for a modal:
+     at 5% white the page reads straight through the dialog and the text on
+     top of it. Anything that overlays content needs this instead. */
+  --zf-surface: #1b3149;
   --zf-border: rgba(255,255,255,0.1);
   --zf-border-soft: rgba(255,255,255,0.06);
 
@@ -1352,7 +1358,7 @@ main {
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1360,8 +1366,11 @@ main {
 }
 
 .modal-box {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(14px);
+  /* Opaque: backdrop-filter used to be doing the heavy lifting here, but a
+     blurred page behind 6% white is still the page, and dialog text sat on
+     top of whatever happened to be underneath it. */
+  background: var(--zf-surface);
+  border: 1px solid var(--zf-border);
   padding: 25px;
   border-radius: 14px;
   width: 350px;
