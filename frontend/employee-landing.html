@@ -403,19 +403,28 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      min-height: 56px;
       padding: 16px 12px;
-      background: var(--zf-glass-faint);
+      background: var(--zf-glass-soft);
+      border: 1px solid var(--zf-border);
       border-radius: 8px;
       text-decoration: none;
-      color: var(--zf-text-muted);
+      /* Full white at 14/600. These are the primary navigation targets on the
+         page, so they read as buttons rather than as muted body text. */
+      color: var(--zf-text);
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.3;
       transition: all 0.3s;
-      font-size: 12px;
       text-align: center;
     }
 
-    .module-link:hover {
-      background: rgba(102,126,234,0.18);
-      color: #3b82f6;
+    .module-link:hover,
+    .module-link:focus-visible {
+      background: rgba(102,126,234,0.22);
+      border-color: var(--zf-purple);
+      color: var(--zf-text);
       transform: translateY(-2px);
     }
 

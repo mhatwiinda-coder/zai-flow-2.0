@@ -521,13 +521,18 @@ async function loadUserAccessibleModules() {
     if (error) throw error;
     document.getElementById('module-count').textContent = (data && data.length) || 0;
 
+    // Must cover every module get_user_accessible_modules can return, or the
+    // fallback below renders the raw key as the label ("approvals") pointing at
+    // a dead "#" link. Keep in step with MODULES in sidebar-manager.js.
     const moduleInfo = {
-      'dashboard': { name: 'Dashboard', icon: '', url: 'dashboard.html' },
-      'sales': { name: 'Sales', icon: '', url: 'sales.html' },
-      'inventory': { name: 'Inventory', icon: '', url: 'inventory.html' },
-      'accounting': { name: 'Accounting', icon: '', url: 'accounting.html' },
-      'hr_payroll': { name: 'HR & Payroll', icon: '', url: 'hr.html' },
-      'purchasing': { name: 'Purchasing', icon: '', url: 'purchasing.html' }
+      'dashboard': { name: 'Dashboard', url: 'dashboard.html' },
+      'sales': { name: 'Sales', url: 'sales.html' },
+      'inventory': { name: 'Inventory', url: 'inventory.html' },
+      'accounting': { name: 'Accounting', url: 'accounting.html' },
+      'approvals': { name: 'Approvals', url: 'approvals.html' },
+      'hr_payroll': { name: 'HR & Payroll', url: 'hr.html' },
+      'purchasing': { name: 'Purchasing', url: 'purchasing.html' },
+      'bi': { name: 'BI Dashboard', url: 'bi.html' }
     };
 
     let html = '';
@@ -535,10 +540,7 @@ async function loadUserAccessibleModules() {
     // Add Admin Dashboard link for admin users (show even if no other modules)
     if (currentContext && currentContext.user_role === 'admin') {
       html += `
-        <a href="admin-business.html" class="quick-link" title="Admin Business">
-          <div class="quick-link-icon"></div>
-          <div class="quick-link-name">Admin Business</div>
-        </a>
+        <a href="admin-business.html" class="module-link" title="Admin Business">Admin Business</a>
       `;
     }
 
@@ -570,10 +572,7 @@ async function loadUserAccessibleModules() {
     Object.keys(moduleMap).forEach(moduleName => {
       const info = moduleInfo[moduleName] || { name: moduleName, icon: '', url: '#' };
       html += `
-        <a href="${info.url}" class="quick-link" title="${info.name}">
-          <div class="quick-link-icon">${info.icon}</div>
-          <div class="quick-link-name">${info.name}</div>
-        </a>
+        <a href="${info.url}" class="module-link" title="${info.name}">${info.name}</a>
       `;
     });
 
