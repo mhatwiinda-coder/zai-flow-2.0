@@ -598,7 +598,10 @@ function loadLeaveRequests() {
   })();
 }
 
-function approveLeave(leaveRequestId) {
+/* Both of these used to announce success unconditionally, ignoring the
+   success/message the function returns - so a refusal still showed "Leave
+   request approved" and the row simply stayed PENDING. */
+function approveLeave(leaveRequestId, overrideBalance) {
   (async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -610,12 +613,30 @@ function approveLeave(leaveRequestId) {
       const { data, error } = await window.supabase.rpc('approve_leave', {
         p_leave_request_id: leaveRequestId,
         p_branch_id: context.branch_id,
-        p_approved_by: user.id
+        p_approved_by: user.id,
+        p_override_balance: overrideBalance === true
       });
 
       if (error) throw error;
-      alert("Leave request approved");
-      loadLeaveRequests();
+      const result = data[0];
+
+      if (result.success) {
+        alert(result.message);
+        loadLeaveRequests();
+        return;
+      }
+
+      // Over-balance is refused rather than blocked outright: HR does grant
+      // leave ahead of accrual. Confirming records the override against the
+      // request, so the decision is deliberate and leaves a trail.
+      if (result.needs_override) {
+        if (confirm(result.message + '\n\nApprove anyway? This will be recorded against the request.')) {
+          approveLeave(leaveRequestId, true);
+        }
+        return;
+      }
+
+      alert(result.message);
     } catch (err) {
       console.error("Approve leave error:", err);
       alert("Failed to approve leave: " + err.message);
@@ -632,15 +653,27 @@ function rejectLeave(leaveRequestId) {
         alert('Branch context not available');
         return;
       }
+
+      // The employee sees this on their own page; a refusal without one just
+      // leaves them guessing. reject_leave enforces it too.
+      const reason = prompt('Why is this leave request being rejected?\nThe employee will see this.');
+      if (reason === null) return;
+      if (!reason.trim()) {
+        alert('A reason is required to reject a leave request.');
+        return;
+      }
+
       const { data, error } = await window.supabase.rpc('reject_leave', {
         p_leave_request_id: leaveRequestId,
         p_branch_id: context.branch_id,
-        p_approved_by: user.id
+        p_approved_by: user.id,
+        p_reason: reason.trim()
       });
 
       if (error) throw error;
-      alert("Leave request rejected");
-      loadLeaveRequests();
+      const result = data[0];
+      alert(result.message);
+      if (result.success) loadLeaveRequests();
     } catch (err) {
       console.error("Reject leave error:", err);
       alert("Failed to reject leave: " + err.message);
